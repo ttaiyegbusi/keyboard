@@ -3,58 +3,80 @@
    TABLE OF CONTENTS
     1.  CSS VARIABLES
     2.  RESET & BASE
-    3.  LAYOUT — TOPBAR
+    3.  TOPBAR
     4.  TOOLBAR BUTTONS
-    5.  SHARED DROPDOWN PANEL (dark theme)
-    6.  PAPERS PANEL — grid + thumbnails
-    7.  COLORS PANEL — swatch grid
-    8.  FONTS PANEL  — list
-    9.  LAYOUT — SCENE
+    5.  SHARED DROPDOWN PANEL
+    6.  PAPERS PANEL
+    7.  COLORS PANEL
+    8.  FONTS PANEL
+    9.  SCENE LAYOUT
    10.  PAPER BACKGROUNDS
    11.  PAPER TYPOGRAPHY
    12.  KEYBOARD SHELL
    13.  KEY BASE
-   14.  KEY SIZE VARIANTS
-   15.  KEY LABEL STYLES
-   16.  KEY SPECIAL STATES
+   14.  KEY SIZES
+   15.  KEY LABELS  ← all use --key-text / --key-text-sub
+   16.  KEY STATES
    17.  RESPONSIVE
 ═══════════════════════════════════════════════════════════════ */
 
-/* ── 1. CSS VARIABLES ─────────────────────────────────────── */
+/* ── 1. CSS VARIABLES ─────────────────────────────────────────
+   Defaults = the original dark Midnight theme.
+   Per-colour overrides are injected inline on .keyboard-body.
+───────────────────────────────────────────────────────────────*/
 :root {
-  --bg:              #1c1c1c;
-  --topbar-bg:       #181818;
-  --toolbar-bg:      #141414;
+  --bg:           #1c1c1c;
+  --topbar-bg:    #181818;
+  --toolbar-bg:   #141414;
 
-  /* Keys — overridden per colour theme via inline CSS vars */
-  --key-top:    #303238;
-  --key-mid:    #282a30;
-  --key-bot:    #24262b;
-  --key-text:   #d8dade;
-  --key-text-muted: #b3b6bd;
-  --kbd-top:    #222329;
-  --kbd-bot:    #1c1d21;
-  --kbd-border: rgba(255,255,255,0.055);
-  --knob-bg:    radial-gradient(circle at 35% 30%, #383b42 0%, #252832 45%, #111318 100%);
+  /* Keyboard shell */
+  --kbd-top:      #222329;
+  --kbd-bot:      #1c1d21;
+  --kbd-border:   rgba(255,255,255,0.055);
 
-  /* Dropdown dark theme */
-  --dd-bg:      #1e1e22;
-  --dd-border:  rgba(255,255,255,0.08);
-  --dd-hover:   rgba(255,255,255,0.05);
-  --dd-active:  rgba(59,130,246,0.14);
-  --dd-text:    #e0e2e8;
-  --dd-subtext: #6e7280;
-  --dd-title:   #f0f2f8;
+  /* Key face gradient */
+  --key-top:      #303238;
+  --key-mid:      #282a30;
+  --key-bot:      #24262b;
 
-  --blue:       #3b82f6;
-  --divider:    rgba(255,255,255,0.09);
-  --key-h:      56px;
-  --gap:        8px;
-  --topbar-h:   54px;
+  /* Key depth shadows — positive values give key physical depth */
+  --key-highlight: rgba(255,255,255,0.09);   /* top inset — lit edge */
+  --key-shadow:    rgba(0,0,0,0.50);          /* bottom inset — depth */
+  --key-drop-shadow: rgba(0,0,0,0.72);        /* external drop below key */
 
-  /* Font vars from next/font */
+  /* Key text — ALL label elements inherit from these two vars */
+  --key-text:      #d8dade;   /* primary:  letter labels, numbers */
+  --key-text-sub:  #7a7e88;   /* secondary: fn nums, mod labels, icons */
+
+  /* Knob */
+  --knob-bg: radial-gradient(circle at 35% 30%, #383b42 0%, #252832 50%, #111318 100%);
+
+  /* UI */
+  --blue:     #3b82f6;
+  --divider:  rgba(255,255,255,0.09);
+  --dd-bg:    #1e1e22;
+  --dd-border:rgba(255,255,255,0.08);
+  --dd-hover: rgba(255,255,255,0.05);
+  --dd-active:rgba(59,130,246,0.14);
+  --dd-text:  #e0e2e8;
+  --dd-sub:   #6e7280;
+
+  --key-h:    56px;
+  --gap:      8px;
+  --topbar-h: 54px;
+
+  /* ── SF Pro system font stack ─────────────────────────────
+     On macOS/iOS this resolves to SF Pro automatically.
+     Falls back to system-ui (San Francisco on Apple, Segoe on
+     Windows, Roboto on Android) everywhere else.
+  ─────────────────────────────────────────────────────────── */
+  --sf:       -apple-system, BlinkMacSystemFont, "SF Pro Text",
+              "SF Pro Display", system-ui, "Helvetica Neue",
+              Arial, sans-serif;
+
+  /* Writing fonts (set by next/font in layout.tsx) */
+  --font-special-elite: var(--font-special-elite, 'Courier New', monospace);
   --font-inter:         var(--font-inter, sans-serif);
-  --font-special-elite: var(--font-special-elite, monospace);
   --font-caveat:        var(--font-caveat, cursive);
   --font-playfair:      var(--font-playfair, Georgia, serif);
   --font-jetbrains:     var(--font-jetbrains, monospace);
@@ -64,21 +86,22 @@
   --keyboard-scale: 1;
 }
 
-/* ── 2. RESET & BASE ────────────────────────────────────────── */
+/* ── 2. RESET & BASE ──────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 100%; height: 100%; overflow: hidden; }
 body {
   background: var(--bg);
-  font-family: var(--font-inter);
+  font-family: var(--sf);          /* SF Pro everywhere in the UI */
   color: #f1f1f1;
   height: 100vh;
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 button { background: none; border: none; cursor: pointer; font-family: inherit; color: inherit; }
 
-/* ── 3. LAYOUT — TOPBAR ─────────────────────────────────────── */
+/* ── 3. TOPBAR ────────────────────────────────────────────── */
 .topbar {
   flex-shrink: 0;
   height: var(--topbar-h);
@@ -91,16 +114,17 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   position: relative;
   z-index: 200;
 }
-.brand { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 500; color: #f2f2f2; letter-spacing: -0.01em; }
-.brand-dot { width: 16px; height: 16px; border-radius: 999px; background: #f4f6f8; flex-shrink: 0; }
+.brand {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 14px; font-weight: 600; color: #f2f2f2;
+  letter-spacing: -0.02em;
+}
+.brand-dot { width: 16px; height: 16px; border-radius: 999px; background: #f4f6f8; }
 
-/* ── 4. TOOLBAR BUTTONS ─────────────────────────────────────── */
+/* ── 4. TOOLBAR BUTTONS ───────────────────────────────────── */
 .toolbar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 10px;
+  display: flex; align-items: center; gap: 6px;
+  height: 36px; padding: 0 10px;
   border-radius: 10px;
   background: var(--toolbar-bg);
   border: 1px solid rgba(255,255,255,0.07);
@@ -108,77 +132,49 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 }
 .tb-divider { width: 1px; height: 16px; background: var(--divider); flex-shrink: 0; }
 
-/* Shared toolbar button */
 .tb-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 5px;
-  border-radius: 6px;
-  color: #848790;
-  font-size: 13px;
-  font-weight: 450;
+  display: flex; align-items: center; gap: 5px;
+  padding: 3px 5px; border-radius: 6px;
+  color: #848790; font-size: 13px; font-weight: 450;
   transition: background 0.14s, color 0.14s;
   white-space: nowrap;
 }
-.tb-btn:hover          { background: rgba(255,255,255,0.06); color: #b0b2ba; }
-.tb-btn--active        { background: rgba(59,130,246,0.14); color: #6aabff; }
+.tb-btn:hover       { background: rgba(255,255,255,0.06); color: #b0b2ba; }
+.tb-btn--active     { background: rgba(59,130,246,0.14); color: #6aabff; }
 
-/* Paper swatch chip */
 .chip-swatch {
-  display: inline-block;
-  width: 14px; height: 14px;
-  border-radius: 3px;
-  flex-shrink: 0;
+  display: inline-block; width: 14px; height: 14px;
+  border-radius: 3px; flex-shrink: 0;
   transition: background 0.25s ease;
   border: 1px solid rgba(255,255,255,0.1);
 }
-
-/* Color dot (round) */
 .color-dot {
-  display: inline-block;
-  width: 14px; height: 14px;
-  border-radius: 999px;
-  flex-shrink: 0;
+  display: inline-block; width: 14px; height: 14px;
+  border-radius: 999px; flex-shrink: 0;
   border: 1px solid rgba(255,255,255,0.12);
 }
-
-/* Chevron */
 .chevron-icon { width: 10px; height: 6px; stroke: currentColor; flex-shrink: 0; }
-
-/* Icon-only button */
-.tb-icon-btn { padding: 4px 5px; }
+.tb-icon-btn  { padding: 4px 5px; }
 .tb-icon-btn svg { width: 14px; height: 14px; color: #5a5c66; transition: color 0.14s; }
 .tb-icon-btn:hover svg { color: #9a9ca8; }
-
-/* Volume icon gets a subtle active colour when not muted */
-.tb-icon-btn[aria-label*="high"] svg  { color: #7090c0; }
-.tb-icon-btn[aria-label*="low"] svg   { color: #7090c0; }
-.tb-icon-btn[aria-label*="mute"] svg  { color: #804040; }
-
+.tb-icon-btn[aria-label*="high"] svg { color: #7090c0; }
+.tb-icon-btn[aria-label*="low"]  svg { color: #7090c0; }
+.tb-icon-btn[aria-label*="mute"] svg { color: #904040; }
 .tb-label { color: #9a9ca2; }
 
-/* ── 5. SHARED DROPDOWN PANEL (dark) ────────────────────────── */
-/*
-  All three dropdowns (.dropdown-panel) share this dark card style.
-  They are absolutely positioned relative to .toolbar.
-  Each panel variant can add overrides below this block.
-*/
+/* ── 5. SHARED DROPDOWN (dark) ────────────────────────────── */
 .dropdown-panel {
   position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
+  top: calc(100% + 10px); right: 0;
   background: var(--dd-bg);
   border: 1px solid var(--dd-border);
   border-radius: 16px;
   box-shadow:
-    0 20px 60px rgba(0,0,0,0.55),
+    0 24px 64px rgba(0,0,0,0.6),
     0 4px 16px rgba(0,0,0,0.4),
     0 1px 0 rgba(255,255,255,0.04) inset;
   padding: 18px 18px 20px;
   z-index: 500;
-
-  /* Hidden state */
   opacity: 0;
   pointer-events: none;
   transform: translateY(-6px) scale(0.97);
@@ -186,47 +182,34 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
 .dropdown-panel--open {
-  opacity: 1;
-  pointer-events: all;
+  opacity: 1; pointer-events: all;
   transform: translateY(0) scale(1);
 }
-
 .dropdown-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--dd-subtext);
-  letter-spacing: 0.08em;
+  font-size: 10px; font-weight: 700;
+  color: var(--dd-sub);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 14px;
 }
 
-/* ── 6. PAPERS PANEL ─────────────────────────────────────────── */
+/* ── 6. PAPERS PANEL ──────────────────────────────────────── */
 .papers-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px 8px;
   width: 300px;
 }
-
 .paper-option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 4px;
-  border-radius: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 6px 4px; border-radius: 10px;
+  background: none; border: none; cursor: pointer;
   transition: background 0.14s;
 }
 .paper-option:hover { background: var(--dd-hover); }
-
 .paper-thumb-wrap { position: relative; width: 76px; height: 94px; }
-
 .paper-thumb {
-  width: 76px; height: 94px;
-  border-radius: 8px;
+  width: 76px; height: 94px; border-radius: 8px;
   border: 2px solid rgba(255,255,255,0.08);
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.35);
@@ -234,22 +217,22 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 }
 .paper-option:hover .paper-thumb { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
 .paper-option--active .paper-thumb { border-color: var(--blue); }
-
 .paper-thumb-inner { width: 100%; height: 100%; border-radius: 6px; }
 
-/* Check badge */
 .check-badge {
   position: absolute; top: -6px; right: -6px;
   width: 18px; height: 18px;
-  background: var(--blue); border-radius: 999px; border: 2px solid var(--dd-bg);
+  background: var(--blue); border-radius: 999px;
+  border: 2px solid var(--dd-bg);
   display: flex; align-items: center; justify-content: center;
   opacity: 0; transform: scale(0.6);
   transition: opacity 0.15s, transform 0.15s;
 }
 .paper-option--active .check-badge { opacity: 1; transform: scale(1); }
 .check-badge svg { width: 9px; height: 9px; }
-
-.paper-name-label { font-size: 10px; font-weight: 500; color: var(--dd-subtext); text-align: center; }
+.paper-name-label {
+  font-size: 10px; font-weight: 500; color: var(--dd-sub); text-align: center;
+}
 .paper-option--active .paper-name-label { color: var(--dd-text); }
 
 /* Thumb textures */
@@ -262,143 +245,75 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .pt-notebook { background: #f8f9ff; background-image: repeating-linear-gradient(0deg,transparent,transparent 12px,#b0c8e8 12px,#b0c8e8 13px); background-position: 0 8px; }
 .pt-dots     { background: #fff0f5; background-image: radial-gradient(circle,#e8a0b8 1.2px,transparent 1.2px); background-size: 10px 10px; background-position: 5px 5px; }
 
-/* ── 7. COLORS PANEL ────────────────────────────────────────── */
+/* ── 7. COLORS PANEL ──────────────────────────────────────── */
 .colors-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
   width: 240px;
 }
-
 .color-option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 4px;
-  border-radius: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 8px 4px; border-radius: 10px;
+  background: none; border: none; cursor: pointer;
   transition: background 0.14s;
 }
-.color-option:hover { background: var(--dd-hover); }
-.color-option--active { background: var(--dd-active); }
+.color-option:hover   { background: var(--dd-hover); }
+.color-option--active { background: rgba(255,255,255,0.06); }
 
 .color-swatch-circle {
-  width: 36px; height: 36px;
+  width: 40px; height: 40px;
   border-radius: 999px;
-  border: 2px solid rgba(255,255,255,0.12);
+  border: 2px solid rgba(255,255,255,0.14);
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.1) inset;
   transition: transform 0.14s, box-shadow 0.14s;
 }
-.color-option:hover .color-swatch-circle { transform: scale(1.08); box-shadow: 0 4px 14px rgba(0,0,0,0.5); }
-.color-option--active .color-swatch-circle { border-color: rgba(255,255,255,0.4); }
+.color-option:hover .color-swatch-circle { transform: scale(1.1); box-shadow: 0 4px 16px rgba(0,0,0,0.55); }
+.color-option--active .color-swatch-circle { border-color: rgba(255,255,255,0.45); box-shadow: 0 0 0 3px rgba(59,130,246,0.5), 0 4px 12px rgba(0,0,0,0.45); }
 
-.color-check { width: 14px; height: 14px; }
-
+.color-check { width: 16px; height: 16px; }
 .color-label {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--dd-subtext);
-  text-align: center;
-  white-space: nowrap;
+  font-size: 10px; font-weight: 500; color: var(--dd-sub);
+  text-align: center; white-space: nowrap;
 }
 .color-option--active .color-label { color: var(--dd-text); }
 
-/* ── 8. FONTS PANEL ─────────────────────────────────────────── */
-.dropdown-panel--fonts { right: 0; width: 280px; }
-
-.fonts-list {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
+/* ── 8. FONTS PANEL ───────────────────────────────────────── */
+.dropdown-panel--fonts { width: 280px; }
+.fonts-list { display: flex; flex-direction: column; gap: 3px; }
 
 .font-option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
-  border-radius: 8px;
-  width: 100%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  transition: background 0.14s;
-  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px;
+  width: 100%; background: none; border: none;
+  cursor: pointer; text-align: left;
+  transition: background 0.14s; position: relative;
 }
-.font-option:hover  { background: var(--dd-hover); }
+.font-option:hover   { background: var(--dd-hover); }
 .font-option--active { background: var(--dd-active); }
 
-.font-preview {
-  font-size: 15px;
-  color: var(--dd-text);
-  min-width: 120px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.3;
-}
+.font-preview { font-size: 15px; color: var(--dd-text); min-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+.font-meta    { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.font-desc    { font-size: 10px; color: var(--dd-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.font-tag     { display: inline-block; font-size: 9px; font-weight: 600; letter-spacing: 0.05em; padding: 1px 5px; border-radius: 4px; width: fit-content; text-transform: uppercase; }
+.font-check   { width: 12px; height: 12px; flex-shrink: 0; margin-left: auto; }
 
-.font-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  flex: 1;
-  min-width: 0;
-}
-
-.font-desc {
-  font-size: 10px;
-  color: var(--dd-subtext);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.font-tag {
-  display: inline-block;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  padding: 1px 5px;
-  border-radius: 4px;
-  width: fit-content;
-  text-transform: uppercase;
-}
-
-.font-check {
-  width: 12px; height: 12px;
-  flex-shrink: 0;
-  margin-left: auto;
-}
-
-/* ── 9. LAYOUT — SCENE ──────────────────────────────────────── */
+/* ── 9. SCENE LAYOUT ──────────────────────────────────────── */
 .scene {
-  flex: 1;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  overflow: hidden;
-  padding-bottom: 28px;
+  flex: 1; position: relative;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  overflow: hidden; padding-bottom: 28px;
 }
 
-/* ── 10. PAPER BACKGROUNDS ──────────────────────────────────── */
+/* ── 10. PAPER BACKGROUNDS ────────────────────────────────── */
 .paper-panel {
-  position: absolute;
-  left: 50%; top: 0;
+  position: absolute; left: 50%; top: 0;
   transform: translateX(-50%);
-  width: 560px;
-  height: calc(100% - 60px);
+  width: 560px; height: calc(100% - 60px);
   border-radius: 22px 22px 0 0;
-  overflow: hidden;
-  z-index: 1;
-  cursor: text;
+  overflow: hidden; z-index: 1; cursor: text;
   box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 16px 48px rgba(0,0,0,0.3);
   transition: background 0.3s ease;
 }
@@ -410,18 +325,16 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .paper-panel--oilpaper { background: #e6ddb8; background-image: radial-gradient(ellipse at 70% 30%,rgba(160,130,70,0.3) 0%,transparent 55%),radial-gradient(ellipse at 25% 75%,rgba(180,150,90,0.2) 0%,transparent 50%); }
 .paper-panel--notebook { background: #f7f8ff; background-image: repeating-linear-gradient(0deg,transparent,transparent 27px,#b4c8e8 27px,#b4c8e8 28px); background-position: 0 44px; }
 .paper-panel--notebook::before { content:''; position:absolute; left:60px; top:0; bottom:0; width:1.5px; background:rgba(210,100,100,0.45); pointer-events:none; z-index:1; }
-.paper-panel--dots     { background: #fff0f5; background-image: radial-gradient(circle,#e8a0b8 1.5px,transparent 1.5px); background-size: 22px 22px; background-position: 11px 11px; }
+.paper-panel--dots { background: #fff0f5; background-image: radial-gradient(circle,#e8a0b8 1.5px,transparent 1.5px); background-size: 22px 22px; background-position: 11px 11px; }
 
-/* ── 11. PAPER TYPOGRAPHY ───────────────────────────────────── */
+/* ── 11. PAPER TYPOGRAPHY ─────────────────────────────────── */
 .paper-textarea {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
+  position: absolute; inset: 0; width: 100%; height: 100%;
   background: transparent; border: none; outline: none; resize: none;
   z-index: 2; padding: 32px 36px;
   font-size: 17px; line-height: 1.8; letter-spacing: 0.01em;
   caret-color: #2a4080;
 }
-/* Per-paper defaults (overridden by inline fontFamily from FontsPanel selection) */
 .paper-panel--cream    .paper-textarea { color:#2a1f0e; font-family:var(--font-special-elite); }
 .paper-panel--a4white  .paper-textarea { color:#1a1a1a; font-family:var(--font-inter); font-size:15px; line-height:1.75; }
 .paper-panel--kraft    .paper-textarea { color:#f5e8d0; font-family:var(--font-special-elite); caret-color:#f5e8d0; }
@@ -430,90 +343,191 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .paper-panel--oilpaper .paper-textarea { color:#2a200a; font-family:var(--font-special-elite); }
 .paper-panel--notebook .paper-textarea { color:#1a1a2e; font-family:var(--font-inter); font-size:15px; line-height:28px; padding-left:72px; padding-top:44px; }
 .paper-panel--dots     .paper-textarea { color:#4a1a30; font-family:var(--font-caveat); font-size:20px; line-height:1.6; caret-color:#c06080; }
-/* Placeholders */
-.paper-textarea::placeholder                       { color:rgba(120,90,50,0.3); font-style:italic; }
+.paper-textarea::placeholder { color:rgba(120,90,50,0.3); font-style:italic; }
 .paper-panel--kraft .paper-textarea::placeholder,
 .paper-panel--carton .paper-textarea::placeholder  { color:rgba(245,232,208,0.3); }
 .paper-panel--a4white .paper-textarea::placeholder { color:rgba(100,100,100,0.3); }
 .paper-panel--dots .paper-textarea::placeholder    { color:rgba(200,100,140,0.35); }
 .paper-panel--notebook .paper-textarea::placeholder{ color:rgba(80,80,160,0.3); }
 
-/* ── 12. KEYBOARD SHELL ─────────────────────────────────────── */
-.keyboard-zone { position:relative; z-index:10; flex-shrink:0; transform:scale(var(--keyboard-scale)); transform-origin:bottom center; }
+/* ── 12. KEYBOARD SHELL ───────────────────────────────────── */
+.keyboard-zone {
+  position: relative; z-index: 10; flex-shrink: 0;
+  transform: scale(var(--keyboard-scale));
+  transform-origin: bottom center;
+}
 .keyboard-body {
-  width:1060px; padding:11px 12px 16px; border-radius:16px;
+  width: 1060px; padding: 11px 12px 16px; border-radius: 16px;
   background: linear-gradient(180deg, var(--kbd-top) 0%, var(--kbd-bot) 100%);
   border: 1px solid var(--kbd-border);
-  box-shadow: 0 2px 0 rgba(255,255,255,0.035) inset, 0 -1px 0 rgba(0,0,0,0.75) inset, 0 18px 40px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.5);
-  transition: background 0.4s ease, border-color 0.4s ease;
+  box-shadow:
+    0 2px 0 rgba(255,255,255,0.06) inset,
+    0 -2px 0 rgba(0,0,0,0.6) inset,
+    0 20px 48px rgba(0,0,0,0.6),
+    0 4px 14px rgba(0,0,0,0.55);
+  transition: background 0.35s ease, border-color 0.35s ease;
 }
 .keyboard-grid { display:flex; flex-direction:column; gap:var(--gap); }
 .key-row { display:flex; gap:var(--gap); align-items:flex-end; }
 
-/* ── 13. KEY BASE ───────────────────────────────────────────── */
+/* ── 13. KEY BASE ─────────────────────────────────────────────
+   Box-shadow layers (inner to outer):
+   1. top inset highlight  → simulates lit top edge of physical key
+   2. bottom inset shadow  → simulates depth/underside
+   3. drop shadow          → key floats above the shell
+───────────────────────────────────────────────────────────────*/
 .key {
   height: var(--key-h);
   border-radius: 7px;
-  background: linear-gradient(180deg, var(--key-top) 0%, var(--key-mid) 50%, var(--key-bot) 100%);
+  background: linear-gradient(180deg, var(--key-top) 0%, var(--key-mid) 55%, var(--key-bot) 100%);
   border: 1px solid var(--kbd-border);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 -2px 0 rgba(0,0,0,0.45) inset, 0 2px 4px rgba(0,0,0,0.7);
+  box-shadow:
+    0 1px 0 var(--key-highlight) inset,
+    0 -2px 0 var(--key-shadow) inset,
+    0 3px 5px var(--key-drop-shadow);
   color: var(--key-text);
   display: flex; align-items: center; justify-content: center;
   position: relative; flex-shrink: 0; user-select: none; cursor: pointer;
-  transition: filter 0.08s, transform 0.08s, box-shadow 0.08s, background 0.4s ease, color 0.4s ease;
+  transition:
+    filter 0.08s, transform 0.08s, box-shadow 0.08s,
+    background 0.35s ease, color 0.35s ease;
   -webkit-tap-highlight-color: transparent;
+  /* Use SF Pro for all key labels */
+  font-family: var(--sf);
 }
 .key--pressed {
-  filter: brightness(0.75);
+  filter: brightness(0.82);
   transform: translateY(1px);
-  box-shadow: 0 0 0 rgba(255,255,255,0.08) inset, 0 -1px 0 rgba(0,0,0,0.45) inset, 0 1px 2px rgba(0,0,0,0.6);
+  box-shadow:
+    0 0 0 var(--key-highlight) inset,
+    0 -1px 0 var(--key-shadow) inset,
+    0 1px 2px var(--key-drop-shadow);
 }
-.key--shift.key--pressed { border-color: rgba(59,130,246,0.5); }
 
-/* ── 14. KEY SIZE VARIANTS ──────────────────────────────────── */
-.k-std    { width:60px; }  .k-esc     { width:96px; }
-.k-tab    { width:96px; }  .k-caps    { width:114px; }
-.k-delete { width:114px; } .k-return  { width:132px; }
-.k-shift-l{ width:148px; } .k-shift-r { width:144px; }
-.k-mod    { width:62px; }  .k-mod-sm  { width:50px; }
-.k-space  { width:348px; } .k-fn      { width:60px; }
+/* ── 14. KEY SIZES ────────────────────────────────────────── */
+.k-std    { width:60px; }  .k-esc    { width:96px; }
+.k-tab    { width:96px; }  .k-caps   { width:114px; }
+.k-delete { width:114px; } .k-return { width:132px; }
+.k-shift-l{ width:148px; } .k-shift-r{ width:144px; }
+.k-mod    { width:62px; }  .k-mod-sm { width:50px; }
+.k-space  { width:348px; } .k-fn     { width:60px; }
 .k-pipe   { width:84px; }
 .k-knob-w { width:70px; height:var(--key-h); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .k-arrow  { width:60px; height:26px; border-radius:5px; }
 .k-arrow-ud { display:flex; flex-direction:column; gap:3px; align-self:flex-end; flex-shrink:0; }
 
-/* ── 15. KEY LABEL STYLES ───────────────────────────────────── */
-.lbl-c  { font-size:16px; font-weight:500; color:var(--key-text); letter-spacing:-0.01em; }
-.lbl-st { display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.15; }
-.s-top  { font-size:11px; font-weight:500; color:var(--key-text-muted); line-height:1.2; }
-.s-bot  { font-size:13px; font-weight:500; color:var(--key-text); line-height:1.2; }
-.lbl-ml { position:absolute; bottom:7px; left:9px; font-size:10px; font-weight:500; color:var(--key-text-muted); letter-spacing:0.01em; }
-.lbl-mr { position:absolute; bottom:7px; right:9px; font-size:10px; font-weight:500; color:var(--key-text-muted); letter-spacing:0.01em; }
-.lbl-fn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; width:100%; height:100%; }
-.fn-ic  { color:#9a9da4; display:flex; align-items:center; } .fn-ic svg { width:13px; height:13px; }
-.fn-n   { font-size:8px; font-weight:500; color:#6a6d75; letter-spacing:0.02em; }
-.arr-l  { font-size:10px; color:var(--key-text-muted); line-height:1; }
+/* ── 15. KEY LABELS ───────────────────────────────────────────
+   ALL colour references use --key-text or --key-text-sub.
+   No hardcoded hex colours here — they all inherit from the
+   theme injected on .keyboard-body.
+───────────────────────────────────────────────────────────────*/
+
+/* Single centred letter */
+.lbl-c {
+  font-size: 15px; font-weight: 500;
+  color: var(--key-text);
+  letter-spacing: -0.01em;
+}
+
+/* Stacked symbol top / number bottom */
+.lbl-st {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  line-height: 1.15;
+}
+.s-top {
+  font-size: 10px; font-weight: 500;
+  color: var(--key-text-sub);       /* dimmer — shift symbol */
+  line-height: 1.2;
+}
+.s-bot {
+  font-size: 13px; font-weight: 500;
+  color: var(--key-text);           /* brighter — primary number */
+  line-height: 1.2;
+}
+
+/* Modifier labels — bottom-left / bottom-right */
+.lbl-ml {
+  position: absolute; bottom: 7px; left: 9px;
+  font-size: 9px; font-weight: 500;
+  color: var(--key-text-sub); letter-spacing: 0.01em;
+}
+.lbl-mr {
+  position: absolute; bottom: 7px; right: 9px;
+  font-size: 9px; font-weight: 500;
+  color: var(--key-text-sub); letter-spacing: 0.01em;
+}
+
+/* Function key: icon + Fn number */
+.lbl-fn {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px; width: 100%; height: 100%;
+}
+.fn-ic {
+  color: var(--key-text-sub);       /* icon inherits sub colour */
+  display: flex; align-items: center;
+}
+.fn-ic svg { width: 13px; height: 13px; }
+.fn-n {
+  font-size: 7.5px; font-weight: 600;
+  color: var(--key-text-sub);       /* Fn number inherits sub colour */
+  letter-spacing: 0.04em;
+}
+
+/* Arrow labels */
+.arr-l {
+  font-size: 10px;
+  color: var(--key-text-sub);
+  line-height: 1;
+}
+
+/* Globe/fn bottom-row modifier */
 .fn-globe-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; }
-.mod-fn-label  { font-size:8px; color:var(--key-text-muted); font-weight:500; }
-.mod-sym { position:absolute; top:7px; left:9px; font-size:11px; color:var(--key-text-muted); font-weight:500; }
-.mod-sub { font-size:9px !important; }
-.mod-cmd { font-size:15px; color:var(--key-text-muted); line-height:1; }
-.knob   { width:40px; height:40px; border-radius:999px; background:var(--knob-bg); box-shadow:0 1px 1px rgba(255,255,255,0.13) inset,0 4px 10px rgba(0,0,0,0.6); }
+.fn-globe-wrap svg { color: var(--key-text-sub); }
+.mod-fn-label  { font-size: 8px; font-weight: 500; color: var(--key-text-sub); }
 
-/* ── 16. KEY SPECIAL STATES ─────────────────────────────────── */
+/* ^ ⌥ symbols — top of modifier keys */
+.mod-sym {
+  position: absolute; top: 7px; left: 9px;
+  font-size: 11px; font-weight: 500;
+  color: var(--key-text-sub);
+}
+/* Smaller sub-label on modifier keys */
+.mod-sub { font-size: 8.5px !important; color: var(--key-text-sub) !important; }
+
+/* ⌘ command */
+.mod-cmd { font-size: 16px; color: var(--key-text-sub); line-height: 1; }
+
+/* Knob */
+.knob {
+  width: 42px; height: 42px; border-radius: 999px;
+  background: var(--knob-bg);
+  box-shadow:
+    0 1px 2px rgba(255,255,255,0.15) inset,
+    0 5px 12px rgba(0,0,0,0.65);
+}
+
+/* ── 16. KEY SPECIAL STATES ───────────────────────────────── */
+/* Homing bars on F and J */
 .key--homing::after {
-  content:''; position:absolute; bottom:9px; left:50%; transform:translateX(-50%);
-  width:16px; height:2px; border-radius:999px;
-  background:rgba(0,0,0,0.55); box-shadow:0 1px 0 rgba(255,255,255,0.1);
+  content: ''; position: absolute; bottom: 9px;
+  left: 50%; transform: translateX(-50%);
+  width: 16px; height: 2px; border-radius: 999px;
+  background: var(--key-shadow);
+  box-shadow: 0 1px 0 var(--key-highlight);
 }
-.caps-dot {
-  position:absolute; top:8px; right:8px;
-  width:5px; height:5px; border-radius:999px;
-  background:var(--blue); opacity:0; transition:opacity 0.15s;
-}
-.key--caps.key--pressed .caps-dot { opacity:1; }
 
-/* ── 17. RESPONSIVE ─────────────────────────────────────────── */
-@media (max-width:1180px) { :root{--keyboard-scale:0.76;} .paper-panel{width:480px;} }
-@media (max-width:960px)  { :root{--keyboard-scale:0.58;} .paper-panel{width:400px;} }
-@media (max-width:640px)  { :root{--keyboard-scale:0.40;} .paper-panel{width:90vw;} }
+/* Caps lock indicator dot */
+.caps-dot {
+  position: absolute; top: 8px; right: 8px;
+  width: 5px; height: 5px; border-radius: 999px;
+  background: var(--blue); opacity: 0;
+  transition: opacity 0.15s;
+}
+.key--caps.key--pressed .caps-dot { opacity: 1; }
+
+/* ── 17. RESPONSIVE ───────────────────────────────────────── */
+@media (max-width: 1180px) { :root { --keyboard-scale: 0.76; } .paper-panel { width: 480px; } }
+@media (max-width: 960px)  { :root { --keyboard-scale: 0.58; } .paper-panel { width: 400px; } }
+@media (max-width: 640px)  { :root { --keyboard-scale: 0.40; } .paper-panel { width: 90vw; } }
