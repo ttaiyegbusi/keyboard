@@ -1,16 +1,15 @@
 // ─────────────────────────────────────────────────────────────
 // src/hooks/useSound.ts
 //
-// Synthesises a realistic Apple-style mechanical keyboard click
-// using the Web Audio API — no external audio file needed.
+// Soft mechanical keyboard click — Apple Magic Keyboard style.
+// Quiet, deep thock with a gentle top-end click.
+// Much more pleasant than the previous harsh snap.
 //
-// The sound is built from 3 layers:
-//   1. Noise burst   — the initial impact transient (white noise)
-//   2. Tone click    — a very short pitched thock body
-//   3. High click    — a thin high-frequency tick overlay
-//
-// All layers are shaped with short ADSR envelopes and mixed
-// to produce a crisp, satisfying key press sound.
+// Sound design:
+//   1. Sub-bass thump   — very short, pitches down fast (the body)
+//   2. Mid noise burst  — bandpass filtered, heavy damping (the meat)
+//   3. Soft tick        — low-amplitude sine at ~3kHz (the presence)
+// All layers are very short and decay quickly → "quiet thock"
 // ─────────────────────────────────────────────────────────────
 
 "use client";
@@ -18,97 +17,103 @@
 import { useRef, useCallback } from "react";
 import { VolumeState } from "@/types";
 
-// Volume gain levels per state
 const GAIN_MAP: Record<VolumeState, number> = {
-  high: 0.55,
-  low:  0.20,
+  high: 0.40,
+  low:  0.15,
   mute: 0.00,
 };
 
 export function useSound(volume: VolumeState) {
-  // AudioContext is lazy-created on first keypress (browser policy)
   const ctxRef = useRef<AudioContext | null>(null);
 
   const getCtx = useCallback((): AudioContext => {
     if (!ctxRef.current) {
-      ctxRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      ctxRef.current = new (
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      )();
     }
+    // Resume if suspended (browser autoplay policy)
+    if (ctxRef.current.state === "suspended") ctxRef.current.resume();
     return ctxRef.current;
   }, []);
 
   const playClick = useCallback(() => {
-    const gain = GAIN_MAP[volume];
-    if (gain === 0) return;
+    const masterGain = GAIN_MAP[volume];
+    if (masterGain === 0) return;
 
     const ctx = getCtx();
     const now = ctx.currentTime;
 
-    // ── Master gain ────────────────────────────────────────────
+    // ── Master output gain ─────────────────────────────────────
     const master = ctx.createGain();
-    master.gain.setValueAtTime(gain, now);
+    master.gain.setValueAtTime(masterGain, now);
     master.connect(ctx.destination);
 
-    // ── Layer 1: Noise burst (impact transient) ────────────────
-    const bufferSize = ctx.sampleRate * 0.04; // 40ms of noise
-    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1);
-    }
-    const noiseSource = ctx.createBufferSource();
-    noiseSource.buffer = noiseBuffer;
+    // ── Layer 1: Sub-bass thump ────────────────────────────────
+    // A sine that pitches steeply down — gives the "thock" weight.
+    const sub = ctx.createOscillator();
+    sub.type = "sine";
+    sub.frequency.setValueAtTime(160, now);
+    sub.frequency.exponentialRampToValueAtTime(55, now + 0.018);
 
-    // Band-pass filter to shape noise into a "thock"
-    const noiseBpf = ctx.createBiquadFilter();
-    noiseBpf.type = "bandpass";
-    noiseBpf.frequency.setValueAtTime(1800, now);
-    noiseBpf.Q.setValueAtTime(0.8, now);
+    const subGain = ctx.createGain();
+    subGain.gain.setValueAtTime(1.0, now);
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.022);
+
+    sub.connect(subGain);
+    subGain.connect(master);
+    sub.start(now);
+    sub.stop(now + 0.025);
+
+    // ── Layer 2: Mid noise burst ───────────────────────────────
+    // White noise → bandpass at ~900Hz, heavy Q → soft thud body.
+    const bufLen = Math.ceil(ctx.sampleRate * 0.05);
+    const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buf;
+
+    const bpf = ctx.createBiquadFilter();
+    bpf.type = "bandpass";
+    bpf.frequency.setValueAtTime(900, now);
+    bpf.Q.setValueAtTime(1.8, now);
+
+    // Low-pass after BPF to soften it further
+    const lpf = ctx.createBiquadFilter();
+    lpf.type = "lowpass";
+    lpf.frequency.setValueAtTime(2200, now);
 
     const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.9, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+    noiseGain.gain.setValueAtTime(0.55, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.038);
 
-    noiseSource.connect(noiseBpf);
-    noiseBpf.connect(noiseGain);
+    noise.connect(bpf);
+    bpf.connect(lpf);
+    lpf.connect(noiseGain);
     noiseGain.connect(master);
-    noiseSource.start(now);
-    noiseSource.stop(now + 0.04);
+    noise.start(now);
+    noise.stop(now + 0.05);
 
-    // ── Layer 2: Tone body (the "thock" fundamental) ───────────
-    const osc = ctx.createOscillator();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(220, now);
-    osc.frequency.exponentialRampToValueAtTime(80, now + 0.025);
-
-    const oscGain = ctx.createGain();
-    oscGain.gain.setValueAtTime(0.6, now);
-    oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
-
-    osc.connect(oscGain);
-    oscGain.connect(master);
-    osc.start(now);
-    osc.stop(now + 0.04);
-
-    // ── Layer 3: High tick (the crisp click top end) ───────────
+    // ── Layer 3: Presence tick ─────────────────────────────────
+    // Very quiet sine at ~3kHz for just 6ms — adds a tiny "click"
+    // without sounding harsh or snappy.
     const tick = ctx.createOscillator();
-    tick.type = "square";
-    tick.frequency.setValueAtTime(4400, now);
-    tick.frequency.exponentialRampToValueAtTime(2200, now + 0.006);
+    tick.type = "sine";
+    tick.frequency.setValueAtTime(3200, now);
+    tick.frequency.exponentialRampToValueAtTime(1800, now + 0.005);
 
     const tickGain = ctx.createGain();
-    tickGain.gain.setValueAtTime(0.12, now);
-    tickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.008);
+    tickGain.gain.setValueAtTime(0.08, now);
+    tickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.007);
 
-    // High-pass to keep only the click edge
-    const tickHpf = ctx.createBiquadFilter();
-    tickHpf.type = "highpass";
-    tickHpf.frequency.setValueAtTime(3000, now);
-
-    tick.connect(tickHpf);
-    tickHpf.connect(tickGain);
+    tick.connect(tickGain);
     tickGain.connect(master);
     tick.start(now);
-    tick.stop(now + 0.01);
+    tick.stop(now + 0.008);
+
   }, [volume, getCtx]);
 
   return { playClick };

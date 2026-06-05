@@ -10,55 +10,64 @@
     7.  COLORS PANEL
     8.  FONTS PANEL
     9.  SCENE LAYOUT
-   10.  NOTEPAD — 3D scene + card
+   10.  NOTEPAD CARD
    11.  PAPER BACKGROUNDS
    12.  PAPER TYPOGRAPHY
-   13.  KEYBOARD — 3D scene
-   14.  KEYBOARD SHELL
-   15.  KEY BASE (depth shadows)
-   16.  KEY SIZES
-   17.  KEY LABELS
-   18.  KEY STATES
-   19.  RESPONSIVE
+   13.  KEYBOARD SHELL & GRID
+   14.  KEY BASE
+   15.  KEY SIZES
+   16.  KEY LABELS
+   17.  KEY STATES
+   18.  RESPONSIVE
 ═══════════════════════════════════════════════════════════════ */
 
 
-/* ── 1. CSS VARIABLES ───────────────────────────────────────── */
+/* ── 1. CSS VARIABLES ─────────────────────────────────────── */
 :root {
   --bg:          #1a1a1a;
   --topbar-bg:   #161616;
   --toolbar-bg:  #121212;
 
-  /* Key tokens — defaults (Midnight theme) */
-  --kbd-top:          #1e2332;
-  --kbd-bot:          #131825;
-  --key-top:          #2c3548;
-  --key-mid:          #242e42;
-  --key-bot:          #1c2638;
-  --key-text:         #dde4f0;
-  --key-text-sub:     #6a7a9a;
-  --kbd-border:       rgba(255,255,255,0.08);
-  --key-highlight:    rgba(255,255,255,0.12);
-  --key-shadow:       rgba(0,0,0,0.55);
-  --key-drop-shadow:  rgba(0,0,0,0.7);
-  --knob-bg:          radial-gradient(circle at 35% 30%, #2e3850 0%, #151c2c 50%, #080d15 100%);
+  /* Keyboard defaults (overridden per theme via inline vars) */
+  --kbd-top:          #222329;
+  --kbd-bot:          #1c1d21;
+  --key-top:          #303238;
+  --key-mid:          #282a30;
+  --key-bot:          #24262b;
+  --key-text:         #d8dade;
+  --key-text-sub:     #72767f;
+  --kbd-border:       rgba(255,255,255,0.07);
+  --key-highlight:    rgba(255,255,255,0.10);
+  --key-shadow:       rgba(0,0,0,0.50);
+  --key-drop-shadow:  rgba(0,0,0,0.65);
+  --knob-bg: radial-gradient(circle at 35% 30%,#383b42 0%,#252832 50%,#111318 100%);
 
-  /* UI */
-  --blue:       #3b82f6;
-  --divider:    rgba(255,255,255,0.09);
-  --dd-bg:      #1c1c20;
-  --dd-border:  rgba(255,255,255,0.08);
-  --dd-hover:   rgba(255,255,255,0.05);
-  --dd-active:  rgba(59,130,246,0.14);
-  --dd-text:    #e0e2e8;
-  --dd-sub:     #6e7280;
+  /* UI chrome */
+  --blue:      #3b82f6;
+  --divider:   rgba(255,255,255,0.09);
+  --dd-bg:     #1c1c20;
+  --dd-border: rgba(255,255,255,0.08);
+  --dd-hover:  rgba(255,255,255,0.05);
+  --dd-active: rgba(59,130,246,0.14);
+  --dd-text:   #e0e2e8;
+  --dd-sub:    #6e7280;
 
-  --key-h:      54px;
-  --gap:        7px;
-  --topbar-h:   52px;
-  --kbd-radius: 18px;
+  --key-h:       54px;   /* key height */
+  --gap:          7px;   /* gap between keys */
+  --pad:         14px;   /* shell padding — equal left & right */
+  --topbar-h:    52px;
+  --kbd-radius:  18px;
 
-  /* SF Pro — resolves to Apple's system font on macOS/iOS */
+  /*
+    Shell inner width = widest key row = Row 4 (home row):
+      caps(114) + 12×std(60) + return(132) + 13×gap(7) = 1057px
+    Shell total width = 1057 + 2×14 = 1085px
+    All shorter rows use justify-content:space-between to fill exactly 1057px.
+  */
+  --inner-w: 1057px;
+  --shell-w:  1085px;
+
+  /* SF Pro system font stack */
   --sf: -apple-system, BlinkMacSystemFont, "SF Pro Text",
         "SF Pro Display", system-ui, "Helvetica Neue", Arial, sans-serif;
 
@@ -133,8 +142,7 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .chip-swatch {
   display: inline-block; width: 13px; height: 13px;
   border-radius: 3px; flex-shrink: 0;
-  transition: background 0.25s ease;
-  border: 1px solid rgba(255,255,255,0.1);
+  transition: background 0.25s; border: 1px solid rgba(255,255,255,0.1);
 }
 .color-dot {
   display: inline-block; width: 13px; height: 13px;
@@ -169,15 +177,10 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   transform-origin: top right;
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
-.dropdown-panel--open {
-  opacity: 1; pointer-events: all;
-  transform: translateY(0) scale(1);
-}
+.dropdown-panel--open { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
 .dropdown-title {
-  font-size: 10px; font-weight: 700;
-  color: var(--dd-sub);
-  letter-spacing: 0.1em; text-transform: uppercase;
-  margin-bottom: 12px;
+  font-size: 10px; font-weight: 700; color: var(--dd-sub);
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px;
 }
 
 
@@ -196,8 +199,7 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .paper-thumb-wrap { position: relative; width: 74px; height: 90px; }
 .paper-thumb {
   width: 74px; height: 90px; border-radius: 7px;
-  border: 2px solid rgba(255,255,255,0.07);
-  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.07); overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
   transition: border-color 0.16s, transform 0.14s, box-shadow 0.14s;
 }
@@ -207,8 +209,7 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 
 .check-badge {
   position: absolute; top: -5px; right: -5px;
-  width: 17px; height: 17px;
-  background: var(--blue); border-radius: 999px;
+  width: 17px; height: 17px; background: var(--blue); border-radius: 999px;
   border: 2px solid var(--dd-bg);
   display: flex; align-items: center; justify-content: center;
   opacity: 0; transform: scale(0.6);
@@ -219,7 +220,7 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .paper-name-label { font-size: 9px; font-weight: 500; color: var(--dd-sub); text-align: center; }
 .paper-option--active .paper-name-label { color: var(--dd-text); }
 
-/* Thumbnail textures */
+/* Thumb textures */
 .pt-cream    { background: #f5edd6; }
 .pt-white    { background: #f0f0f0; background-image: radial-gradient(circle,#d0d0d0 0.8px,transparent 0.8px); background-size: 5px 5px; }
 .pt-kraft    { background: #a0622a; background-image: repeating-linear-gradient(0deg,rgba(0,0,0,0.07) 0,rgba(0,0,0,0.07) 1px,transparent 1px,transparent 5px); }
@@ -231,25 +232,20 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 
 
 /* ── 7. COLORS PANEL ────────────────────────────────────────── */
-.colors-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 5px; width: 228px;
-}
+.colors-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 228px; }
 .color-option {
   display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 7px 4px; border-radius: 9px;
-  background: none; border: none; cursor: pointer;
+  padding: 7px 4px; border-radius: 9px; background: none; border: none; cursor: pointer;
   transition: background 0.14s;
 }
 .color-option:hover   { background: var(--dd-hover); }
 .color-option--active { background: rgba(255,255,255,0.05); }
-
 .color-swatch-circle {
   width: 38px; height: 38px; border-radius: 999px;
   border: 2px solid rgba(255,255,255,0.14);
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.1) inset;
-  transition: transform 0.14s, box-shadow 0.14s;
+  transition: transform 0.14s;
 }
 .color-option:hover .color-swatch-circle { transform: scale(1.1); }
 .color-option--active .color-swatch-circle {
@@ -264,17 +260,14 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 /* ── 8. FONTS PANEL ─────────────────────────────────────────── */
 .dropdown-panel--fonts { width: 270px; }
 .fonts-list { display: flex; flex-direction: column; gap: 2px; }
-
 .font-option {
   display: flex; align-items: center; gap: 8px;
   padding: 8px 9px; border-radius: 7px;
-  width: 100%; background: none; border: none;
-  cursor: pointer; text-align: left;
-  transition: background 0.14s; position: relative;
+  width: 100%; background: none; border: none; cursor: pointer;
+  text-align: left; transition: background 0.14s; position: relative;
 }
 .font-option:hover   { background: var(--dd-hover); }
 .font-option--active { background: var(--dd-active); }
-
 .font-preview { font-size: 14px; color: var(--dd-text); min-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
 .font-meta    { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 .font-desc    { font-size: 9px; color: var(--dd-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -282,129 +275,77 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .font-check   { width: 11px; height: 11px; flex-shrink: 0; margin-left: auto; }
 
 
-/* ── 9. SCENE LAYOUT ────────────────────────────────────────── */
-/*
-  The scene is the full remaining height below the topbar.
-  It uses a column layout: notepad on top, keyboard below.
-  Both are centred. No gaps, no dead space.
-*/
+/* ── 9. SCENE LAYOUT ────────────────────────────────────────────
+   Scene holds: notepad (peeking above keyboard) + keyboard.
+   They are stacked as a single column, centred, with NO gap.
+   The notepad bottom edge disappears under/into the keyboard top.
+───────────────────────────────────────────────────────────────*/
 .scene {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0;
+  justify-content: flex-end;   /* anchor both to the bottom */
+  padding-bottom: 48px;
   overflow: hidden;
-  padding: 32px 0 20px;
-  /* Subtle radial desk-light glow on the background */
-  background: radial-gradient(ellipse at 50% 60%, rgba(50,55,70,0.5) 0%, transparent 70%);
 }
 
 
-/* ── 10. NOTEPAD — 3D scene + card ─────────────────────────────
-   The notepad is a compact card — like a physical notepad on a desk.
-   It's given a 3D perspective tilt so you see the top face and
-   a slight bottom edge, as if resting on the surface in front of you.
+/* ── 10. NOTEPAD CARD ───────────────────────────────────────────
+   The notepad is exactly as wide as the keyboard shell.
+   It sits flush on top of the keyboard — no gap between them.
+   Rounded on top corners only; bottom corners flush with the
+   keyboard top edge (appears to slide into the shell).
+   The keyboard's top border-radius visually "holds" the pad.
 ───────────────────────────────────────────────────────────────*/
-.notepad-scene {
-  /* 3D perspective container */
-  perspective: 1000px;
-  perspective-origin: 50% 30%;
-  flex-shrink: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  width: 100%;
-}
-
 .notepad {
-  /* Compact notepad dimensions — like an A5 pad */
-  width: 380px;
-  height: 290px;
-  border-radius: 4px 4px 3px 3px;
+  /* Match keyboard shell width exactly */
+  width: var(--shell-w);
+  height: 220px;
+
+  /* Rounded only on top — bottom merges into keyboard */
+  border-radius: 16px 16px 0 0;
+
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
 
-  /* 3D tilt — tilted away from viewer, like lying on a desk */
-  transform: rotateX(6deg) translateY(6px);
+  /* No gap — sits directly on top of keyboard */
+  margin-bottom: 0;
+
+  /* Paper shadow — looks like it's resting on the keyboard body */
+  box-shadow:
+    0 -1px 0 rgba(255,255,255,0.08) inset,   /* top highlight */
+    0 8px 32px rgba(0,0,0,0.35),              /* shadow on keyboard below */
+    0 2px 8px rgba(0,0,0,0.25);
+
+  transition: background 0.3s ease;
+
+  /* Scale with keyboard */
+  transform: scale(var(--keyboard-scale));
   transform-origin: bottom center;
-  transform-style: preserve-3d;
-
-  /* Paper shadow cast on desk */
-  box-shadow:
-    0 2px 0 rgba(255,255,255,0.06) inset,    /* top highlight edge */
-    0 -1px 0 rgba(0,0,0,0.3) inset,           /* bottom depth */
-    0 24px 60px rgba(0,0,0,0.55),             /* main shadow on desk */
-    0 8px 20px rgba(0,0,0,0.4),              /* close shadow */
-    0 2px 6px rgba(0,0,0,0.35);             /* base contact shadow */
-
-  /* Smooth paper switch */
-  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Spiral binding at top */
-.notepad-binding {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 22px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.06) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  z-index: 3;
-  border-bottom: 1px solid rgba(0,0,0,0.12);
-}
-
-.binding-ring {
-  width: 14px; height: 14px;
-  border-radius: 999px;
-  border: 2.5px solid rgba(0,0,0,0.3);
-  background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(200,200,200,0.2) 100%);
-  box-shadow:
-    0 1px 2px rgba(0,0,0,0.35),
-    0 1px 0 rgba(255,255,255,0.4) inset;
-  flex-shrink: 0;
-}
-
-/* Notepad left ruled line */
+/* Red left margin line */
 .notepad::before {
   content: '';
   position: absolute;
-  left: 42px; top: 22px; bottom: 0;
-  width: 1px;
-  background: rgba(180, 100, 100, 0.35);
-  z-index: 2;
+  left: 52px; top: 0; bottom: 0;
+  width: 1.5px;
+  background: rgba(210,100,100,0.4);
   pointer-events: none;
-}
-
-/* Paper bottom-edge thickness — simulates pad of pages */
-.notepad::after {
-  content: '';
-  position: absolute;
-  bottom: -5px; left: 3px; right: 3px;
-  height: 6px;
-  background: linear-gradient(180deg, #d0c8b8 0%, #b8b0a0 100%);
-  border-radius: 0 0 3px 3px;
-  z-index: 0;
+  z-index: 2;
 }
 
 
 /* ── 11. PAPER BACKGROUNDS ──────────────────────────────────── */
-/* These classes go on .notepad directly */
 .paper-panel--cream {
   background: #f5edd6;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(180,160,110,0.15) 24px, rgba(180,160,110,0.15) 25px);
-  background-position: 0 22px;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 25px, rgba(180,160,110,0.13) 25px, rgba(180,160,110,0.13) 26px);
 }
 .paper-panel--a4white {
   background: #f2f2f2;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(150,150,200,0.12) 24px, rgba(150,150,200,0.12) 25px);
-  background-position: 0 22px;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 25px, rgba(150,150,200,0.10) 25px, rgba(150,150,200,0.10) 26px);
 }
 .paper-panel--kraft {
   background: #9e5e28;
@@ -414,10 +355,6 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 }
 .paper-panel--antique {
   background: radial-gradient(ellipse at 40% 20%, #d4b483 0%, #c9a55a 50%, #b08030 100%);
-  background-image:
-    radial-gradient(ellipse at 40% 20%, #d4b483 0%, #c9a55a 50%, #b08030 100%),
-    repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(100,70,20,0.1) 24px, rgba(100,70,20,0.1) 25px);
-  background-position: 0 22px;
 }
 .paper-panel--carton {
   background: #ae7638;
@@ -431,37 +368,34 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 }
 .paper-panel--notebook {
   background: #f7f8ff;
-  background-image: repeating-linear-gradient(0deg, transparent, transparent 24px, #b4c8e8 24px, #b4c8e8 25px);
-  background-position: 0 22px;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 25px, #b4c8e8 25px, #b4c8e8 26px);
 }
 .paper-panel--dots {
   background: #fff0f5;
   background-image: radial-gradient(circle, #e8a0b8 1.5px, transparent 1.5px);
-  background-size: 20px 20px;
-  background-position: 10px 32px;
+  background-size: 22px 22px;
+  background-position: 11px 11px;
 }
 
 
 /* ── 12. PAPER TYPOGRAPHY ───────────────────────────────────── */
 .paper-textarea {
-  position: absolute;
-  /* Start below the binding + ruled margin */
-  top: 24px; left: 0; right: 0; bottom: 0;
-  width: 100%; height: calc(100% - 24px);
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
   background: transparent; border: none; outline: none; resize: none;
   z-index: 2;
-  padding: 6px 16px 16px 52px; /* indent past the red margin line */
-  font-size: 14px; line-height: 25px; letter-spacing: 0.01em;
+  padding: 14px 20px 16px 64px;   /* left indent past the red margin */
+  font-size: 14px; line-height: 26px; letter-spacing: 0.01em;
   caret-color: #2a4080;
 }
 .paper-panel--cream    .paper-textarea { color: #2a1f0e; font-family: var(--font-special-elite); }
-.paper-panel--a4white  .paper-textarea { color: #1a1a1a; font-family: var(--font-inter); font-size: 13px; line-height: 25px; }
+.paper-panel--a4white  .paper-textarea { color: #1a1a1a; font-family: var(--font-inter); font-size: 13px; }
 .paper-panel--kraft    .paper-textarea { color: #f5e8d0; font-family: var(--font-special-elite); caret-color: #f5e8d0; }
 .paper-panel--antique  .paper-textarea { color: #2e1c00; font-family: var(--font-special-elite); }
 .paper-panel--carton   .paper-textarea { color: #f0e0c4; font-family: var(--font-special-elite); caret-color: #f0e0c4; }
 .paper-panel--oilpaper .paper-textarea { color: #2a200a; font-family: var(--font-special-elite); }
-.paper-panel--notebook .paper-textarea { color: #1a1a2e; font-family: var(--font-inter); font-size: 13px; line-height: 25px; }
-.paper-panel--dots     .paper-textarea { color: #4a1a30; font-family: var(--font-caveat); font-size: 17px; line-height: 25px; caret-color: #c06080; }
+.paper-panel--notebook .paper-textarea { color: #1a1a2e; font-family: var(--font-inter); font-size: 13px; }
+.paper-panel--dots     .paper-textarea { color: #4a1a30; font-family: var(--font-caveat); font-size: 17px; caret-color: #c06080; }
 .paper-textarea::placeholder { color: rgba(120,90,50,0.3); font-style: italic; }
 .paper-panel--kraft .paper-textarea::placeholder,
 .paper-panel--carton .paper-textarea::placeholder  { color: rgba(245,232,208,0.3); }
@@ -470,120 +404,96 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .paper-panel--notebook .paper-textarea::placeholder{ color: rgba(80,80,160,0.3); }
 
 
-/* ── 13. KEYBOARD — 3D scene ────────────────────────────────────
-   The keyboard sits on the "desk" in front of the notepad.
-   It's tilted slightly toward the viewer (opposite to the notepad).
-   This creates the illusion of both objects resting on the same surface.
+/* ── 13. KEYBOARD SHELL & GRID ──────────────────────────────────
+   No 3D. Flat. Even padding on left and right.
+   Shell width = inner-w + 2×pad = 1057 + 28 = 1085px.
+   key-row uses justify-content: space-between so every row
+   stretches to exactly fill the inner width regardless of how
+   many keys it has — left and right edges always align.
 ───────────────────────────────────────────────────────────────*/
-.keyboard-scene {
-  perspective: 1200px;
-  perspective-origin: 50% -20%;
-  flex-shrink: 0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100%;
-}
-
 .keyboard-zone {
-  transform: rotateX(-4deg);
-  transform-origin: top center;
-  transform-style: preserve-3d;
   flex-shrink: 0;
-  /* Scale to fit viewport */
-  scale: var(--keyboard-scale);
+  transform: scale(var(--keyboard-scale));
+  transform-origin: bottom center;
 }
 
-
-/* ── 14. KEYBOARD SHELL ─────────────────────────────────────────
-   The outer body of the keyboard.
-   Uses multiple box-shadows to create a thick physical presence:
-     - Top inset: lit front face of the shell body
-     - Bottom inset: dark underside depth
-     - Outer shadows: the keyboard resting on the desk
-───────────────────────────────────────────────────────────────*/
 .keyboard-body {
-  /* Width computed to exactly fit all keys + gaps + padding */
-  width: 1060px;
-  padding: 10px 11px 14px;
+  width: var(--shell-w);    /* 1085px exactly */
+  padding: var(--pad);      /* 14px all sides */
+  padding-bottom: 16px;
   border-radius: var(--kbd-radius);
-  background: linear-gradient(160deg, var(--kbd-top) 0%, var(--kbd-bot) 100%);
-  border-top: 1px solid var(--kbd-border);
-  border-left: 1px solid var(--kbd-border);
-  border-right: 1px solid rgba(0,0,0,0.4);
-  border-bottom: 1px solid rgba(0,0,0,0.5);
+  background: linear-gradient(180deg, var(--kbd-top) 0%, var(--kbd-bot) 100%);
+  border: 1px solid var(--kbd-border);
   box-shadow:
-    /* Top face highlight — lit from above */
-    0 1px 0 rgba(255,255,255,0.07) inset,
-    /* Bottom depth — physical thickness */
+    0 2px 0 rgba(255,255,255,0.06) inset,
     0 -3px 0 rgba(0,0,0,0.7) inset,
-    /* Side depth — left edge */
-    -3px 0 0 rgba(0,0,0,0.2) inset,
-    /* Outer: main shadow on desk */
-    0 24px 60px rgba(0,0,0,0.65),
-    /* Outer: close contact shadow */
-    0 8px 18px rgba(0,0,0,0.5),
-    /* Outer: thin base line */
-    0 2px 4px rgba(0,0,0,0.6);
-  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+    0 20px 50px rgba(0,0,0,0.6),
+    0 6px 16px rgba(0,0,0,0.5),
+    0 2px 4px rgba(0,0,0,0.5);
+  transition: background 0.35s ease, border-color 0.35s ease;
 }
 
-.keyboard-grid { display: flex; flex-direction: column; gap: var(--gap); }
-.key-row { display: flex; gap: var(--gap); align-items: flex-end; width: 100%; }
+.keyboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* Every row fills the full inner width evenly */
+.key-row {
+  display: flex;
+  gap: var(--gap);
+  align-items: flex-end;
+  width: var(--inner-w);         /* exactly 1057px */
+  justify-content: space-between; /* keys spread perfectly edge-to-edge */
+}
 
 
-/* ── 15. KEY BASE ───────────────────────────────────────────────
-   Each key is a raised physical button.
-   Shadow layers (top to bottom inside the key):
-     1. Top inset highlight  → the lit top edge
-     2. Subtle side inset    → side edge definition
-     3. Bottom inset shadow  → underside depth
-     4. External drop shadow → key above the shell surface
+/* ── 14. KEY BASE ─────────────────────────────────────────────
+   Physical button appearance using layered box-shadows and borders.
+   border-bottom acts as the key's physical bottom wall (thickness).
 ───────────────────────────────────────────────────────────────*/
 .key {
   height: var(--key-h);
-  border-radius: 6px;
-  /* Key face — slightly lighter at top, darker at bottom */
-  background: linear-gradient(
-    180deg,
-    var(--key-top) 0%,
-    var(--key-mid) 40%,
+  border-radius: 7px;
+  background: linear-gradient(180deg,
+    var(--key-top)  0%,
+    var(--key-mid) 50%,
     var(--key-bot) 100%
   );
-  border-top: 1px solid var(--key-highlight);
-  border-left: 1px solid rgba(255,255,255,0.06);
-  border-right: 1px solid rgba(0,0,0,0.3);
-  border-bottom: 2px solid var(--key-shadow);
+  border: 1px solid var(--kbd-border);
+  border-top-color: var(--key-highlight);
+  border-bottom: 2.5px solid var(--key-shadow);
   box-shadow:
-    /* Top highlight ridge */
     0 1px 0 var(--key-highlight) inset,
-    /* Key drop shadow onto shell */
-    0 3px 6px var(--key-drop-shadow),
-    /* Subtle contact shadow */
-    0 1px 2px rgba(0,0,0,0.4);
+    0 3px 7px var(--key-drop-shadow),
+    0 1px 2px rgba(0,0,0,0.35);
   color: var(--key-text);
   display: flex; align-items: center; justify-content: center;
   position: relative; flex-shrink: 0; user-select: none; cursor: pointer;
   font-family: var(--sf);
   transition:
-    filter 0.06s, transform 0.06s, box-shadow 0.06s,
-    background 0.35s ease, color 0.35s ease,
-    border-color 0.35s ease;
+    filter 0.07s, transform 0.07s, box-shadow 0.07s,
+    background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Pressed state — key physically depresses */
 .key--pressed {
-  filter: brightness(0.85);
-  transform: translateY(1.5px) scaleY(0.98);
-  border-bottom-width: 0px;
+  filter: brightness(0.82);
+  transform: translateY(1px);
+  border-bottom-width: 1px;
   box-shadow:
     0 0 0 rgba(255,255,255,0.05) inset,
-    0 1px 2px var(--key-drop-shadow);
+    0 1px 3px var(--key-drop-shadow);
 }
 
 
-/* ── 16. KEY SIZES ──────────────────────────────────────────── */
+/* ── 15. KEY SIZES ──────────────────────────────────────────────
+   These widths are FIXED and intentional.
+   The key-row uses justify-content:space-between so rows with
+   fewer/wider keys (fn row, shift row) still fill the same width.
+   Do not change these without recalculating --inner-w.
+───────────────────────────────────────────────────────────────*/
 .k-std    { width: 60px; }
 .k-esc    { width: 96px; }
 .k-tab    { width: 96px; }
@@ -594,42 +504,42 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .k-shift-r{ width: 144px; }
 .k-mod    { width: 62px; }
 .k-mod-sm { width: 50px; }
-.k-space  { width: 348px; }
+.k-cmd    { width: 86px; }   /* command key — wider than option */
+.k-space  { width: 400px; }  /* spacebar fills available bottom-row space */
 .k-fn     { width: 60px; }
 .k-pipe   { width: 84px; }
-.k-knob-w { width: 68px; height: var(--key-h); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.k-arrow  { width: 60px; height: 25px; border-radius: 5px; }
+.k-knob-w { height: var(--key-h); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.k-arrow  { width: 60px; height: 26px; border-radius: 5px; }
 .k-arrow-ud { display: flex; flex-direction: column; gap: 3px; align-self: flex-end; flex-shrink: 0; }
 
 
-/* ── 17. KEY LABELS ─────────────────────────────────────────── */
-/* Single centred letter (A–Z) */
-.lbl-c {
-  font-size: 14px; font-weight: 500;
-  color: var(--key-text); letter-spacing: -0.01em;
-}
+/* ── 16. KEY LABELS ─────────────────────────────────────────── */
+/* All colours use CSS variables — zero hardcoded hex */
 
-/* Stacked symbol / number */
-.lbl-st { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.15; }
+/* Single centred letter (A–Z) */
+.lbl-c { font-size: 15px; font-weight: 500; color: var(--key-text); letter-spacing: -0.02em; }
+
+/* Stacked: shift-symbol top, base-char bottom */
+.lbl-st { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
 .s-top  { font-size: 10px; font-weight: 500; color: var(--key-text-sub); line-height: 1.2; }
 .s-bot  { font-size: 13px; font-weight: 500; color: var(--key-text); line-height: 1.2; }
 
-/* Modifier labels — bottom aligned */
-.lbl-ml { position: absolute; bottom: 6px; left: 8px; font-size: 8.5px; font-weight: 500; color: var(--key-text-sub); }
-.lbl-mr { position: absolute; bottom: 6px; right: 8px; font-size: 8.5px; font-weight: 500; color: var(--key-text-sub); }
+/* Modifier text — bottom-left / bottom-right */
+.lbl-ml { position: absolute; bottom: 6px; left: 8px; font-size: 8px; font-weight: 500; color: var(--key-text-sub); letter-spacing: 0.01em; }
+.lbl-mr { position: absolute; bottom: 6px; right: 8px; font-size: 8px; font-weight: 500; color: var(--key-text-sub); letter-spacing: 0.01em; }
 
-/* Function key */
+/* Function key: icon + Fn number */
 .lbl-fn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 100%; height: 100%; }
 .fn-ic  { color: var(--key-text-sub); display: flex; align-items: center; }
 .fn-ic svg { width: 12px; height: 12px; }
 .fn-n   { font-size: 7px; font-weight: 700; color: var(--key-text-sub); letter-spacing: 0.05em; text-transform: uppercase; }
 
-/* Arrow + modifier text */
-.arr-l  { font-size: 9px; color: var(--key-text-sub); line-height: 1; }
+/* Arrow + modifier symbols */
+.arr-l        { font-size: 9px; color: var(--key-text-sub); line-height: 1; }
 .fn-globe-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
 .fn-globe-wrap svg { color: var(--key-text-sub); }
 .mod-fn-label  { font-size: 7.5px; font-weight: 500; color: var(--key-text-sub); }
-.mod-sym { position: absolute; top: 7px; left: 8px; font-size: 11px; font-weight: 500; color: var(--key-text-sub); }
+.mod-sym { position: absolute; top: 7px; left: 8px; font-size: 11px; font-weight: 400; color: var(--key-text-sub); }
 .mod-sub { font-size: 8px !important; color: var(--key-text-sub) !important; }
 .mod-cmd { font-size: 15px; color: var(--key-text-sub); line-height: 1; }
 
@@ -638,44 +548,43 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   width: 40px; height: 40px; border-radius: 999px;
   background: var(--knob-bg);
   box-shadow:
-    0 1px 2px rgba(255,255,255,0.18) inset,
+    0 1px 2px rgba(255,255,255,0.15) inset,
     0 -1px 1px rgba(0,0,0,0.5) inset,
-    0 5px 14px rgba(0,0,0,0.7),
-    0 2px 4px rgba(0,0,0,0.5);
+    0 4px 10px rgba(0,0,0,0.65),
+    0 1px 3px rgba(0,0,0,0.45);
 }
 
 
-/* ── 18. KEY STATES ─────────────────────────────────────────── */
-/* Homing bars on F and J */
+/* ── 17. KEY STATES ─────────────────────────────────────────── */
+/* Homing bars (F and J) */
 .key--homing::after {
   content: ''; position: absolute; bottom: 8px;
   left: 50%; transform: translateX(-50%);
   width: 14px; height: 2px; border-radius: 999px;
-  background: var(--key-shadow);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.4);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.15);
 }
 
-/* Caps Lock indicator dot */
+/* Caps lock indicator */
 .caps-dot {
   position: absolute; top: 7px; right: 7px;
   width: 4px; height: 4px; border-radius: 999px;
-  background: var(--blue); opacity: 0;
-  transition: opacity 0.15s;
+  background: var(--blue); opacity: 0; transition: opacity 0.15s;
 }
 .key--caps.key--pressed .caps-dot { opacity: 1; }
 
 
-/* ── 19. RESPONSIVE ─────────────────────────────────────────── */
-@media (max-width: 1180px) {
-  :root { --keyboard-scale: 0.75; }
-  .notepad { width: 340px; height: 260px; }
+/* ── 18. RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 1160px) {
+  :root { --keyboard-scale: 0.76; }
+  .notepad { height: 200px; }
 }
-@media (max-width: 960px) {
+@media (max-width: 900px) {
   :root { --keyboard-scale: 0.56; }
-  .notepad { width: 300px; height: 240px; }
-  .scene { padding: 20px 0 10px; }
+  .notepad { height: 180px; }
+  .scene { padding-bottom: 24px; }
 }
 @media (max-width: 640px) {
   :root { --keyboard-scale: 0.38; }
-  .notepad { width: 260px; height: 200px; }
+  .notepad { height: 160px; }
 }

@@ -1,3 +1,8 @@
+// ─────────────────────────────────────────────────────────────
+// src/app/page.tsx
+// Scene: notepad sits flush on top of keyboard — one unified unit.
+// ─────────────────────────────────────────────────────────────
+
 "use client";
 
 import React from "react";
@@ -33,6 +38,11 @@ export default function Home() {
       />
 
       <main className="scene" onClick={closeDropdowns}>
+        {/*
+          Notepad and Keyboard are direct siblings with no gap.
+          .notepad has margin-bottom:0, .keyboard-zone sits right below it.
+          Together they look like one physical object.
+        */}
         <PaperCanvas
           activePaper={activePaper} activeFont={activeFont}
           textareaRef={textareaRef} onPanelClick={closeDropdowns}
