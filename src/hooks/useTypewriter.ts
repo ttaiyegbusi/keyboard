@@ -1,16 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // src/hooks/useTypewriter.ts
-//
-// Central state hook. Now manages:
-//   - Paper selection + dropdown
-//   - Keyboard colour selection + dropdown
-//   - Font selection + dropdown
-//   - Volume state (mute / low / high) cycling
-//   - Shift / CapsLock toggle
-//   - Textarea ref + text insertion
-//   - Physical keyboard highlight sync
-//
-// One dropdown can be open at a time — opening one closes others.
+// Central state hook. Physical keyboard presses also trigger
+// the click sound via a ref callback (avoids stale closure).
 // ─────────────────────────────────────────────────────────────
 
 "use client";
@@ -21,36 +12,22 @@ import { PaperType, KeyboardColor, FontId, VolumeState } from "@/types";
 type DropdownId = "paper" | "color" | "font" | null;
 
 export interface UseTypewriterReturn {
-  // ── Paper ──────────────────────────────────────────────────
-  activePaper: PaperType;
-  setActivePaper: (p: PaperType) => void;
-
-  // ── Keyboard color ─────────────────────────────────────────
-  activeColor: KeyboardColor;
-  setActiveColor: (c: KeyboardColor) => void;
-
-  // ── Font ───────────────────────────────────────────────────
-  activeFont: FontId;
-  setActiveFont: (f: FontId) => void;
-
-  // ── Volume ─────────────────────────────────────────────────
-  volume: VolumeState;
-  cycleVolume: () => void;
-
-  // ── Dropdowns (only one open at a time) ────────────────────
+  activePaper: PaperType;    setActivePaper: (p: PaperType) => void;
+  activeColor: KeyboardColor; setActiveColor: (c: KeyboardColor) => void;
+  activeFont:  FontId;        setActiveFont:  (f: FontId) => void;
+  volume:      VolumeState;   cycleVolume:    () => void;
   openDropdown: DropdownId;
   toggleDropdown: (id: DropdownId) => void;
   closeDropdowns: () => void;
-
-  // ── Keyboard state ─────────────────────────────────────────
   shiftActive: boolean;
-  capsLock: boolean;
+  capsLock:    boolean;
   pressedKeys: Set<string>;
-
-  // ── Textarea ───────────────────────────────────────────────
   textareaRef: RefObject<HTMLTextAreaElement>;
-  focusPaper: () => void;
+  focusPaper:  () => void;
   handleVirtualKey: (code: string, char?: string, shiftChar?: string) => void;
+  // Expose a ref so Keyboard can register its playClick callback
+  // and useTypewriter can call it for physical keypresses
+  registerSoundCb: (cb: () => void) => void;
 }
 
 export function useTypewriter(): UseTypewriterReturn {
@@ -64,48 +41,44 @@ export function useTypewriter(): UseTypewriterReturn {
   const [pressedKeys,  setPressedKeys]     = useState<Set<string>>(new Set());
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Holds the playClick function from Keyboard component
+  const soundCbRef  = useRef<(() => void) | null>(null);
 
-  // ── Dropdown management ──────────────────────────────────────
+  const registerSoundCb = useCallback((cb: () => void) => {
+    soundCbRef.current = cb;
+  }, []);
+
+  // ── Dropdowns ─────────────────────────────────────────────────
   const toggleDropdown = useCallback((id: DropdownId) => {
     setOpenDropdown((cur) => (cur === id ? null : id));
   }, []);
-
   const closeDropdowns = useCallback(() => setOpenDropdown(null), []);
 
-  // ── Paper ────────────────────────────────────────────────────
+  // ── Paper / Color / Font setters ──────────────────────────────
   const setActivePaper = useCallback((p: PaperType) => {
-    setActivePaperState(p);
-    closeDropdowns();
+    setActivePaperState(p); closeDropdowns();
     setTimeout(() => textareaRef.current?.focus(), 150);
   }, [closeDropdowns]);
 
-  // ── Color ────────────────────────────────────────────────────
   const setActiveColor = useCallback((c: KeyboardColor) => {
-    setActiveColorState(c);
-    closeDropdowns();
+    setActiveColorState(c); closeDropdowns();
     setTimeout(() => textareaRef.current?.focus(), 150);
   }, [closeDropdowns]);
 
-  // ── Font ─────────────────────────────────────────────────────
   const setActiveFont = useCallback((f: FontId) => {
-    setActiveFontState(f);
-    closeDropdowns();
+    setActiveFontState(f); closeDropdowns();
     setTimeout(() => textareaRef.current?.focus(), 150);
   }, [closeDropdowns]);
 
-  // ── Volume cycling: high → low → mute → high ─────────────────
+  // ── Volume ────────────────────────────────────────────────────
   const cycleVolume = useCallback(() => {
-    setVolume((v) => {
-      if (v === "high") return "low";
-      if (v === "low")  return "mute";
-      return "high";
-    });
+    setVolume((v) => v === "high" ? "low" : v === "low" ? "mute" : "high");
   }, []);
 
-  // ── Focus ────────────────────────────────────────────────────
+  // ── Focus ─────────────────────────────────────────────────────
   const focusPaper = useCallback(() => textareaRef.current?.focus(), []);
 
-  // ── Text insertion ───────────────────────────────────────────
+  // ── Text helpers ──────────────────────────────────────────────
   const insertChar = useCallback((ch: string) => {
     const el = textareaRef.current;
     if (!el) return;
@@ -130,14 +103,14 @@ export function useTypewriter(): UseTypewriterReturn {
     }
   }, []);
 
-  const setShift = useCallback((on: boolean) => setShiftActive(on), []);
-  const toggleCaps = useCallback(() => setCapsLock((c) => !c), []);
+  const setShift    = useCallback((on: boolean) => setShiftActive(on), []);
+  const toggleCaps  = useCallback(() => setCapsLock((c) => !c), []);
   const isUppercase = useCallback(() => shiftActive !== capsLock, [shiftActive, capsLock]);
 
   const handleVirtualKey = useCallback(
     (code: string, char?: string, shiftChar?: string) => {
       if (code === "ShiftLeft" || code === "ShiftRight") { setShift(!shiftActive); return; }
-      if (code === "CapsLock") { toggleCaps(); return; }
+      if (code === "CapsLock")  { toggleCaps(); return; }
       if (code === "Backspace") { doBackspace(); textareaRef.current?.focus(); return; }
       if (code === "Enter")     { insertChar("\n"); textareaRef.current?.focus(); return; }
       if (code === "Tab")       { insertChar("    "); textareaRef.current?.focus(); return; }
@@ -155,7 +128,7 @@ export function useTypewriter(): UseTypewriterReturn {
     [shiftActive, isUppercase, doBackspace, insertChar, setShift, toggleCaps]
   );
 
-  // ── Physical key highlight ────────────────────────────────────
+  // ── Physical key highlight + sound ───────────────────────────
   const pressKey = useCallback((code: string) => {
     setPressedKeys((prev) => new Set(prev).add(code));
     setTimeout(() => {
@@ -166,6 +139,8 @@ export function useTypewriter(): UseTypewriterReturn {
   useEffect(() => {
     const onDown = (e: KeyboardEvent) => {
       pressKey(e.code);
+      // Fire the click sound for physical keypresses too
+      soundCbRef.current?.();
       if (e.code === "ShiftLeft" || e.code === "ShiftRight") setShiftActive(true);
       if (e.code === "CapsLock") toggleCaps();
     };
@@ -174,10 +149,13 @@ export function useTypewriter(): UseTypewriterReturn {
     };
     window.addEventListener("keydown", onDown);
     window.addEventListener("keyup",   onUp);
-    return () => { window.removeEventListener("keydown", onDown); window.removeEventListener("keyup", onUp); };
+    return () => {
+      window.removeEventListener("keydown", onDown);
+      window.removeEventListener("keyup",   onUp);
+    };
   }, [pressKey, toggleCaps]);
 
-  // ── Close dropdowns on outside click ─────────────────────────
+  // ── Outside click closes dropdowns ───────────────────────────
   useEffect(() => {
     if (!openDropdown) return;
     const handler = () => closeDropdowns();
@@ -185,7 +163,6 @@ export function useTypewriter(): UseTypewriterReturn {
     return () => { clearTimeout(id); document.removeEventListener("click", handler); };
   }, [openDropdown, closeDropdowns]);
 
-  // ── Auto-focus ────────────────────────────────────────────────
   useEffect(() => { textareaRef.current?.focus(); }, []);
 
   return {
@@ -196,5 +173,6 @@ export function useTypewriter(): UseTypewriterReturn {
     openDropdown, toggleDropdown, closeDropdowns,
     shiftActive, capsLock, pressedKeys,
     textareaRef, focusPaper, handleVirtualKey,
+    registerSoundCb,
   };
 }
