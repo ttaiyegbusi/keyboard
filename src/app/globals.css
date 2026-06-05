@@ -276,10 +276,11 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 
 
 /* ── 9. SCENE LAYOUT ────────────────────────────────────────────
-   Scene holds: notepad card (small, centered) + keyboard below.
-   The notepad is SMALLER than the keyboard — it floats centered
-   above the keyboard like a piece of paper on a desk.
-   Dark background is visible on both sides of the notepad.
+   Two completely separate, independent elements stacked vertically:
+     1. Notepad card  — 500×300px, centered, floating freely
+     2. Gap           — visible dark space between them
+     3. Keyboard      — sits at the bottom independently
+   No connection, no overlap, no merging between the two.
 ───────────────────────────────────────────────────────────────*/
 .scene {
   flex: 1;
@@ -287,45 +288,34 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
+  gap: 24px;               /* clear dark gap between notepad and keyboard */
   padding-bottom: 48px;
   overflow: hidden;
 }
 
 
 /* ── 10. NOTEPAD CARD ───────────────────────────────────────────
-   Small compact notepad card — centered above the keyboard.
-   Width is ~half the keyboard width. Rounded on ALL corners.
-   Sits above the keyboard with dark space visible on both sides.
-   Bottom edge overlaps slightly into keyboard top edge.
+   A standalone floating card.
+   500px wide, 300px tall.
+   Rounded corners on ALL 4 sides.
+   Completely separate from the keyboard — no overlap, no merging.
+   Dark background visible on all sides around it.
 ───────────────────────────────────────────────────────────────*/
 .notepad {
-  /* Small card — NOT full keyboard width */
-  width: 560px;
-  height: 220px;
-
-  /* Fully rounded — all 4 corners */
-  border-radius: 16px 16px 14px 14px;
-
+  width: 500px;
+  height: 300px;
+  border-radius: 16px;          /* all 4 corners rounded */
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
-
-  /* Overlap slightly into keyboard top so they feel connected */
-  margin-bottom: -18px;
+  margin-bottom: 0;             /* no overlap with keyboard */
   z-index: 5;
-
-  /* Card shadow — casts onto keyboard below */
   box-shadow:
     0 1px 0 rgba(255,255,255,0.06) inset,
-    0 12px 40px rgba(0,0,0,0.45),
-    0 4px 12px rgba(0,0,0,0.35),
-    0 2px 4px rgba(0,0,0,0.25);
-
+    0 16px 48px rgba(0,0,0,0.5),
+    0 4px 14px rgba(0,0,0,0.35),
+    0 2px 4px rgba(0,0,0,0.2);
   transition: background 0.3s ease;
-
-  /* Scales in sync with keyboard */
-  transform: scale(var(--keyboard-scale));
-  transform-origin: bottom center;
 }
 
 /* Red left margin line */
