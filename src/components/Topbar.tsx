@@ -1,124 +1,168 @@
 // ─────────────────────────────────────────────────────────────
 // src/components/Topbar.tsx
 //
-// The fixed header bar. Contains:
-//   - Brand mark (dot + "tta")
-//   - Toolbar (color chip → opens PapersPanel, font selector,
-//     audio icon, settings icon, download button)
-//   - PapersPanel dropdown (rendered inside the toolbar so it
-//     positions relative to the chip button)
+// Header bar — now wires up all 4 toolbar dropdowns:
+//   1. Paper chip   → PapersPanel
+//   2. Color dot    → ColorsPanel
+//   3. Font label   → FontsPanel
+//   4. Volume icon  → cycles mute/low/high (no dropdown)
 // ─────────────────────────────────────────────────────────────
 
 "use client";
 
 import React from "react";
-import { PapersPanel } from "./PapersPanel";
-import { PaperType } from "@/types";
-import { PAPERS } from "@/data/papers";
+import { PapersPanel }  from "./PapersPanel";
+import { ColorsPanel }  from "./ColorsPanel";
+import { FontsPanel }   from "./FontsPanel";
+import { PaperType, KeyboardColor, FontId, VolumeState } from "@/types";
+import { PAPERS }   from "@/data/papers";
+import { KEYBOARD_COLORS } from "@/data/colors";
+import { FONTS }    from "@/data/fonts";
 
 interface TopbarProps {
-  activePaper: PaperType;
-  panelOpen: boolean;
-  onChipClick: (e: React.MouseEvent) => void;
-  onSelectPaper: (paper: PaperType) => void;
+  // State
+  activePaper:  PaperType;
+  activeColor:  KeyboardColor;
+  activeFont:   FontId;
+  volume:       VolumeState;
+  openDropdown: "paper" | "color" | "font" | null;
+  // Handlers
+  onPaperChipClick:  (e: React.MouseEvent) => void;
+  onColorDotClick:   (e: React.MouseEvent) => void;
+  onFontLabelClick:  (e: React.MouseEvent) => void;
+  onVolumeClick:     () => void;
+  onSelectPaper:     (p: PaperType) => void;
+  onSelectColor:     (c: KeyboardColor) => void;
+  onSelectFont:      (f: FontId) => void;
 }
 
 export function Topbar({
-  activePaper,
-  panelOpen,
-  onChipClick,
-  onSelectPaper,
+  activePaper, activeColor, activeFont, volume, openDropdown,
+  onPaperChipClick, onColorDotClick, onFontLabelClick, onVolumeClick,
+  onSelectPaper, onSelectColor, onSelectFont,
 }: TopbarProps) {
-  // Look up swatch colour for active paper
-  const swatch = PAPERS.find((p) => p.id === activePaper)?.swatchColor ?? "#f4f6f8";
+  const paperSwatch = PAPERS.find((p) => p.id === activePaper)?.swatchColor ?? "#f5edd6";
+  const colorSwatch = KEYBOARD_COLORS.find((c) => c.id === activeColor)?.swatch ?? "#3a3c42";
+  const fontLabel   = FONTS.find((f) => f.id === activeFont)?.label ?? "Font";
 
   return (
     <header className="topbar">
-      {/* ── Brand ─────────────────────────────────────── */}
+      {/* ── Brand ─────────────────────────────────────────── */}
       <div className="brand">
         <span className="brand-dot" />
         <span>tta</span>
       </div>
 
-      {/* ── Toolbar ───────────────────────────────────── */}
+      {/* ── Toolbar ───────────────────────────────────────── */}
       <div className="toolbar" onClick={(e) => e.stopPropagation()}>
 
-        {/* Color chip — click to open paper picker */}
+        {/* 1. Paper picker chip */}
         <button
-          className="chip-btn"
-          aria-label="Open paper picker"
-          aria-expanded={panelOpen}
-          onClick={onChipClick}
+          className={`tb-btn chip-btn ${openDropdown === "paper" ? "tb-btn--active" : ""}`}
+          aria-label="Paper style"
+          aria-expanded={openDropdown === "paper"}
+          onClick={onPaperChipClick}
         >
-          <span
-            className="chip-swatch"
-            style={{ background: swatch }}
-          />
+          <span className="chip-swatch" style={{ background: paperSwatch }} />
           <ChevronIcon />
         </button>
 
         <div className="tb-divider" />
 
-        {/* Muted dot */}
-        <div className="tb-item">
-          <span className="muted-dot" />
+        {/* 2. Keyboard colour dot */}
+        <button
+          className={`tb-btn chip-btn ${openDropdown === "color" ? "tb-btn--active" : ""}`}
+          aria-label="Keyboard color"
+          aria-expanded={openDropdown === "color"}
+          onClick={onColorDotClick}
+        >
+          <span className="color-dot" style={{ background: colorSwatch }} />
           <ChevronIcon />
-        </div>
+        </button>
 
         <div className="tb-divider" />
 
-        {/* Font selector */}
-        <div className="tb-item tb-label">
-          Inter <ChevronIcon />
-        </div>
+        {/* 3. Font selector */}
+        <button
+          className={`tb-btn tb-label ${openDropdown === "font" ? "tb-btn--active" : ""}`}
+          aria-label="Writing font"
+          aria-expanded={openDropdown === "font"}
+          onClick={onFontLabelClick}
+        >
+          {fontLabel} <ChevronIcon />
+        </button>
 
         <div className="tb-divider" />
 
-        {/* Speaker */}
-        <span className="tb-icon" aria-hidden>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-          </svg>
-        </span>
+        {/* 4. Volume icon — cycles on click */}
+        <button
+          className="tb-btn tb-icon-btn"
+          aria-label={`Volume: ${volume}`}
+          onClick={onVolumeClick}
+          title={`Volume: ${volume} (click to change)`}
+        >
+          <VolumeIcon state={volume} />
+        </button>
 
-        {/* Settings */}
-        <span className="tb-icon" aria-hidden>
+        {/* Settings (decorative) */}
+        <button className="tb-btn tb-icon-btn" aria-label="Settings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
           </svg>
-        </span>
+        </button>
 
         <div className="tb-divider" />
 
-        {/* Download */}
-        <div className="tb-item tb-label">
+        {/* Download (decorative) */}
+        <button className="tb-btn tb-label">
           Download <ChevronIcon />
-        </div>
+        </button>
 
-        {/* ── Papers dropdown (portals inside toolbar for positioning) ── */}
-        <PapersPanel
-          open={panelOpen}
-          activePaper={activePaper}
-          onSelect={onSelectPaper}
-        />
+        {/* ── Dropdown panels — positioned relative to toolbar ── */}
+        <PapersPanel open={openDropdown === "paper"} activePaper={activePaper} onSelect={onSelectPaper} />
+        <ColorsPanel open={openDropdown === "color"} activeColor={activeColor} onSelect={onSelectColor} />
+        <FontsPanel  open={openDropdown === "font"}  activeFont={activeFont}   onSelect={onSelectFont}  />
       </div>
     </header>
   );
 }
 
-/** Tiny reusable chevron SVG */
+// ── Sub-components ─────────────────────────────────────────────
+
 function ChevronIcon() {
   return (
-    <svg
-      className="chevron-icon"
-      viewBox="0 0 10 6"
-      fill="none"
-      aria-hidden
-    >
+    <svg className="chevron-icon" viewBox="0 0 10 6" fill="none" aria-hidden>
       <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+/** Volume icon — changes shape based on current volume state */
+function VolumeIcon({ state }: { state: VolumeState }) {
+  if (state === "mute") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <line x1="23" y1="9" x2="17" y2="15"/>
+        <line x1="17" y1="9" x2="23" y2="15"/>
+      </svg>
+    );
+  }
+  if (state === "low") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>
+    );
+  }
+  // high
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
     </svg>
   );
 }

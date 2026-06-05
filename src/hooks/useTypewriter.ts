@@ -1,229 +1,200 @@
 // ─────────────────────────────────────────────────────────────
 // src/hooks/useTypewriter.ts
 //
-// Central hook that manages:
-//   - Paper selection state
-//   - Papers dropdown open/closed state
-//   - Shift / CapsLock toggle state
-//   - Textarea ref (so any component can insert text)
-//   - Physical keyboard → visual key highlight sync
-//   - On-screen key press handler
+// Central state hook. Now manages:
+//   - Paper selection + dropdown
+//   - Keyboard colour selection + dropdown
+//   - Font selection + dropdown
+//   - Volume state (mute / low / high) cycling
+//   - Shift / CapsLock toggle
+//   - Textarea ref + text insertion
+//   - Physical keyboard highlight sync
 //
-// All keyboard logic lives here so components stay clean.
+// One dropdown can be open at a time — opening one closes others.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  RefObject,
-} from "react";
-import { PaperType } from "@/types";
+import { useCallback, useEffect, useRef, useState, RefObject } from "react";
+import { PaperType, KeyboardColor, FontId, VolumeState } from "@/types";
 
-// ─── Types ────────────────────────────────────────────────────
+type DropdownId = "paper" | "color" | "font" | null;
 
 export interface UseTypewriterReturn {
-  /** Currently selected paper id */
+  // ── Paper ──────────────────────────────────────────────────
   activePaper: PaperType;
-  /** Change the active paper */
-  setActivePaper: (paper: PaperType) => void;
+  setActivePaper: (p: PaperType) => void;
 
-  /** Whether the papers dropdown is visible */
-  panelOpen: boolean;
-  /** Toggle the dropdown */
-  togglePanel: () => void;
-  /** Close the dropdown */
-  closePanel: () => void;
+  // ── Keyboard color ─────────────────────────────────────────
+  activeColor: KeyboardColor;
+  setActiveColor: (c: KeyboardColor) => void;
 
-  /** Is Shift currently active */
+  // ── Font ───────────────────────────────────────────────────
+  activeFont: FontId;
+  setActiveFont: (f: FontId) => void;
+
+  // ── Volume ─────────────────────────────────────────────────
+  volume: VolumeState;
+  cycleVolume: () => void;
+
+  // ── Dropdowns (only one open at a time) ────────────────────
+  openDropdown: DropdownId;
+  toggleDropdown: (id: DropdownId) => void;
+  closeDropdowns: () => void;
+
+  // ── Keyboard state ─────────────────────────────────────────
   shiftActive: boolean;
-  /** Is Caps Lock on */
   capsLock: boolean;
-
-  /** Set of currently "pressed" key codes (for visual highlights) */
   pressedKeys: Set<string>;
 
-  /** Ref to the <textarea> element inside the paper panel */
+  // ── Textarea ───────────────────────────────────────────────
   textareaRef: RefObject<HTMLTextAreaElement>;
-
-  /** Focus the textarea */
   focusPaper: () => void;
-
-  /** Handle a virtual key press from the on-screen keyboard */
   handleVirtualKey: (code: string, char?: string, shiftChar?: string) => void;
 }
 
-// ─── Hook ─────────────────────────────────────────────────────
-
 export function useTypewriter(): UseTypewriterReturn {
   const [activePaper, setActivePaperState] = useState<PaperType>("cream");
-  const [panelOpen, setPanelOpen] = useState(false);
-  const [shiftActive, setShiftActive] = useState(false);
-  const [capsLock, setCapsLock] = useState(false);
-  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
+  const [activeColor, setActiveColorState] = useState<KeyboardColor>("midnight");
+  const [activeFont,  setActiveFontState]  = useState<FontId>("special-elite");
+  const [volume,      setVolume]           = useState<VolumeState>("high");
+  const [openDropdown, setOpenDropdown]    = useState<DropdownId>(null);
+  const [shiftActive,  setShiftActive]     = useState(false);
+  const [capsLock,     setCapsLock]        = useState(false);
+  const [pressedKeys,  setPressedKeys]     = useState<Set<string>>(new Set());
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // ── Paper selection ──────────────────────────────────────────
-  const setActivePaper = useCallback((paper: PaperType) => {
-    setActivePaperState(paper);
-    setPanelOpen(false);
-    // Slight delay so the dropdown close animation finishes first
+  // ── Dropdown management ──────────────────────────────────────
+  const toggleDropdown = useCallback((id: DropdownId) => {
+    setOpenDropdown((cur) => (cur === id ? null : id));
+  }, []);
+
+  const closeDropdowns = useCallback(() => setOpenDropdown(null), []);
+
+  // ── Paper ────────────────────────────────────────────────────
+  const setActivePaper = useCallback((p: PaperType) => {
+    setActivePaperState(p);
+    closeDropdowns();
     setTimeout(() => textareaRef.current?.focus(), 150);
+  }, [closeDropdowns]);
+
+  // ── Color ────────────────────────────────────────────────────
+  const setActiveColor = useCallback((c: KeyboardColor) => {
+    setActiveColorState(c);
+    closeDropdowns();
+    setTimeout(() => textareaRef.current?.focus(), 150);
+  }, [closeDropdowns]);
+
+  // ── Font ─────────────────────────────────────────────────────
+  const setActiveFont = useCallback((f: FontId) => {
+    setActiveFontState(f);
+    closeDropdowns();
+    setTimeout(() => textareaRef.current?.focus(), 150);
+  }, [closeDropdowns]);
+
+  // ── Volume cycling: high → low → mute → high ─────────────────
+  const cycleVolume = useCallback(() => {
+    setVolume((v) => {
+      if (v === "high") return "low";
+      if (v === "low")  return "mute";
+      return "high";
+    });
   }, []);
 
-  // ── Dropdown ─────────────────────────────────────────────────
-  const togglePanel = useCallback(() => setPanelOpen((p) => !p), []);
-  const closePanel  = useCallback(() => setPanelOpen(false), []);
+  // ── Focus ────────────────────────────────────────────────────
+  const focusPaper = useCallback(() => textareaRef.current?.focus(), []);
 
-  // ── Focus helper ─────────────────────────────────────────────
-  const focusPaper = useCallback(() => {
-    textareaRef.current?.focus();
-  }, []);
-
-  // ── Text insertion helpers ────────────────────────────────────
+  // ── Text insertion ───────────────────────────────────────────
   const insertChar = useCallback((ch: string) => {
     const el = textareaRef.current;
     if (!el) return;
-    const start = el.selectionStart ?? 0;
-    const end   = el.selectionEnd   ?? 0;
-    const val   = el.value;
-    el.value = val.slice(0, start) + ch + val.slice(end);
-    el.selectionStart = el.selectionEnd = start + ch.length;
-    // Dispatch input event so React controlled inputs stay in sync if needed
+    const s = el.selectionStart ?? 0;
+    const e = el.selectionEnd   ?? 0;
+    el.value = el.value.slice(0, s) + ch + el.value.slice(e);
+    el.selectionStart = el.selectionEnd = s + ch.length;
     el.dispatchEvent(new Event("input", { bubbles: true }));
   }, []);
 
   const doBackspace = useCallback(() => {
     const el = textareaRef.current;
     if (!el) return;
-    const start = el.selectionStart ?? 0;
-    const end   = el.selectionEnd   ?? 0;
-    if (start !== end) {
-      el.value = el.value.slice(0, start) + el.value.slice(end);
-      el.selectionStart = el.selectionEnd = start;
-    } else if (start > 0) {
-      el.value = el.value.slice(0, start - 1) + el.value.slice(start);
-      el.selectionStart = el.selectionEnd = start - 1;
+    const s = el.selectionStart ?? 0;
+    const e = el.selectionEnd   ?? 0;
+    if (s !== e) {
+      el.value = el.value.slice(0, s) + el.value.slice(e);
+      el.selectionStart = el.selectionEnd = s;
+    } else if (s > 0) {
+      el.value = el.value.slice(0, s - 1) + el.value.slice(s);
+      el.selectionStart = el.selectionEnd = s - 1;
     }
   }, []);
 
-  // ── Shift / Caps helpers ──────────────────────────────────────
   const setShift = useCallback((on: boolean) => setShiftActive(on), []);
-
   const toggleCaps = useCallback(() => setCapsLock((c) => !c), []);
+  const isUppercase = useCallback(() => shiftActive !== capsLock, [shiftActive, capsLock]);
 
-  /** Returns true if letters should currently be uppercased */
-  const isUppercase = useCallback(
-    () => shiftActive !== capsLock,
-    [shiftActive, capsLock]
-  );
-
-  // ── Virtual key handler (on-screen keyboard clicks) ───────────
   const handleVirtualKey = useCallback(
     (code: string, char?: string, shiftChar?: string) => {
-      // Modifier keys
-      if (code === "ShiftLeft" || code === "ShiftRight") {
-        setShift(!shiftActive);
-        return;
-      }
-      if (code === "CapsLock") {
-        toggleCaps();
-        return;
-      }
-
-      // Functional keys
+      if (code === "ShiftLeft" || code === "ShiftRight") { setShift(!shiftActive); return; }
+      if (code === "CapsLock") { toggleCaps(); return; }
       if (code === "Backspace") { doBackspace(); textareaRef.current?.focus(); return; }
       if (code === "Enter")     { insertChar("\n"); textareaRef.current?.focus(); return; }
       if (code === "Tab")       { insertChar("    "); textareaRef.current?.focus(); return; }
       if (code === "Escape")    { textareaRef.current?.focus(); return; }
-
-      // Character keys
       if (char !== undefined) {
         const isLetter = /^[a-z]$/i.test(char);
-        let out: string;
-
-        if (isLetter) {
-          out = isUppercase() ? char.toUpperCase() : char.toLowerCase();
-        } else {
-          out = shiftActive ? (shiftChar ?? char) : char;
-        }
-
+        const out = isLetter
+          ? (isUppercase() ? char.toUpperCase() : char.toLowerCase())
+          : (shiftActive ? (shiftChar ?? char) : char);
         insertChar(out);
-        if (shiftActive) setShift(false); // auto-release shift after one char
+        if (shiftActive) setShift(false);
         textareaRef.current?.focus();
       }
     },
     [shiftActive, isUppercase, doBackspace, insertChar, setShift, toggleCaps]
   );
 
-  // ── Pressed-keys flash helper ─────────────────────────────────
+  // ── Physical key highlight ────────────────────────────────────
   const pressKey = useCallback((code: string) => {
     setPressedKeys((prev) => new Set(prev).add(code));
     setTimeout(() => {
-      setPressedKeys((prev) => {
-        const next = new Set(prev);
-        next.delete(code);
-        return next;
-      });
+      setPressedKeys((prev) => { const n = new Set(prev); n.delete(code); return n; });
     }, 120);
   }, []);
 
-  // ── Physical keyboard listeners ───────────────────────────────
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      // Highlight key visually
+    const onDown = (e: KeyboardEvent) => {
       pressKey(e.code);
-
-      // Track shift / caps (just for visual state, browser handles actual input)
       if (e.code === "ShiftLeft" || e.code === "ShiftRight") setShiftActive(true);
       if (e.code === "CapsLock") toggleCaps();
     };
-
-    const onKeyUp = (e: KeyboardEvent) => {
+    const onUp = (e: KeyboardEvent) => {
       if (e.code === "ShiftLeft" || e.code === "ShiftRight") setShiftActive(false);
     };
-
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup",   onKeyUp);
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup",   onKeyUp);
-    };
+    window.addEventListener("keydown", onDown);
+    window.addEventListener("keyup",   onUp);
+    return () => { window.removeEventListener("keydown", onDown); window.removeEventListener("keyup", onUp); };
   }, [pressKey, toggleCaps]);
 
-  // ── Close panel on outside click ─────────────────────────────
+  // ── Close dropdowns on outside click ─────────────────────────
   useEffect(() => {
-    const handler = () => closePanel();
-    if (panelOpen) {
-      // Use setTimeout so the chip-button click doesn't immediately close it
-      const id = setTimeout(() => document.addEventListener("click", handler), 0);
-      return () => {
-        clearTimeout(id);
-        document.removeEventListener("click", handler);
-      };
-    }
-  }, [panelOpen, closePanel]);
+    if (!openDropdown) return;
+    const handler = () => closeDropdowns();
+    const id = setTimeout(() => document.addEventListener("click", handler), 0);
+    return () => { clearTimeout(id); document.removeEventListener("click", handler); };
+  }, [openDropdown, closeDropdowns]);
 
-  // ── Auto-focus on mount ───────────────────────────────────────
-  useEffect(() => {
-    textareaRef.current?.focus();
-  }, []);
+  // ── Auto-focus ────────────────────────────────────────────────
+  useEffect(() => { textareaRef.current?.focus(); }, []);
 
   return {
-    activePaper,
-    setActivePaper,
-    panelOpen,
-    togglePanel,
-    closePanel,
-    shiftActive,
-    capsLock,
-    pressedKeys,
-    textareaRef,
-    focusPaper,
-    handleVirtualKey,
+    activePaper, setActivePaper,
+    activeColor, setActiveColor,
+    activeFont,  setActiveFont,
+    volume, cycleVolume,
+    openDropdown, toggleDropdown, closeDropdowns,
+    shiftActive, capsLock, pressedKeys,
+    textareaRef, focusPaper, handleVirtualKey,
   };
 }

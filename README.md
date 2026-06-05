@@ -134,4 +134,3 @@ All key visual tokens are CSS variables at the top of `globals.css` under **§1 
 | Styling     | Plain CSS (no Tailwind) |
 | Fonts       | next/font/google        |
 | Deployment  | Vercel (zero-config)    |
-# keyboard

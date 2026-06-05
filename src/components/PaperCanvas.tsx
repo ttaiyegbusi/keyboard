@@ -1,44 +1,31 @@
 // ─────────────────────────────────────────────────────────────
 // src/components/PaperCanvas.tsx
 //
-// The large centre-stage paper panel that sits behind the
-// keyboard. This is where typed text appears.
-//
-// The paper's visual style (background texture, font, colour)
-// is driven entirely by the `activePaper` CSS class applied to
-// the wrapper div — all visual rules live in globals.css under
-// the "PAPER BACKGROUNDS" and "PAPER TYPOGRAPHY" sections.
-//
-// Props:
-//   activePaper  — current paper type id (becomes a CSS class)
-//   textareaRef  — forwarded ref so the parent can focus/read it
-//   onPanelClick — closes the papers dropdown when scene is clicked
+// The large writing surface. Now also accepts activeFont so
+// the textarea font updates when the user picks a new font.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
 
 import React, { RefObject } from "react";
-import { PaperType } from "@/types";
+import { PaperType, FontId } from "@/types";
+import { FONTS } from "@/data/fonts";
 
 interface PaperCanvasProps {
   activePaper: PaperType;
+  activeFont:  FontId;
   textareaRef: RefObject<HTMLTextAreaElement>;
   onPanelClick: () => void;
 }
 
-export function PaperCanvas({
-  activePaper,
-  textareaRef,
-  onPanelClick,
-}: PaperCanvasProps) {
+export function PaperCanvas({ activePaper, activeFont, textareaRef, onPanelClick }: PaperCanvasProps) {
+  // Look up font-family string for the chosen font
+  const fontFamily = FONTS.find((f) => f.id === activeFont)?.family ?? "inherit";
+
   return (
     <div
       className={`paper-panel paper-panel--${activePaper}`}
-      onClick={(e) => {
-        e.stopPropagation();
-        onPanelClick();
-        textareaRef.current?.focus();
-      }}
+      onClick={(e) => { e.stopPropagation(); onPanelClick(); textareaRef.current?.focus(); }}
     >
       <textarea
         ref={textareaRef}
@@ -46,7 +33,8 @@ export function PaperCanvas({
         placeholder="Start typing…"
         spellCheck
         autoComplete="off"
-        /* Prevent the textarea from stealing click events away from the panel */
+        // Override font-family inline — overrides the per-paper CSS default
+        style={{ fontFamily }}
         onClick={(e) => e.stopPropagation()}
       />
     </div>

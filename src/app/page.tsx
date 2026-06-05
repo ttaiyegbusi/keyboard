@@ -1,76 +1,58 @@
 // ─────────────────────────────────────────────────────────────
 // src/app/page.tsx
-//
-// Root page — composes all components into the full layout:
-//
-//   <Topbar>          ← fixed header (brand + toolbar + panel)
-//   <main.scene>
-//     <PaperCanvas>   ← large centre paper (behind keyboard)
-//     <Keyboard>      ← interactive keyboard at bottom
-//   </main>
-//
-// All state is managed by the useTypewriter hook and passed
-// down as props — no prop drilling more than one level.
+// Root page — wires all state and components together.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
 
 import React from "react";
-import { Topbar }      from "@/components/Topbar";
-import { PaperCanvas } from "@/components/PaperCanvas";
-import { Keyboard }    from "@/components/Keyboard";
+import { Topbar }        from "@/components/Topbar";
+import { PaperCanvas }   from "@/components/PaperCanvas";
+import { Keyboard }      from "@/components/Keyboard";
 import { useTypewriter } from "@/hooks/useTypewriter";
 
 export default function Home() {
   const {
-    activePaper,
-    setActivePaper,
-    panelOpen,
-    togglePanel,
-    closePanel,
-    shiftActive,
-    capsLock,
-    pressedKeys,
-    textareaRef,
-    handleVirtualKey,
+    activePaper, setActivePaper,
+    activeColor, setActiveColor,
+    activeFont,  setActiveFont,
+    volume,      cycleVolume,
+    openDropdown, toggleDropdown, closeDropdowns,
+    shiftActive, capsLock, pressedKeys,
+    textareaRef, handleVirtualKey,
   } = useTypewriter();
 
   return (
     <>
-      {/* ── Top navigation bar ───────────────────────────── */}
       <Topbar
         activePaper={activePaper}
-        panelOpen={panelOpen}
-        onChipClick={(e) => {
-          e.stopPropagation();
-          togglePanel();
-        }}
+        activeColor={activeColor}
+        activeFont={activeFont}
+        volume={volume}
+        openDropdown={openDropdown}
+        onPaperChipClick={(e) => { e.stopPropagation(); toggleDropdown("paper"); }}
+        onColorDotClick={(e)  => { e.stopPropagation(); toggleDropdown("color"); }}
+        onFontLabelClick={(e) => { e.stopPropagation(); toggleDropdown("font");  }}
+        onVolumeClick={cycleVolume}
         onSelectPaper={setActivePaper}
+        onSelectColor={setActiveColor}
+        onSelectFont={setActiveFont}
       />
 
-      {/* ── Main scene ───────────────────────────────────── */}
-      {/*
-        Clicking the bare scene background closes the panel.
-        Individual children call e.stopPropagation() so only
-        true outside-clicks dismiss the dropdown.
-      */}
-      <main className="scene" onClick={closePanel}>
-
-        {/* The paper the user types on */}
+      <main className="scene" onClick={closeDropdowns}>
         <PaperCanvas
           activePaper={activePaper}
+          activeFont={activeFont}
           textareaRef={textareaRef}
-          onPanelClick={closePanel}
+          onPanelClick={closeDropdowns}
         />
-
-        {/* The keyboard at the bottom */}
         <Keyboard
           pressedKeys={pressedKeys}
           shiftActive={shiftActive}
           capsLock={capsLock}
+          activeColor={activeColor}
           onKeyPress={handleVirtualKey}
         />
-
       </main>
     </>
   );
