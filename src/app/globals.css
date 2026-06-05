@@ -276,52 +276,54 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 
 
 /* ── 9. SCENE LAYOUT ────────────────────────────────────────────
-   Scene holds: notepad (peeking above keyboard) + keyboard.
-   They are stacked as a single column, centred, with NO gap.
-   The notepad bottom edge disappears under/into the keyboard top.
+   Scene holds: notepad card (small, centered) + keyboard below.
+   The notepad is SMALLER than the keyboard — it floats centered
+   above the keyboard like a piece of paper on a desk.
+   Dark background is visible on both sides of the notepad.
 ───────────────────────────────────────────────────────────────*/
 .scene {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;   /* anchor both to the bottom */
+  justify-content: flex-end;
   padding-bottom: 48px;
   overflow: hidden;
 }
 
 
 /* ── 10. NOTEPAD CARD ───────────────────────────────────────────
-   The notepad is exactly as wide as the keyboard shell.
-   It sits flush on top of the keyboard — no gap between them.
-   Rounded on top corners only; bottom corners flush with the
-   keyboard top edge (appears to slide into the shell).
-   The keyboard's top border-radius visually "holds" the pad.
+   Small compact notepad card — centered above the keyboard.
+   Width is ~half the keyboard width. Rounded on ALL corners.
+   Sits above the keyboard with dark space visible on both sides.
+   Bottom edge overlaps slightly into keyboard top edge.
 ───────────────────────────────────────────────────────────────*/
 .notepad {
-  /* Match keyboard shell width exactly */
-  width: var(--shell-w);
+  /* Small card — NOT full keyboard width */
+  width: 560px;
   height: 220px;
 
-  /* Rounded only on top — bottom merges into keyboard */
-  border-radius: 16px 16px 0 0;
+  /* Fully rounded — all 4 corners */
+  border-radius: 16px 16px 14px 14px;
 
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
 
-  /* No gap — sits directly on top of keyboard */
-  margin-bottom: 0;
+  /* Overlap slightly into keyboard top so they feel connected */
+  margin-bottom: -18px;
+  z-index: 5;
 
-  /* Paper shadow — looks like it's resting on the keyboard body */
+  /* Card shadow — casts onto keyboard below */
   box-shadow:
-    0 -1px 0 rgba(255,255,255,0.08) inset,   /* top highlight */
-    0 8px 32px rgba(0,0,0,0.35),              /* shadow on keyboard below */
-    0 2px 8px rgba(0,0,0,0.25);
+    0 1px 0 rgba(255,255,255,0.06) inset,
+    0 12px 40px rgba(0,0,0,0.45),
+    0 4px 12px rgba(0,0,0,0.35),
+    0 2px 4px rgba(0,0,0,0.25);
 
   transition: background 0.3s ease;
 
-  /* Scale with keyboard */
+  /* Scales in sync with keyboard */
   transform: scale(var(--keyboard-scale));
   transform-origin: bottom center;
 }
