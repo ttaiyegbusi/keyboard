@@ -9,7 +9,7 @@
 //   type "knob"     → dial, no label
 // ─────────────────────────────────────────────────────────────
 
-export type KeyType = "char" | "special" | "fn" | "knob";
+export type KeyType = "char" | "special" | "fn" | "knob" | "touchid";
 
 export interface KeyDef {
   type: KeyType;
@@ -56,7 +56,7 @@ export const ROW_FN: KeyDef[] = [
   { type: "fn", code: "F10", fnLabel: "F10", fnIcon: ICONS.mute,        sizeClass: "k-fn" },
   { type: "fn", code: "F11", fnLabel: "F11", fnIcon: ICONS.volDown,     sizeClass: "k-fn" },
   { type: "fn", code: "F12", fnLabel: "F12", fnIcon: ICONS.volUp,       sizeClass: "k-fn" },
-  { type: "knob", sizeClass: "k-knob-w" },
+  { type: "touchid", sizeClass: "k-knob-w" },
 ];
 
 export const ROW_NUMBER: KeyDef[] = [

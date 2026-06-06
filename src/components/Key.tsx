@@ -1,6 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // src/components/Key.tsx
-// Light mode key — always white face, dark text.
+// Light mode. White keys, dark text.
+// Touch ID = square key with circular sensor inset.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
@@ -17,14 +18,17 @@ interface KeyProps {
 }
 
 export function Key({ keyDef, pressed, onPress }: KeyProps) {
-  const { type, code, char, shift, label, labelAlign, sizeClass, fnLabel, fnIcon, homing, isShift, isCaps, isLetter } = keyDef;
+  const {
+    type, code, char, shift, label, labelAlign,
+    sizeClass, fnLabel, fnIcon, homing, isShift, isCaps, isLetter,
+  } = keyDef;
 
   const classes = [
     "key", sizeClass,
-    pressed ? "key--pressed" : "",
-    homing  ? "key--homing"  : "",
-    isShift ? "key--shift"   : "",
-    isCaps  ? "key--caps"    : "",
+    pressed  ? "key--pressed" : "",
+    homing   ? "key--homing"  : "",
+    isShift  ? "key--shift"   : "",
+    isCaps   ? "key--caps"    : "",
   ].filter(Boolean).join(" ");
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -36,24 +40,40 @@ export function Key({ keyDef, pressed, onPress }: KeyProps) {
     if (code) onPress(code, char, shift);
   };
 
+  // ── Touch ID — square key with circular sensor ─────────────
+  if (type === "touchid") {
+    return (
+      <div className="k-knob-w" aria-label="Touch ID" title="Touch ID">
+        <div className="knob" />
+      </div>
+    );
+  }
+
+  // ── Old knob (fallback) ─────────────────────────────────────
   if (type === "knob") {
-    return <div className="k-knob-w" aria-hidden><div className="knob" /></div>;
+    return (
+      <div className="k-knob-w" aria-hidden>
+        <div className="knob" />
+      </div>
+    );
   }
 
   return (
-    <div className={classes} role="button"
+    <div
+      className={classes}
+      role="button"
       aria-label={label ?? (shift ?? char) ?? code}
       tabIndex={-1}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
     >
-      {/* Fn key */}
+      {/* Fn key: icon + number */}
       {type === "fn" && (
         <div className="lbl-fn">
           {fnIcon && (
             <span className="fn-ic" aria-hidden>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
                 <path d={fnIcon} />
               </svg>
             </span>
