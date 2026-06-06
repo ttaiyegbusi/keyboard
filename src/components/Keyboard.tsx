@@ -1,12 +1,16 @@
 // ─────────────────────────────────────────────────────────────
 // src/components/Keyboard.tsx
-// Light mode keyboard. Only --kbd-shell / --kbd-shell-bot
-// change per theme. Key face is always white via CSS.
+//
+// Color-change animation:
+// When activeColor changes, the keyboard briefly scales down
+// (0.985) then back to 1.0 — a subtle "click-in" pulse that
+// makes the color switch feel physical and premium.
+// The shell color crossfades with a 400ms ease.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Key } from "./Key";
 import { ROW_FN, ROW_NUMBER, ROW_QWERTY, ROW_HOME, ROW_SHIFT } from "@/data/keyboard";
 import { KeyboardColor, VolumeState } from "@/types";
@@ -31,9 +35,23 @@ export function Keyboard({
   const { playClick } = useSound(volume);
   useEffect(() => { registerSoundCb(playClick); }, [playClick, registerSoundCb]);
 
+  // ── Color-change animation ─────────────────────────────────
+  // Tracks whether a color-switch pulse is active
+  const [pulsing, setPulsing] = useState(false);
+  const prevColor = useRef(activeColor);
+
+  useEffect(() => {
+    if (prevColor.current !== activeColor) {
+      prevColor.current = activeColor;
+      // Trigger pulse: scale down then back up
+      setPulsing(true);
+      const t = setTimeout(() => setPulsing(false), 320);
+      return () => clearTimeout(t);
+    }
+  }, [activeColor]);
+
   const theme = KEYBOARD_COLORS.find((c) => c.id === activeColor);
 
-  // Only inject shell background vars — key vars are locked to white in CSS
   const shellStyle: React.CSSProperties = theme ? {
     ["--kbd-shell"     as string]: theme.vars.shellTop,
     ["--kbd-shell-bot" as string]: theme.vars.shellBot,
@@ -46,7 +64,10 @@ export function Keyboard({
 
   return (
     <div className="keyboard-zone">
-      <div className="keyboard-body" style={shellStyle}>
+      <div
+        className={`keyboard-body ${pulsing ? "kbd-pulse" : ""}`}
+        style={shellStyle}
+      >
         <div className="keyboard-grid">
 
           <div className="key-row">
@@ -90,8 +111,8 @@ export function Keyboard({
           <div className="key-row key-row--bottom">
             <div className="key k-mod-sm" onMouseDown={(e) => { e.preventDefault(); playClick(); }}>
               <div className="fn-globe-wrap">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10"/>
                   <line x1="2" y1="12" x2="22" y2="12"/>
                   <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>

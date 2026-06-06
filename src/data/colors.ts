@@ -1,153 +1,149 @@
 // ─────────────────────────────────────────────────────────────
 // src/data/colors.ts
 //
-// Apple-inspired keyboard SHELL colours.
-// ONLY the shell (aluminium frame) changes colour.
-// Keys are ALWAYS white — that's how real Apple keyboards work.
+// The exact 7 Apple iMac aluminum finish colours.
+// Source: Apple iMac 24" (2021) color lineup.
+// Each shell has a subtle 2-stop gradient — lighter at top,
+// richer/slightly darker at bottom — matching the anodized
+// aluminum look in the real product photos.
 //
-// Each theme sets:
-//   shellTop / shellBot  — the shell gradient (what shows between keys)
-//   swatch               — dot colour shown in the toolbar
-//
-// Key face colours are hardcoded white in CSS and never change.
+// Keys are always white — only shellTop/shellBot change.
 // ─────────────────────────────────────────────────────────────
 
 import { KeyboardColorOption } from "@/types";
 
 export const KEYBOARD_COLORS: KeyboardColorOption[] = [
+  // ── Silver ───────────────────────────────────────────────────
+  // The default finish. Cool neutral grey with warm undertone.
   {
     id: "silver",
     label: "Silver",
-    swatch: "#d4d4d8",
+    swatch: "#c8c8c8",
     vars: {
-      shellTop: "#e4e4e7",  shellBot: "#d4d4d8",
-      keyTop: "#ffffff",    keyMid: "#ffffff",    keyBot: "#f4f4f5",
-      keyText: "#18181b",   keyTextSub: "#71717a",
-      keyBorder: "rgba(0,0,0,0.08)",
-      keyHighlight: "rgba(255,255,255,0.9)",
-      keyShadow: "rgba(0,0,0,0.14)",
-      dropShadow: "rgba(0,0,0,0.10)",
-      knob: "radial-gradient(circle at 35% 30%,#e4e4e7 0%,#a1a1aa 50%,#71717a 100%)",
+      shellTop:    "#dcdcdc",
+      shellBot:    "#b8b8b8",
+      keyTop:    "#ffffff", keyMid: "#ffffff", keyBot: "#f5f5f7",
+      keyText:   "#1d1d1f", keyTextSub: "#6e6e73",
+      keyBorder:    "rgba(0,0,0,0.09)",
+      keyHighlight: "rgba(255,255,255,0.92)",
+      keyShadow:    "rgba(0,0,0,0.14)",
+      dropShadow:   "rgba(0,0,0,0.10)",
+      knob: "radial-gradient(circle at 38% 32%,#e8e8e8 0%,#b0b0b0 55%,#888 100%)",
     },
   },
-  {
-    id: "spacegray",
-    label: "Space Gray",
-    swatch: "#52525b",
-    vars: {
-      shellTop: "#52525b",  shellBot: "#3f3f46",
-      keyTop: "#ffffff",    keyMid: "#ffffff",    keyBot: "#f4f4f5",
-      keyText: "#18181b",   keyTextSub: "#71717a",
-      keyBorder: "rgba(0,0,0,0.08)",
-      keyHighlight: "rgba(255,255,255,0.9)",
-      keyShadow: "rgba(0,0,0,0.18)",
-      dropShadow: "rgba(0,0,0,0.14)",
-      knob: "radial-gradient(circle at 35% 30%,#71717a 0%,#3f3f46 50%,#27272a 100%)",
-    },
-  },
-  {
-    id: "midnight",
-    label: "Midnight",
-    swatch: "#1e293b",
-    vars: {
-      shellTop: "#1e293b",  shellBot: "#0f172a",
-      keyTop: "#ffffff",    keyMid: "#ffffff",    keyBot: "#f4f4f5",
-      keyText: "#18181b",   keyTextSub: "#71717a",
-      keyBorder: "rgba(0,0,0,0.08)",
-      keyHighlight: "rgba(255,255,255,0.9)",
-      keyShadow: "rgba(0,0,0,0.20)",
-      dropShadow: "rgba(0,0,0,0.16)",
-      knob: "radial-gradient(circle at 35% 30%,#334155 0%,#1e293b 50%,#0f172a 100%)",
-    },
-  },
-  {
-    id: "starlight",
-    label: "Starlight",
-    swatch: "#e7e5e4",
-    vars: {
-      shellTop: "#f5f5f4",  shellBot: "#e7e5e4",
-      keyTop: "#ffffff",    keyMid: "#ffffff",    keyBot: "#fafaf9",
-      keyText: "#18181b",   keyTextSub: "#71717a",
-      keyBorder: "rgba(0,0,0,0.07)",
-      keyHighlight: "rgba(255,255,255,0.95)",
-      keyShadow: "rgba(0,0,0,0.12)",
-      dropShadow: "rgba(0,0,0,0.08)",
-      knob: "radial-gradient(circle at 35% 30%,#f5f5f4 0%,#d6d3d1 50%,#a8a29e 100%)",
-    },
-  },
-  {
-    id: "pink",
-    label: "Pink",
-    swatch: "#f9a8d4",
-    vars: {
-      shellTop: "#f9a8d4",  shellBot: "#f472b6",
-      keyTop: "#ffffff",    keyMid: "#ffffff",    keyBot: "#fdf2f8",
-      keyText: "#18181b",   keyTextSub: "#71717a",
-      keyBorder: "rgba(0,0,0,0.07)",
-      keyHighlight: "rgba(255,255,255,0.9)",
-      keyShadow: "rgba(0,0,0,0.12)",
-      dropShadow: "rgba(0,0,0,0.10)",
-      knob: "radial-gradient(circle at 35% 30%,#fce7f3 0%,#f9a8d4 50%,#ec4899 100%)",
-    },
-  },
+
+  // ── Blue ─────────────────────────────────────────────────────
+  // Periwinkle — soft cornflower blue with slight grey.
+  // Apple calls this "Blue". See Image 3.
   {
     id: "skyblue",
-    label: "Sky Blue",
-    swatch: "#7dd3fc",
+    label: "Blue",
+    swatch: "#81a4c8",
     vars: {
-      shellTop: "#7dd3fc",  shellBot: "#38bdf8",
-      keyTop: "#ffffff",    keyMid: "#ffffff",    keyBot: "#f0f9ff",
-      keyText: "#18181b",   keyTextSub: "#71717a",
-      keyBorder: "rgba(0,0,0,0.07)",
-      keyHighlight: "rgba(255,255,255,0.9)",
-      keyShadow: "rgba(0,0,0,0.12)",
-      dropShadow: "rgba(0,0,0,0.10)",
-      knob: "radial-gradient(circle at 35% 30%,#e0f2fe 0%,#7dd3fc 50%,#0ea5e9 100%)",
+      shellTop:    "#9ab4cc",
+      shellBot:    "#6e98bc",
+      keyTop:    "#ffffff", keyMid: "#ffffff", keyBot: "#f0f4f8",
+      keyText:   "#1d1d1f", keyTextSub: "#6e6e73",
+      keyBorder:    "rgba(0,0,0,0.08)",
+      keyHighlight: "rgba(255,255,255,0.92)",
+      keyShadow:    "rgba(0,0,0,0.12)",
+      dropShadow:   "rgba(0,0,0,0.09)",
+      knob: "radial-gradient(circle at 38% 32%,#c0d4e8 0%,#81a4c8 55%,#4e7aa0 100%)",
     },
   },
-  {
-    id: "purple",
-    label: "Purple",
-    swatch: "#c084fc",
-    vars: {
-      shellTop: "#c084fc",  shellBot: "#a855f7",
-      keyTop: "#ffffff",    keyMid: "#ffffff",    keyBot: "#faf5ff",
-      keyText: "#18181b",   keyTextSub: "#71717a",
-      keyBorder: "rgba(0,0,0,0.07)",
-      keyHighlight: "rgba(255,255,255,0.9)",
-      keyShadow: "rgba(0,0,0,0.12)",
-      dropShadow: "rgba(0,0,0,0.10)",
-      knob: "radial-gradient(circle at 35% 30%,#f3e8ff 0%,#c084fc 50%,#9333ea 100%)",
-    },
-  },
-  {
-    id: "yellow",
-    label: "Yellow",
-    swatch: "#fde047",
-    vars: {
-      shellTop: "#fde047",  shellBot: "#facc15",
-      keyTop: "#ffffff",    keyMid: "#ffffff",    keyBot: "#fefce8",
-      keyText: "#18181b",   keyTextSub: "#71717a",
-      keyBorder: "rgba(0,0,0,0.07)",
-      keyHighlight: "rgba(255,255,255,0.9)",
-      keyShadow: "rgba(0,0,0,0.12)",
-      dropShadow: "rgba(0,0,0,0.10)",
-      knob: "radial-gradient(circle at 35% 30%,#fef9c3 0%,#fde047 50%,#eab308 100%)",
-    },
-  },
+
+  // ── Green ─────────────────────────────────────────────────────
+  // Sage / mint green — muted, not bright. See Image 1.
   {
     id: "green",
     label: "Green",
-    swatch: "#86efac",
+    swatch: "#7dab8a",
     vars: {
-      shellTop: "#86efac",  shellBot: "#4ade80",
-      keyTop: "#ffffff",    keyMid: "#ffffff",    keyBot: "#f0fdf4",
-      keyText: "#18181b",   keyTextSub: "#71717a",
-      keyBorder: "rgba(0,0,0,0.07)",
-      keyHighlight: "rgba(255,255,255,0.9)",
-      keyShadow: "rgba(0,0,0,0.12)",
-      dropShadow: "rgba(0,0,0,0.10)",
-      knob: "radial-gradient(circle at 35% 30%,#dcfce7 0%,#86efac 50%,#22c55e 100%)",
+      shellTop:    "#96bca2",
+      shellBot:    "#68977a",
+      keyTop:    "#ffffff", keyMid: "#ffffff", keyBot: "#f0f5f2",
+      keyText:   "#1d1d1f", keyTextSub: "#6e6e73",
+      keyBorder:    "rgba(0,0,0,0.08)",
+      keyHighlight: "rgba(255,255,255,0.92)",
+      keyShadow:    "rgba(0,0,0,0.12)",
+      dropShadow:   "rgba(0,0,0,0.09)",
+      knob: "radial-gradient(circle at 38% 32%,#bcd8c4 0%,#7dab8a 55%,#4e8060 100%)",
+    },
+  },
+
+  // ── Yellow ───────────────────────────────────────────────────
+  // Warm golden yellow — muted, anodized. See Image 4.
+  {
+    id: "yellow",
+    label: "Yellow",
+    swatch: "#c8a852",
+    vars: {
+      shellTop:    "#d4b860",
+      shellBot:    "#b89840",
+      keyTop:    "#ffffff", keyMid: "#ffffff", keyBot: "#fdf8ec",
+      keyText:   "#1d1d1f", keyTextSub: "#6e6e73",
+      keyBorder:    "rgba(0,0,0,0.08)",
+      keyHighlight: "rgba(255,255,255,0.92)",
+      keyShadow:    "rgba(0,0,0,0.12)",
+      dropShadow:   "rgba(0,0,0,0.09)",
+      knob: "radial-gradient(circle at 38% 32%,#e8d090 0%,#c8a852 55%,#9a7820 100%)",
+    },
+  },
+
+  // ── Orange ───────────────────────────────────────────────────
+  // Warm coral orange — the iMac Orange finish.
+  {
+    id: "orange",
+    label: "Orange",
+    swatch: "#c87048",
+    vars: {
+      shellTop:    "#d4845c",
+      shellBot:    "#bc5e38",
+      keyTop:    "#ffffff", keyMid: "#ffffff", keyBot: "#fdf3ee",
+      keyText:   "#1d1d1f", keyTextSub: "#6e6e73",
+      keyBorder:    "rgba(0,0,0,0.08)",
+      keyHighlight: "rgba(255,255,255,0.92)",
+      keyShadow:    "rgba(0,0,0,0.12)",
+      dropShadow:   "rgba(0,0,0,0.09)",
+      knob: "radial-gradient(circle at 38% 32%,#e8b090 0%,#c87048 55%,#984020 100%)",
+    },
+  },
+
+  // ── Pink ─────────────────────────────────────────────────────
+  // Soft rose pink — muted, Apple-style.
+  {
+    id: "pink",
+    label: "Pink",
+    swatch: "#c08090",
+    vars: {
+      shellTop:    "#cc98a8",
+      shellBot:    "#b07080",
+      keyTop:    "#ffffff", keyMid: "#ffffff", keyBot: "#fdf0f3",
+      keyText:   "#1d1d1f", keyTextSub: "#6e6e73",
+      keyBorder:    "rgba(0,0,0,0.08)",
+      keyHighlight: "rgba(255,255,255,0.92)",
+      keyShadow:    "rgba(0,0,0,0.12)",
+      dropShadow:   "rgba(0,0,0,0.09)",
+      knob: "radial-gradient(circle at 38% 32%,#e0b8c4 0%,#c08090 55%,#905068 100%)",
+    },
+  },
+
+  // ── Purple ───────────────────────────────────────────────────
+  // Muted lavender purple — the iMac Purple finish.
+  {
+    id: "purple",
+    label: "Purple",
+    swatch: "#9880b0",
+    vars: {
+      shellTop:    "#ac98c0",
+      shellBot:    "#8870a4",
+      keyTop:    "#ffffff", keyMid: "#ffffff", keyBot: "#f6f2fc",
+      keyText:   "#1d1d1f", keyTextSub: "#6e6e73",
+      keyBorder:    "rgba(0,0,0,0.08)",
+      keyHighlight: "rgba(255,255,255,0.92)",
+      keyShadow:    "rgba(0,0,0,0.12)",
+      dropShadow:   "rgba(0,0,0,0.09)",
+      knob: "radial-gradient(circle at 38% 32%,#ccc0e0 0%,#9880b0 55%,#684890 100%)",
     },
   },
 ];

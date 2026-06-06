@@ -11,9 +11,10 @@ export interface PaperOption {
   thumbClass: string;
 }
 
+// Exactly 7 Apple iMac aluminum finishes
 export type KeyboardColor =
-  | "midnight" | "starlight" | "silver" | "spacegray"
-  | "skyblue"  | "pink"      | "purple" | "yellow" | "green";
+  | "silver" | "skyblue" | "green" | "yellow"
+  | "orange" | "pink"    | "purple";
 
 export interface KeyboardColorOption {
   id: KeyboardColor;
@@ -25,13 +26,13 @@ export interface KeyboardColorOption {
     keyTop:       string;
     keyMid:       string;
     keyBot:       string;
-    keyText:      string;    // primary label — must contrast against keyMid
-    keyTextSub:   string;    // secondary/icon colour — dimmer
+    keyText:      string;
+    keyTextSub:   string;
     keyBorder:    string;
-    keyHighlight: string;    // top inset glow
-    keyShadow:    string;    // bottom inset depth
-    dropShadow:   string;    // drop shadow below key
-    knob:         string;    // radial-gradient for the dial
+    keyHighlight: string;
+    keyShadow:    string;
+    dropShadow:   string;
+    knob:         string;
   };
 }
 
@@ -48,8 +49,3 @@ export interface FontOption {
 }
 
 export type VolumeState = "mute" | "low" | "high";
-
-export interface KeyboardState {
-  shiftActive: boolean;
-  capsLock: boolean;
-}
