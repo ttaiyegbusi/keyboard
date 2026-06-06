@@ -1,7 +1,6 @@
 // ─────────────────────────────────────────────────────────────
 // src/components/FontsPanel.tsx
-// Dark mode font list — each option rendered in its own font.
-// Active row highlighted in blue. No sub-labels, clean rows.
+// Light mode font list — each row in its own font, blue active.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
@@ -35,7 +34,8 @@ export function FontsPanel({ open, activeFont, onSelect }: FontsPanelProps) {
               {f.label}
             </span>
             {isActive && (
-              <svg className="font-row-check" viewBox="0 0 14 14" fill="none" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+              <svg className="font-row-check" viewBox="0 0 14 14" fill="none"
+                strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="2,7 6,11 12,3" stroke="white" />
               </svg>
             )}

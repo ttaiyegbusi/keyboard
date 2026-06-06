@@ -1,12 +1,6 @@
 // ─────────────────────────────────────────────────────────────
 // src/components/Key.tsx
-//
-// Rendering rules:
-//   isLetter → single large centred uppercase letter (A, B, C…)
-//   char+shift, no isLetter → stacked: symbol top, char bottom
-//   special → small text label bottom-left or right
-//   fn → icon above, Fn number below
-//   knob → dial, no label
+// Light mode key — always white face, dark text.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
@@ -23,17 +17,14 @@ interface KeyProps {
 }
 
 export function Key({ keyDef, pressed, onPress }: KeyProps) {
-  const {
-    type, code, char, shift, label, labelAlign,
-    sizeClass, fnLabel, fnIcon, homing, isShift, isCaps, isLetter,
-  } = keyDef;
+  const { type, code, char, shift, label, labelAlign, sizeClass, fnLabel, fnIcon, homing, isShift, isCaps, isLetter } = keyDef;
 
   const classes = [
     "key", sizeClass,
-    pressed  ? "key--pressed" : "",
-    homing   ? "key--homing"  : "",
-    isShift  ? "key--shift"   : "",
-    isCaps   ? "key--caps"    : "",
+    pressed ? "key--pressed" : "",
+    homing  ? "key--homing"  : "",
+    isShift ? "key--shift"   : "",
+    isCaps  ? "key--caps"    : "",
   ].filter(Boolean).join(" ");
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -45,22 +36,18 @@ export function Key({ keyDef, pressed, onPress }: KeyProps) {
     if (code) onPress(code, char, shift);
   };
 
-  // ── Knob ──────────────────────────────────────────────────
   if (type === "knob") {
     return <div className="k-knob-w" aria-hidden><div className="knob" /></div>;
   }
 
   return (
-    <div
-      className={classes}
-      role="button"
+    <div className={classes} role="button"
       aria-label={label ?? (shift ?? char) ?? code}
       tabIndex={-1}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
     >
-
-      {/* ── Fn key: icon + number ────────────────────────── */}
+      {/* Fn key */}
       {type === "fn" && (
         <div className="lbl-fn">
           {fnIcon && (
@@ -75,12 +62,12 @@ export function Key({ keyDef, pressed, onPress }: KeyProps) {
         </div>
       )}
 
-      {/* ── Letter key: single centred uppercase label ────── */}
+      {/* Letter key — single centred uppercase */}
       {type === "char" && isLetter && shift && (
         <span className="lbl-c">{shift}</span>
       )}
 
-      {/* ── Symbol key: stacked (shift symbol / base char) ── */}
+      {/* Symbol key — stacked */}
       {type === "char" && !isLetter && char && shift && (
         <div className="lbl-st">
           <span className="s-top">{shift}</span>
@@ -88,7 +75,7 @@ export function Key({ keyDef, pressed, onPress }: KeyProps) {
         </div>
       )}
 
-      {/* ── Special key: text label ───────────────────────── */}
+      {/* Special key */}
       {type === "special" && label && (
         <>
           {labelAlign === "left"   && <span className="lbl-ml">{label}</span>}
@@ -97,7 +84,6 @@ export function Key({ keyDef, pressed, onPress }: KeyProps) {
           {isCaps && <span className="caps-dot" aria-hidden />}
         </>
       )}
-
     </div>
   );
 }

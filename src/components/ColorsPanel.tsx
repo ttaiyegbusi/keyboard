@@ -1,10 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // src/components/ColorsPanel.tsx
-//
-// Dropdown for keyboard colour themes.
-// Shows a grid of Apple-inspired colour swatches.
-// Selecting one injects CSS variable overrides onto the keyboard
-// shell via inline styles (handled in Keyboard.tsx).
+// Light mode colour grid — shadcn popover style.
+// Shows shell colours only — label says "Keyboard Frame".
 // ─────────────────────────────────────────────────────────────
 
 "use client";
@@ -25,8 +22,7 @@ export function ColorsPanel({ open, activeColor, onSelect }: ColorsPanelProps) {
       className={`dropdown-panel ${open ? "dropdown-panel--open" : ""}`}
       onClick={(e) => e.stopPropagation()}
     >
-      <p className="dropdown-title">Keyboard Color</p>
-
+      <p className="dropdown-title">Keyboard Frame</p>
       <div className="colors-grid">
         {KEYBOARD_COLORS.map((c) => {
           const isActive = c.id === activeColor;
@@ -38,15 +34,11 @@ export function ColorsPanel({ open, activeColor, onSelect }: ColorsPanelProps) {
               aria-pressed={isActive}
               onClick={() => onSelect(c.id)}
             >
-              {/* Color circle swatch */}
-              <div
-                className="color-swatch-circle"
-                style={{ background: c.swatch }}
-              >
-                {/* Checkmark when active */}
+              <div className="color-swatch-circle" style={{ background: c.swatch }}>
                 {isActive && (
-                  <svg className="color-check" viewBox="0 0 12 12" fill="none" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="2,6 5,9 10,3" stroke="white" />
+                  <svg className="color-check" viewBox="0 0 14 14" fill="none"
+                    strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="2,7 6,11 12,3" stroke="white" />
                   </svg>
                 )}
               </div>

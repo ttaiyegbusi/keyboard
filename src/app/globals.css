@@ -1,40 +1,88 @@
 /* ═══════════════════════════════════════════════════════════════
-   src/app/globals.css
+   src/app/globals.css  —  LIGHT MODE  (shadcn/ui color system)
+   https://ui.shadcn.com/docs/theming
 ═══════════════════════════════════════════════════════════════ */
 
-/* ── 1. CSS VARIABLES ─────────────────────────────────────── */
+/* ── 1. SHADCN LIGHT TOKENS ────────────────────────────────────
+   Using shadcn's default "zinc" light palette.
+   Variable names mirror shadcn conventions.
+───────────────────────────────────────────────────────────────*/
 :root {
-  --bg:     #1a1a1a;
+  /* shadcn background / surface */
+  --background:        #ffffff;
+  --foreground:        #09090b;          /* zinc-950 */
+  --card:              #ffffff;
+  --card-foreground:   #09090b;
+  --popover:           #ffffff;
+  --popover-foreground:#09090b;
 
-  /* Key tokens */
-  --kbd-top:         #222329;  --kbd-bot:         #1c1d21;
-  --key-top:         #303238;  --key-mid:         #282a30;  --key-bot:    #24262b;
-  --key-text:        #d8dade;  --key-text-sub:    #72767f;
-  --kbd-border:      rgba(255,255,255,0.07);
-  --key-highlight:   rgba(255,255,255,0.10);
-  --key-shadow:      rgba(0,0,0,0.50);
-  --key-drop-shadow: rgba(0,0,0,0.65);
-  --knob-bg: radial-gradient(circle at 35% 30%,#383b42 0%,#252832 50%,#111318 100%);
+  /* shadcn muted */
+  --muted:             #f4f4f5;          /* zinc-100 */
+  --muted-foreground:  #71717a;          /* zinc-500 */
 
-  --blue:      #3b82f6;
-  --divider:   rgba(255,255,255,0.09);
-  --dd-bg:     #1c1c20;
-  --dd-border: rgba(255,255,255,0.08);
-  --dd-hover:  rgba(255,255,255,0.05);
-  --dd-active: rgba(59,130,246,0.14);
-  --dd-text:   #e0e2e8;
-  --dd-sub:    #6e7280;
+  /* shadcn border / input */
+  --border:            #e4e4e7;          /* zinc-200 */
+  --input:             #e4e4e7;
 
-  --key-h:      54px;
-  --gap:         7px;
-  --pad:        14px;
-  --kbd-radius: 18px;
-  --inner-w: 1057px;
-  --shell-w:  1085px;
+  /* shadcn primary (blue) */
+  --primary:           #18181b;          /* zinc-900 */
+  --primary-foreground:#fafafa;
 
+  /* shadcn accent */
+  --accent:            #f4f4f5;
+  --accent-foreground: #18181b;
+
+  /* shadcn ring */
+  --ring:              #3b82f6;          /* blue-500 */
+
+  /* shadcn radius */
+  --radius:            0.5rem;
+
+  /* App-level aliases */
+  --bg:             var(--background);
+  --text:           var(--foreground);
+  --surface:        var(--muted);        /* zinc-100 — topbar / toolbar bg */
+  --surface-border: var(--border);
+
+  /* ── Keyboard shell tokens (overridden per colour theme) ──
+     SHELL = the coloured aluminium frame
+     KEY   = always white/light — only text changes
+  ─────────────────────────────────────────────────────────── */
+  --kbd-shell:       #e4e4e7;            /* zinc-200  — default shell */
+  --kbd-shell-bot:   #d4d4d8;            /* zinc-300 */
+  --kbd-border-col:  rgba(0,0,0,0.10);
+
+  /* Keys are ALWAYS white/near-white regardless of shell color */
+  --key-face:        #ffffff;
+  --key-face-bot:    #f4f4f5;            /* zinc-100 */
+  --key-text-main:   #18181b;            /* zinc-900 — dark labels */
+  --key-text-sub:    #71717a;            /* zinc-500 — dim labels */
+  --key-highlight:   rgba(255,255,255,0.90);
+  --key-shadow-col:  rgba(0,0,0,0.18);
+  --key-drop:        rgba(0,0,0,0.12);
+  --knob-face:       radial-gradient(circle at 35% 30%,#e4e4e7 0%,#a1a1aa 50%,#71717a 100%);
+
+  /* ── Dropdown (popover) tokens — light ── */
+  --dd-bg:     var(--popover);           /* white */
+  --dd-border: var(--border);            /* zinc-200 */
+  --dd-hover:  var(--accent);            /* zinc-100 */
+  --dd-active: #eff6ff;                  /* blue-50 */
+  --dd-text:   var(--foreground);
+  --dd-sub:    var(--muted-foreground);
+
+  /* ── Sizing ── */
+  --key-h:      52px;
+  --gap:         6px;
+  --pad:        13px;
+  --kbd-radius: 16px;
+  --inner-w:  1057px;
+  --shell-w:  1083px;
+
+  /* SF Pro */
   --sf: -apple-system, BlinkMacSystemFont, "SF Pro Text",
         "SF Pro Display", system-ui, "Helvetica Neue", Arial, sans-serif;
 
+  /* Writing fonts */
   --font-special-elite: var(--font-special-elite, 'Courier New', monospace);
   --font-inter:         var(--font-inter, sans-serif);
   --font-caveat:        var(--font-caveat, cursive);
@@ -46,13 +94,14 @@
   --keyboard-scale: 1;
 }
 
-/* ── 2. RESET & BASE ────────────────────────────────────────── */
+
+/* ── 2. RESET ───────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 100%; height: 100%; overflow: hidden; }
 body {
   background: var(--bg);
   font-family: var(--sf);
-  color: #f1f1f1;
+  color: var(--text);
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -61,272 +110,300 @@ body {
 }
 button { background: none; border: none; cursor: pointer; font-family: inherit; color: inherit; }
 
-/* ── 3. APP WRAPPER ─────────────────────────────────────────────
-   Full page, single background colour. No separate topbar bg.
-───────────────────────────────────────────────────────────────*/
+
+/* ── 3. APP WRAPPER ─────────────────────────────────────────── */
 .app {
-  width: 100%;
-  height: 100vh;
+  width: 100%; height: 100vh;
   background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   overflow: hidden;
+  /* Subtle radial gradient — gives depth on light bg */
+  background-image: radial-gradient(ellipse at 50% 60%, #f4f4f5 0%, #e4e4e7 100%);
 }
 
-/* ── 4. CONTENT COLUMN ──────────────────────────────────────────
-   Topbar + Notepad + Gap + Keyboard stack vertically, centred.
-   The topbar sits directly above the notepad, close to it.
-   No fixed positioning — everything flows naturally.
-───────────────────────────────────────────────────────────────*/
+
+/* ── 4. CONTENT COLUMN ──────────────────────────────────────── */
 .content-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  /* Center the whole stack vertically */
-  justify-content: center;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 0; justify-content: center;
 }
-
-/* Gap between notepad and keyboard */
-.scene-gap { height: 24px; flex-shrink: 0; }
+.scene-gap { height: 20px; flex-shrink: 0; }
 
 
 /* ── 5. TOPBAR ──────────────────────────────────────────────────
-   Transparent — no background, no border.
-   Sits directly above the notepad as part of the same composition.
-   Width matches notepad (500px) so it reads as one unit.
+   1200px wide, transparent, no border.
+   Sits directly above the notepad.
 ───────────────────────────────────────────────────────────────*/
 .topbar {
-  width: 500px;                    /* same width as notepad */
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  width: 1200px; max-width: 98vw;
+  height: 44px;
+  display: flex; align-items: center; justify-content: space-between;
   padding: 0 4px;
-  background: transparent;         /* NO background */
-  border: none;                    /* NO border */
-  position: relative;
-  z-index: 200;
-  flex-shrink: 0;
-  margin-bottom: 6px;              /* small gap between topbar and notepad */
+  background: transparent; border: none;
+  position: relative; z-index: 200;
+  flex-shrink: 0; margin-bottom: 8px;
 }
-
 .brand {
   display: flex; align-items: center; gap: 8px;
-  font-size: 13px; font-weight: 600; color: #f0f0f0;
-  letter-spacing: -0.02em;
+  font-size: 14px; font-weight: 700; color: var(--foreground);
+  letter-spacing: -0.03em;
 }
-.brand-dot { width: 14px; height: 14px; border-radius: 999px; background: #f4f6f8; }
+.brand-dot { width: 14px; height: 14px; border-radius: 999px; background: var(--foreground); }
 
 
-/* ── 6. TOOLBAR BUTTONS ─────────────────────────────────────── */
+/* ── 6. TOOLBAR ─────────────────────────────────────────────── */
 .toolbar {
   display: flex; align-items: center; gap: 4px;
-  height: 32px; padding: 0 8px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.07);
+  height: 36px; padding: 0 8px;
+  border-radius: 999px;                 /* fully rounded pill */
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
   position: relative;
 }
-.tb-divider { width: 1px; height: 12px; background: var(--divider); flex-shrink: 0; }
+.tb-divider { width: 1px; height: 14px; background: var(--border); flex-shrink: 0; }
 
 .tb-btn {
   display: flex; align-items: center; gap: 4px;
-  padding: 2px 5px; border-radius: 5px;
-  color: #848790; font-size: 12px; font-weight: 450;
+  padding: 3px 6px; border-radius: 6px;
+  color: var(--muted-foreground); font-size: 12px; font-weight: 500;
   transition: background 0.14s, color 0.14s;
   white-space: nowrap;
 }
-.tb-btn:hover   { background: rgba(255,255,255,0.07); color: #b0b2ba; }
-.tb-btn--active { background: rgba(59,130,246,0.14); color: #6aabff; }
+.tb-btn:hover   { background: var(--accent); color: var(--foreground); }
+.tb-btn--active { background: #eff6ff; color: #2563eb; }
 
 .chip-swatch {
-  display: inline-block; width: 12px; height: 12px;
-  border-radius: 3px; flex-shrink: 0;
-  transition: background 0.25s; border: 1px solid rgba(255,255,255,0.1);
+  display: inline-block; width: 14px; height: 14px;
+  border-radius: 4px; flex-shrink: 0;
+  border: 1.5px solid var(--border);
+  transition: background 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 .color-dot {
-  display: inline-block; width: 12px; height: 12px;
+  display: inline-block; width: 14px; height: 14px;
   border-radius: 999px; flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1.5px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
-.chevron-icon { width: 8px; height: 5px; stroke: currentColor; flex-shrink: 0; }
-.tb-icon-btn  { padding: 3px 4px; }
-.tb-icon-btn svg { width: 12px; height: 12px; color: #555866; transition: color 0.14s; }
-.tb-icon-btn:hover svg              { color: #9a9ca8; }
-.tb-icon-btn[aria-label*="high"] svg { color: #6080b0; }
-.tb-icon-btn[aria-label*="low"]  svg { color: #6080b0; }
-.tb-icon-btn[aria-label*="mute"] svg { color: #904040; }
-.tb-label { color: #9a9ca2; }
+.chevron-icon { width: 9px; height: 5px; stroke: currentColor; flex-shrink: 0; }
+.tb-icon-btn  { padding: 4px 5px; border-radius: 6px; }
+.tb-icon-btn svg { width: 14px; height: 14px; color: var(--muted-foreground); transition: color 0.14s; }
+.tb-icon-btn:hover svg              { color: var(--foreground); }
+.tb-icon-btn[aria-label*="high"] svg { color: #2563eb; }
+.tb-icon-btn[aria-label*="low"]  svg { color: #2563eb; }
+.tb-icon-btn[aria-label*="mute"] svg { color: #dc2626; }
+.tb-label { color: var(--muted-foreground); font-size: 12px; }
 
-/* Download wrapper needs relative positioning for its dropdown */
-.dl-wrap { position: relative; }
+/* Download pill — blue */
+.dl-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 999px;
+  background: #2563eb; color: #fff;
+  font-size: 12px; font-weight: 600;
+  border: none; cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(37,99,235,0.4);
+}
+.dl-pill:hover   { background: #1d4ed8; }
+.dl-pill:active  { transform: scale(0.97); }
+.dl-pill--open   { background: #1e40af; }
+.dl-pill svg     { width: 13px; height: 13px; stroke: #fff; flex-shrink: 0; }
+.dl-pill .chevron-icon { width: 8px; height: 5px; stroke: rgba(255,255,255,0.7); }
 
-/* Download options panel */
-.dl-panel { width: 240px; right: 0; }
+/* Dropdown anchor */
+.tb-dd-wrap { position: relative; }
 
+
+/* ── 7. SHARED DROPDOWN (light, shadcn popover style) ──────────
+   White card, zinc-200 border, soft shadow.
+───────────────────────────────────────────────────────────────*/
+.dropdown-panel {
+  position: absolute;
+  top: calc(100% + 8px); right: 0;
+  background: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow:
+    0 4px 6px -1px rgba(0,0,0,0.1),
+    0 2px 4px -2px rgba(0,0,0,0.1),
+    0 10px 30px rgba(0,0,0,0.08);
+  padding: 8px;
+  z-index: 500;
+  opacity: 0; pointer-events: none;
+  transform: translateY(-4px) scale(0.98);
+  transform-origin: top right;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.dropdown-panel--open {
+  opacity: 1; pointer-events: all;
+  transform: translateY(0) scale(1);
+}
+.dropdown-title {
+  font-size: 10px; font-weight: 700;
+  color: var(--muted-foreground);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 8px 8px;
+}
+
+
+/* ── 8. PAPERS PANEL — dark grid (Image 1) ──────────────────────
+   "PAPERS" title, 3-col grid, tall paper thumbnails,
+   blue border + checkmark on active. Dark background.
+───────────────────────────────────────────────────────────────*/
+.papers-panel-dark {
+  background: #18181b !important;        /* zinc-900 */
+  border: 1px solid #27272a !important;  /* zinc-800 */
+  width: 340px;
+  padding: 16px !important;
+}
+.papers-panel-dark .dropdown-title {
+  color: #a1a1aa;                        /* zinc-400 */
+  font-size: 11px;
+  padding: 0 0 12px 0;
+}
+
+.papers-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px 8px;
+}
+.paper-option {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 6px 4px; border-radius: 10px;
+  background: none; border: none; cursor: pointer;
+  transition: background 0.12s;
+}
+.paper-option:hover { background: rgba(255,255,255,0.05); }
+.paper-thumb-wrap { position: relative; width: 86px; height: 106px; }
+.paper-thumb {
+  width: 86px; height: 106px; border-radius: 10px;
+  border: 2.5px solid #3f3f46;           /* zinc-700 */
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  transition: border-color 0.15s, transform 0.13s, box-shadow 0.13s;
+}
+.paper-option:hover .paper-thumb { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
+.paper-option--active .paper-thumb { border-color: #3b82f6; }
+.paper-thumb-inner { width: 100%; height: 100%; border-radius: 8px; }
+
+.check-badge {
+  position: absolute; top: -6px; right: -6px;
+  width: 20px; height: 20px; background: #3b82f6;
+  border-radius: 999px; border: 2.5px solid #18181b;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: scale(0.5);
+  transition: opacity 0.15s, transform 0.15s;
+}
+.paper-option--active .check-badge { opacity: 1; transform: scale(1); }
+.check-badge svg { width: 10px; height: 10px; }
+.paper-name-label {
+  font-size: 11px; font-weight: 500;
+  color: #71717a;                        /* zinc-500 */
+  text-align: center;
+}
+.paper-option--active .paper-name-label { color: #e4e4e7; font-weight: 600; }
+
+/* Thumbnail textures */
+.pt-cream    { background: #f5edd6; }
+.pt-white    { background: #f0f0f0; background-image: radial-gradient(circle,#d0d0d0 0.8px,transparent 0.8px); background-size: 5px 5px; }
+.pt-kraft    { background: #a0622a; background-image: repeating-linear-gradient(0deg,rgba(0,0,0,0.07) 0,rgba(0,0,0,0.07) 1px,transparent 1px,transparent 5px); }
+.pt-antique  { background: radial-gradient(ellipse at 40% 30%,#d4b483 0%,#c9a55a 40%,#b8934a 100%); }
+.pt-carton   { background: #b07a3a; background-image: repeating-linear-gradient(0deg,rgba(0,0,0,0.11) 0,rgba(0,0,0,0.11) 2px,transparent 2px,transparent 9px); }
+.pt-oilpaper { background: #e8dfc0; background-image: radial-gradient(ellipse at 65% 35%,rgba(160,130,80,0.28) 0%,transparent 55%); }
+.pt-notebook { background: #f8f9ff; background-image: repeating-linear-gradient(0deg,transparent,transparent 12px,#b0c8e8 12px,#b0c8e8 13px); background-position: 0 8px; }
+.pt-dots     { background: #fff0f5; background-image: radial-gradient(circle,#e8a0b8 1.2px,transparent 1.2px); background-size: 10px 10px; background-position: 5px 5px; }
+
+
+/* ── 9. KEYBOARD COLOR PANEL ────────────────────────────────── */
+.colors-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 4px; width: 220px;
+}
+.color-option {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 8px 4px; border-radius: 8px;
+  background: none; border: none; cursor: pointer;
+  transition: background 0.12s;
+}
+.color-option:hover   { background: var(--accent); }
+.color-option--active { background: #eff6ff; }
+.color-swatch-circle {
+  width: 36px; height: 36px; border-radius: 999px;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.6) inset;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.color-option:hover .color-swatch-circle { transform: scale(1.1); }
+.color-option--active .color-swatch-circle {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.25), 0 2px 8px rgba(0,0,0,0.12);
+}
+.color-check { width: 14px; height: 14px; }
+.color-label { font-size: 9px; font-weight: 500; color: var(--muted-foreground); text-align: center; white-space: nowrap; }
+.color-option--active .color-label { color: #2563eb; font-weight: 600; }
+
+
+/* ── 10. FONT PANEL ─────────────────────────────────────────── */
+.dropdown-panel--fonts { width: 210px; padding: 6px !important; }
+.font-row {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 10px 10px; border-radius: 8px;
+  background: none; border: none; cursor: pointer; text-align: left;
+  transition: background 0.12s;
+}
+.font-row:hover   { background: var(--accent); }
+.font-row--active { background: #2563eb !important; border-radius: 8px; }
+.font-row-name { font-size: 15px; color: var(--foreground); line-height: 1.3; }
+.font-row--active .font-row-name { color: #fff; }
+.font-row-check { width: 14px; height: 14px; flex-shrink: 0; }
+
+
+/* ── 11. DOWNLOAD PANEL ─────────────────────────────────────── */
+.dl-panel { width: 200px; right: 0; top: calc(100% + 8px); }
 .dl-option {
   display: flex; align-items: center; gap: 12px;
   width: 100%; padding: 10px 10px; border-radius: 8px;
   background: none; border: none; cursor: pointer;
-  color: var(--dd-text); text-align: left;
-  transition: background 0.14s;
+  transition: background 0.12s;
 }
-.dl-option:hover { background: var(--dd-hover); }
-.dl-option svg   { width: 18px; height: 18px; color: var(--dd-sub); flex-shrink: 0; }
-.dl-opt-label    { display: block; font-size: 13px; font-weight: 500; color: var(--dd-text); }
-.dl-opt-sub      { display: block; font-size: 10px; color: var(--dd-sub); margin-top: 1px; }
+.dl-option:hover { background: var(--accent); }
+.dl-opt-icon     { color: var(--muted-foreground); flex-shrink: 0; display: flex; }
+.dl-opt-icon svg { width: 16px; height: 16px; }
+.dl-opt-text     { font-size: 13px; font-weight: 500; color: var(--foreground); flex: 1; }
+.dl-opt-type     { font-size: 11px; color: var(--muted-foreground); }
 
 
-/* ── 7. SHARED DROPDOWN PANEL ───────────────────────────────── */
-.dropdown-panel {
-  position: absolute;
-  top: calc(100% + 8px); right: 0;
-  background: var(--dd-bg);
-  border: 1px solid var(--dd-border);
-  border-radius: 14px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.65), 0 4px 16px rgba(0,0,0,0.4);
-  padding: 14px 14px 16px;
-  z-index: 500;
-  opacity: 0; pointer-events: none;
-  transform: translateY(-6px) scale(0.97);
-  transform-origin: top right;
-  transition: opacity 0.18s ease, transform 0.18s ease;
-}
-.dropdown-panel--open { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
-.dropdown-title {
-  font-size: 10px; font-weight: 700; color: var(--dd-sub);
-  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px;
-}
-
-
-/* ── 8. PAPERS PANEL ────────────────────────────────────────── */
-.papers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 6px; width: 294px; }
-.paper-option {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 5px 3px; border-radius: 9px; background: none; border: none; cursor: pointer;
-  transition: background 0.14s;
-}
-.paper-option:hover { background: var(--dd-hover); }
-.paper-thumb-wrap { position: relative; width: 74px; height: 90px; }
-.paper-thumb {
-  width: 74px; height: 90px; border-radius: 7px;
-  border: 2px solid rgba(255,255,255,0.07); overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  transition: border-color 0.16s, transform 0.14s;
-}
-.paper-option:hover .paper-thumb { transform: translateY(-2px); }
-.paper-option--active .paper-thumb { border-color: var(--blue); }
-.paper-thumb-inner { width: 100%; height: 100%; border-radius: 5px; }
-.check-badge {
-  position: absolute; top: -5px; right: -5px;
-  width: 17px; height: 17px; background: var(--blue); border-radius: 999px;
-  border: 2px solid var(--dd-bg);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; transform: scale(0.6);
-  transition: opacity 0.15s, transform 0.15s;
-}
-.paper-option--active .check-badge { opacity: 1; transform: scale(1); }
-.check-badge svg { width: 8px; height: 8px; }
-.paper-name-label { font-size: 9px; font-weight: 500; color: var(--dd-sub); text-align: center; }
-.paper-option--active .paper-name-label { color: var(--dd-text); }
-
-/* Thumb textures */
-.pt-cream    { background: #f5edd6; }
-.pt-white    { background: #f0f0f0; background-image: radial-gradient(circle,#d0d0d0 0.8px,transparent 0.8px); background-size: 5px 5px; }
-.pt-kraft    { background: #a0622a; }
-.pt-antique  { background: radial-gradient(ellipse at 40% 30%,#d4b483 0%,#c9a55a 40%,#b8934a 100%); }
-.pt-carton   { background: #b07a3a; }
-.pt-oilpaper { background: #e8dfc0; }
-.pt-notebook { background: #f8f9ff; background-image: repeating-linear-gradient(0deg,transparent,transparent 12px,#b0c8e8 12px,#b0c8e8 13px); background-position: 0 8px; }
-.pt-dots     { background: #fff0f5; background-image: radial-gradient(circle,#e8a0b8 1.2px,transparent 1.2px); background-size: 10px 10px; }
-
-
-/* ── 9. COLORS PANEL ────────────────────────────────────────── */
-.colors-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 228px; }
-.color-option {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 7px 4px; border-radius: 9px; background: none; border: none; cursor: pointer;
-  transition: background 0.14s;
-}
-.color-option:hover   { background: var(--dd-hover); }
-.color-option--active { background: rgba(255,255,255,0.05); }
-.color-swatch-circle {
-  width: 36px; height: 36px; border-radius: 999px;
-  border: 2px solid rgba(255,255,255,0.14);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-  transition: transform 0.14s;
-}
-.color-option:hover .color-swatch-circle { transform: scale(1.1); }
-.color-option--active .color-swatch-circle {
-  border-color: rgba(255,255,255,0.5);
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.5), 0 4px 12px rgba(0,0,0,0.5);
-}
-.color-check { width: 15px; height: 15px; }
-.color-label { font-size: 9px; font-weight: 500; color: var(--dd-sub); text-align: center; white-space: nowrap; }
-.color-option--active .color-label { color: var(--dd-text); }
-
-
-/* ── 10. FONTS PANEL ────────────────────────────────────────── */
-.dropdown-panel--fonts { width: 260px; }
-.fonts-list { display: flex; flex-direction: column; gap: 2px; }
-.font-option {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 8px; border-radius: 7px;
-  width: 100%; background: none; border: none; cursor: pointer;
-  text-align: left; transition: background 0.14s; position: relative;
-}
-.font-option:hover   { background: var(--dd-hover); }
-.font-option--active { background: var(--dd-active); }
-.font-preview { font-size: 14px; color: var(--dd-text); min-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
-.font-meta    { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-.font-desc    { font-size: 9px; color: var(--dd-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.font-tag     { display: inline-block; font-size: 8px; font-weight: 700; letter-spacing: 0.06em; padding: 1px 4px; border-radius: 3px; width: fit-content; text-transform: uppercase; }
-.font-check   { width: 11px; height: 11px; flex-shrink: 0; margin-left: auto; }
-
-
-/* ── 11. NOTEPAD CARD ───────────────────────────────────────────
-   500×500px standalone card. All 4 corners rounded.
-   Completely separate from keyboard.
-   Dark background visible on all sides around it.
-───────────────────────────────────────────────────────────────*/
+/* ── 12. NOTEPAD CARD ───────────────────────────────────────── */
 .notepad {
-  width: 500px;
-  height: 500px;
-  border-radius: 16px;
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
+  width: 500px; height: 400px;
+  border-radius: 14px;
+  position: relative; overflow: hidden; flex-shrink: 0;
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.06) inset,
-    0 20px 60px rgba(0,0,0,0.5),
-    0 6px 18px rgba(0,0,0,0.35),
-    0 2px 4px rgba(0,0,0,0.2);
+    0 1px 0 rgba(255,255,255,0.8) inset,
+    0 10px 30px rgba(0,0,0,0.12),
+    0 4px 10px rgba(0,0,0,0.08),
+    0 1px 3px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
   transition: background 0.3s ease;
 }
-
-/* Red left margin line */
 .notepad::before {
   content: '';
-  position: absolute;
-  left: 52px; top: 0; bottom: 0;
-  width: 1.5px;
-  background: rgba(210,100,100,0.4);
-  pointer-events: none;
-  z-index: 2;
+  position: absolute; left: 52px; top: 0; bottom: 0;
+  width: 1.5px; background: rgba(210,100,100,0.35);
+  pointer-events: none; z-index: 2;
 }
 
 
-/* ── 12. PAPER BACKGROUNDS ──────────────────────────────────── */
+/* ── 13. PAPER BACKGROUNDS ──────────────────────────────────── */
 .paper-panel--cream {
   background: #f5edd6;
-  background-image: repeating-linear-gradient(0deg, transparent, transparent 25px, rgba(180,160,110,0.13) 25px, rgba(180,160,110,0.13) 26px);
+  background-image: repeating-linear-gradient(0deg,transparent,transparent 25px,rgba(180,160,110,0.13) 25px,rgba(180,160,110,0.13) 26px);
 }
 .paper-panel--a4white {
-  background: #f2f2f2;
-  background-image: repeating-linear-gradient(0deg, transparent, transparent 25px, rgba(150,150,200,0.10) 25px, rgba(150,150,200,0.10) 26px);
+  background: #fafafa;
+  background-image: repeating-linear-gradient(0deg,transparent,transparent 25px,rgba(150,150,200,0.10) 25px,rgba(150,150,200,0.10) 26px);
 }
 .paper-panel--kraft {
   background: #9e5e28;
@@ -354,31 +431,35 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 }
 
 
-/* ── 13. PAPER TYPOGRAPHY ───────────────────────────────────── */
+/* ── 14. PAPER TYPOGRAPHY ───────────────────────────────────── */
 .paper-textarea {
   position: absolute; inset: 0; width: 100%; height: 100%;
   background: transparent; border: none; outline: none; resize: none;
   z-index: 2; padding: 16px 20px 16px 64px;
   font-size: 14px; line-height: 26px; letter-spacing: 0.01em;
-  caret-color: #2a4080;
+  caret-color: #2563eb;
 }
 .paper-panel--cream    .paper-textarea { color: #2a1f0e; font-family: var(--font-special-elite); }
-.paper-panel--a4white  .paper-textarea { color: #1a1a1a; font-family: var(--font-inter); font-size: 13px; }
+.paper-panel--a4white  .paper-textarea { color: #09090b; font-family: var(--font-inter); font-size: 13px; }
 .paper-panel--kraft    .paper-textarea { color: #f5e8d0; font-family: var(--font-special-elite); caret-color: #f5e8d0; }
 .paper-panel--antique  .paper-textarea { color: #2e1c00; font-family: var(--font-special-elite); }
 .paper-panel--carton   .paper-textarea { color: #f0e0c4; font-family: var(--font-special-elite); caret-color: #f0e0c4; }
 .paper-panel--oilpaper .paper-textarea { color: #2a200a; font-family: var(--font-special-elite); }
-.paper-panel--notebook .paper-textarea { color: #1a1a2e; font-family: var(--font-inter); font-size: 13px; }
-.paper-panel--dots     .paper-textarea { color: #4a1a30; font-family: var(--font-caveat); font-size: 17px; caret-color: #c06080; }
-.paper-textarea::placeholder { color: rgba(120,90,50,0.3); font-style: italic; }
+.paper-panel--notebook .paper-textarea { color: #0f172a; font-family: var(--font-inter); font-size: 13px; }
+.paper-panel--dots     .paper-textarea { color: #4a1a30; font-family: var(--font-caveat); font-size: 17px; caret-color: #be185d; }
+.paper-textarea::placeholder { color: rgba(120,90,50,0.35); font-style: italic; }
 .paper-panel--kraft .paper-textarea::placeholder,
-.paper-panel--carton .paper-textarea::placeholder  { color: rgba(245,232,208,0.3); }
-.paper-panel--a4white .paper-textarea::placeholder { color: rgba(100,100,100,0.3); }
-.paper-panel--dots .paper-textarea::placeholder    { color: rgba(200,100,140,0.35); }
-.paper-panel--notebook .paper-textarea::placeholder{ color: rgba(80,80,160,0.3); }
+.paper-panel--carton .paper-textarea::placeholder  { color: rgba(245,232,208,0.35); }
+.paper-panel--a4white .paper-textarea::placeholder { color: #a1a1aa; }
+.paper-panel--dots .paper-textarea::placeholder    { color: rgba(200,100,140,0.4); }
+.paper-panel--notebook .paper-textarea::placeholder{ color: #94a3b8; }
 
 
-/* ── 14. KEYBOARD SHELL ─────────────────────────────────────── */
+/* ── 15. KEYBOARD SHELL ─────────────────────────────────────────
+   SHELL = the coloured aluminium frame.
+   Only --kbd-shell / --kbd-shell-bot change per colour theme.
+   Keys always stay white.
+───────────────────────────────────────────────────────────────*/
 .keyboard-zone {
   flex-shrink: 0;
   transform: scale(var(--keyboard-scale));
@@ -387,54 +468,61 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 
 .keyboard-body {
   width: var(--shell-w);
-  padding: var(--pad); padding-bottom: 16px;
+  padding: var(--pad); padding-bottom: 15px;
   border-radius: var(--kbd-radius);
-  background: linear-gradient(180deg,var(--kbd-top) 0%,var(--kbd-bot) 100%);
-  border: 1px solid var(--kbd-border);
+  /* Shell color via CSS variables — only these two change */
+  background: linear-gradient(160deg, var(--kbd-shell) 0%, var(--kbd-shell-bot) 100%);
+  border: 1px solid rgba(0,0,0,0.08);
   box-shadow:
-    0 2px 0 rgba(255,255,255,0.06) inset,
-    0 -3px 0 rgba(0,0,0,0.7) inset,
-    0 20px 50px rgba(0,0,0,0.6),
-    0 6px 16px rgba(0,0,0,0.5);
-  transition: background 0.35s ease, border-color 0.35s ease;
+    0 1px 0 rgba(255,255,255,0.5) inset,   /* top highlight */
+    0 -2px 0 rgba(0,0,0,0.12) inset,         /* bottom edge */
+    0 8px 24px rgba(0,0,0,0.14),
+    0 3px 8px rgba(0,0,0,0.10),
+    0 1px 2px rgba(0,0,0,0.08);
+  transition: background 0.35s ease;
 }
 
 .keyboard-grid { display: flex; flex-direction: column; gap: var(--gap); }
 .key-row {
   display: flex; gap: var(--gap); align-items: flex-end;
-  width: var(--inner-w);
-  justify-content: space-between;
+  width: var(--inner-w); justify-content: space-between;
 }
 
 
-/* ── 15. KEY BASE ───────────────────────────────────────────── */
+/* ── 16. KEY BASE ───────────────────────────────────────────────
+   Keys are ALWAYS WHITE — they never take the shell colour.
+   The shell colour shows through the gaps between keys.
+   This is exactly how real Apple keyboards look:
+   white keys, coloured aluminium frame peeking through gaps.
+───────────────────────────────────────────────────────────────*/
 .key {
   height: var(--key-h);
   border-radius: 7px;
-  background: linear-gradient(180deg,var(--key-top) 0%,var(--key-mid) 50%,var(--key-bot) 100%);
-  border: 1px solid var(--kbd-border);
-  border-top-color: var(--key-highlight);
-  border-bottom: 2.5px solid var(--key-shadow);
+  /* Always white/near-white — NOT affected by theme */
+  background: linear-gradient(180deg, var(--key-face) 0%, var(--key-face-bot) 100%);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-bottom: 1.5px solid rgba(0,0,0,0.14);
   box-shadow:
-    0 1px 0 var(--key-highlight) inset,
-    0 3px 7px var(--key-drop-shadow),
-    0 1px 2px rgba(0,0,0,0.35);
-  color: var(--key-text);
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 2px 4px rgba(0,0,0,0.10),
+    0 1px 2px rgba(0,0,0,0.06);
+  /* Text always dark — high contrast on white keys */
+  color: var(--key-text-main);
   display: flex; align-items: center; justify-content: center;
   position: relative; flex-shrink: 0; user-select: none; cursor: pointer;
   font-family: var(--sf);
-  transition: filter 0.07s, transform 0.07s, box-shadow 0.07s,
-    background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+  transition: filter 0.07s, transform 0.07s, box-shadow 0.07s;
   -webkit-tap-highlight-color: transparent;
 }
 .key--pressed {
-  filter: brightness(0.82); transform: translateY(1px);
-  border-bottom-width: 1px;
-  box-shadow: 0 0 0 rgba(255,255,255,0.05) inset, 0 1px 3px var(--key-drop-shadow);
+  filter: brightness(0.94);
+  transform: translateY(1px);
+  border-bottom-width: 0.5px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
 }
 
 
-/* ── 16. KEY SIZES ──────────────────────────────────────────── */
+/* ── 17. KEY SIZES ──────────────────────────────────────────── */
 .k-std    { width:60px; }  .k-esc    { width:96px; }
 .k-tab    { width:96px; }  .k-caps   { width:114px; }
 .k-delete { width:114px; } .k-return { width:132px; }
@@ -443,290 +531,68 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .k-cmd    { width:86px; }  .k-space  { width:400px; }
 .k-fn     { width:60px; }  .k-pipe   { width:84px; }
 .k-knob-w { height:var(--key-h); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.k-arrow  { width:60px; height:26px; border-radius:5px; }
+.k-arrow  { width:60px; height:26px; border-radius:6px; }
 .k-arrow-ud { display:flex; flex-direction:column; gap:3px; align-self:flex-end; flex-shrink:0; }
 
 
-/* ── 17. KEY LABELS ─────────────────────────────────────────── */
-.lbl-c  { font-size:15px; font-weight:500; color:var(--key-text); letter-spacing:-0.02em; }
+/* ── 18. KEY LABELS — always dark text on white keys ─────────── */
+.lbl-c  { font-size:15px; font-weight:500; color:var(--key-text-main); letter-spacing:-0.02em; }
 .lbl-st { display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.1; }
-.s-top  { font-size:10px; font-weight:500; color:var(--key-text-sub); line-height:1.2; }
-.s-bot  { font-size:13px; font-weight:500; color:var(--key-text); line-height:1.2; }
-.lbl-ml { position:absolute; bottom:6px; left:8px; font-size:8px; font-weight:500; color:var(--key-text-sub); }
-.lbl-mr { position:absolute; bottom:6px; right:8px; font-size:8px; font-weight:500; color:var(--key-text-sub); }
+.s-top  { font-size:10px; font-weight:400; color:var(--key-text-sub); line-height:1.2; }
+.s-bot  { font-size:13px; font-weight:500; color:var(--key-text-main); line-height:1.2; }
+.lbl-ml { position:absolute; bottom:5px; left:7px; font-size:8px; font-weight:400; color:var(--key-text-sub); }
+.lbl-mr { position:absolute; bottom:5px; right:7px; font-size:8px; font-weight:400; color:var(--key-text-sub); }
 .lbl-fn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; width:100%; height:100%; }
 .fn-ic  { color:var(--key-text-sub); display:flex; align-items:center; }
 .fn-ic svg { width:12px; height:12px; }
-.fn-n   { font-size:7px; font-weight:700; color:var(--key-text-sub); letter-spacing:0.05em; text-transform:uppercase; }
+.fn-n   { font-size:7px; font-weight:600; color:var(--key-text-sub); letter-spacing:0.04em; text-transform:uppercase; }
 .arr-l  { font-size:9px; color:var(--key-text-sub); line-height:1; }
-.fn-globe-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; }
+.fn-globe-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
 .fn-globe-wrap svg { color:var(--key-text-sub); }
-.mod-fn-label  { font-size:7.5px; font-weight:500; color:var(--key-text-sub); }
-.mod-sym { position:absolute; top:7px; left:8px; font-size:11px; font-weight:400; color:var(--key-text-sub); }
-.mod-sub { font-size:8px !important; color:var(--key-text-sub) !important; }
-.mod-cmd { font-size:15px; color:var(--key-text-sub); line-height:1; }
+.mod-fn-label  { font-size:7px; font-weight:500; color:var(--key-text-sub); }
+.mod-sym { position:absolute; top:6px; left:7px; font-size:11px; font-weight:400; color:var(--key-text-sub); }
+.mod-sub { font-size:7.5px !important; color:var(--key-text-sub) !important; }
+.mod-cmd { font-size:14px; color:var(--key-text-sub); line-height:1; }
+
+/* Knob — always grey/neutral on any shell colour */
 .knob {
-  width:40px; height:40px; border-radius:999px; background:var(--knob-bg);
-  box-shadow: 0 1px 2px rgba(255,255,255,0.15) inset, 0 -1px 1px rgba(0,0,0,0.5) inset,
-    0 4px 10px rgba(0,0,0,0.65), 0 1px 3px rgba(0,0,0,0.45);
+  width:38px; height:38px; border-radius:999px;
+  background: var(--knob-face);
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.6) inset,
+    0 3px 8px rgba(0,0,0,0.15),
+    0 1px 3px rgba(0,0,0,0.1);
 }
 
 
-/* ── 18. KEY STATES ─────────────────────────────────────────── */
+/* ── 19. KEY STATES ─────────────────────────────────────────── */
 .key--homing::after {
-  content:''; position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+  content:''; position:absolute; bottom:7px;
+  left:50%; transform:translateX(-50%);
   width:14px; height:2px; border-radius:999px;
-  background:rgba(0,0,0,0.4); box-shadow:0 1px 0 rgba(255,255,255,0.15);
+  background:rgba(0,0,0,0.2);
 }
 .caps-dot {
-  position:absolute; top:7px; right:7px;
+  position:absolute; top:6px; right:6px;
   width:4px; height:4px; border-radius:999px;
-  background:var(--blue); opacity:0; transition:opacity 0.15s;
+  background:#2563eb; opacity:0; transition:opacity 0.15s;
 }
 .key--caps.key--pressed .caps-dot { opacity:1; }
 
 
-/* ── 19. RESPONSIVE ─────────────────────────────────────────── */
-@media (max-width: 1200px) {
-  :root { --keyboard-scale: 0.8; }
-  .notepad { width: 460px; height: 460px; }
-  .topbar  { width: 460px; }
+/* ── 20. RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 1300px) { .topbar { width: min(1200px, 98vw); } }
+@media (max-width: 1160px) {
+  :root { --keyboard-scale: 0.78; }
+  .notepad { width: 460px; height: 360px; }
 }
-@media (max-width: 960px) {
-  :root { --keyboard-scale: 0.6; }
-  .notepad { width: 380px; height: 380px; }
-  .topbar  { width: 380px; }
+@media (max-width: 920px) {
+  :root { --keyboard-scale: 0.58; }
+  .notepad { width: 380px; height: 300px; }
+  .topbar  { width: min(700px, 96vw); }
 }
 @media (max-width: 640px) {
-  :root { --keyboard-scale: 0.4; }
-  .notepad { width: 300px; height: 300px; }
-  .topbar  { width: 300px; }
-}
-
-
-/* ══════════════════════════════════════════════════════════════
-   ADDITIONS — applied on top of the base stylesheet
-══════════════════════════════════════════════════════════════ */
-
-/* ── Topbar: 1200px wide ───────────────────────────────────── */
-.topbar {
-  width: 1200px !important;
-  max-width: 98vw;
-  margin-bottom: 10px !important;
-}
-
-/* ── Notepad: 400px height ─────────────────────────────────── */
-.notepad {
-  width: 500px !important;
-  height: 400px !important;
-}
-
-/* ── Dropdown wrapper (relative anchor) ────
-
-/* ====================================================
-   ADDITIONS - topbar width, notepad height, dropdowns
-   ==================================================== */
-
-/* Topbar 1200px */
-.topbar {
-  width: 1200px !important;
-  max-width: 98vw;
-  margin-bottom: 10px !important;
-}
-
-/* Notepad 500x400 */
-.notepad {
-  width: 500px !important;
-  height: 400px !important;
-}
-
-/* Dropdown anchor wrapper */
-.tb-dd-wrap { position: relative; }
-
-/* Blue download pill */
-.dl-pill {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: #3b82f6;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  border: none;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  white-space: nowrap;
-}
-.dl-pill:hover  { background: #2d74ee; }
-.dl-pill:active { transform: scale(0.97); }
-.dl-pill--open  { background: #2563eb; }
-.dl-pill svg    { width: 14px; height: 14px; stroke: #fff; flex-shrink: 0; }
-.dl-pill .chevron-icon { width: 9px; height: 5px; stroke: rgba(255,255,255,0.7); }
-
-/* Download dropdown */
-.dl-panel { width: 200px; right: 0; top: calc(100% + 10px); }
-
-.dl-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 10px 8px;
-  border-radius: 8px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: background 0.13s;
-}
-.dl-option:hover { background: var(--dd-hover); }
-.dl-opt-icon     { color: var(--dd-sub); flex-shrink: 0; display: flex; }
-.dl-opt-icon svg { width: 18px; height: 18px; }
-.dl-opt-text     { font-size: 14px; font-weight: 500; color: var(--dd-text); flex: 1; }
-.dl-opt-type     { font-size: 12px; color: var(--dd-sub); }
-
-/* Dark color picker panel */
-.picker-panel {
-  width: 256px;
-  left: 0;
-  top: calc(100% + 10px);
-  padding: 14px;
-}
-.picker-canvas {
-  width: 100%;
-  height: 180px;
-  border-radius: 8px;
-  cursor: crosshair;
-  display: block;
-  border: 1px solid rgba(255,255,255,0.06);
-}
-.picker-crosshair {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border-radius: 999px;
-  border: 2px solid #fff;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.5);
-  pointer-events: none;
-  z-index: 10;
-}
-.picker-row { margin-top: 10px; }
-.hue-slider {
-  width: 100%;
-  height: 12px;
-  border-radius: 999px;
-  outline: none;
-  border: none;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  background: linear-gradient(to right,
-    hsl(0,100%,50%), hsl(30,100%,50%), hsl(60,100%,50%),
-    hsl(90,100%,50%), hsl(120,100%,50%), hsl(150,100%,50%),
-    hsl(180,100%,50%), hsl(210,100%,50%), hsl(240,100%,50%),
-    hsl(270,100%,50%), hsl(300,100%,50%), hsl(330,100%,50%),
-    hsl(360,100%,50%));
-}
-.hue-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: #fff;
-  border: 2px solid rgba(0,0,0,0.2);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-  cursor: pointer;
-}
-.picker-hex-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-  padding: 6px 10px;
-}
-.picker-hex-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--dd-sub);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-.picker-hex-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--dd-text);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.picker-swatch-label {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--dd-sub);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-top: 12px;
-  margin-bottom: 8px;
-}
-.picker-swatches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.picker-swatch {
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  border: 1.5px solid rgba(255,255,255,0.12);
-  cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s;
-  flex-shrink: 0;
-}
-.picker-swatch:hover {
-  transform: scale(1.18);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-}
-
-/* Dark font rows */
-.dropdown-panel--fonts {
-  width: 220px !important;
-  padding: 8px !important;
-}
-.font-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 11px 12px;
-  border-radius: 8px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  transition: background 0.13s;
-}
-.font-row:hover   { background: var(--dd-hover); }
-.font-row--active { background: var(--blue) !important; }
-.font-row-name    { font-size: 15px; color: var(--dd-text); line-height: 1.3; }
-.font-row--active .font-row-name { color: #fff; }
-.font-row-check   { width: 14px; height: 14px; flex-shrink: 0; }
-
-/* Responsive */
-@media (max-width: 1300px) { .topbar { width: min(1200px, 98vw) !important; } }
-@media (max-width: 1200px) {
-  :root { --keyboard-scale: 0.8; }
-  .notepad { width: 460px !important; height: 360px !important; }
-}
-@media (max-width: 960px) {
-  :root { --keyboard-scale: 0.6; }
-  .notepad { width: 380px !important; height: 300px !important; }
-  .topbar  { width: min(700px, 96vw) !important; }
+  :root { --keyboard-scale: 0.40; }
+  .notepad { width: 300px; height: 260px; }
 }

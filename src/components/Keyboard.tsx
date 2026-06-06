@@ -1,6 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // src/components/Keyboard.tsx
-// Flat layout, no 3D. Notepad sits on top flush.
+// Light mode keyboard. Only --kbd-shell / --kbd-shell-bot
+// change per theme. Key face is always white via CSS.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
@@ -28,33 +29,26 @@ export function Keyboard({
 }: KeyboardProps) {
   const ip = (code: string) => pressedKeys.has(code);
   const { playClick } = useSound(volume);
-
   useEffect(() => { registerSoundCb(playClick); }, [playClick, registerSoundCb]);
 
   const theme = KEYBOARD_COLORS.find((c) => c.id === activeColor);
+
+  // Only inject shell background vars — key vars are locked to white in CSS
   const shellStyle: React.CSSProperties = theme ? {
-    ["--kbd-top"         as string]: theme.vars.shellTop,
-    ["--kbd-bot"         as string]: theme.vars.shellBot,
-    ["--key-top"         as string]: theme.vars.keyTop,
-    ["--key-mid"         as string]: theme.vars.keyMid,
-    ["--key-bot"         as string]: theme.vars.keyBot,
-    ["--key-text"        as string]: theme.vars.keyText,
-    ["--key-text-sub"    as string]: theme.vars.keyTextSub,
-    ["--kbd-border"      as string]: theme.vars.keyBorder,
-    ["--key-highlight"   as string]: theme.vars.keyHighlight,
-    ["--key-shadow"      as string]: theme.vars.keyShadow,
-    ["--key-drop-shadow" as string]: theme.vars.dropShadow,
-    ["--knob-bg"         as string]: theme.vars.knob,
+    ["--kbd-shell"     as string]: theme.vars.shellTop,
+    ["--kbd-shell-bot" as string]: theme.vars.shellBot,
   } : {};
 
-  const hk = (code: string, char?: string, sc?: string) => { playClick(); onKeyPress(code, char, sc); };
+  const hk = (code: string, char?: string, sc?: string) => {
+    playClick();
+    onKeyPress(code, char, sc);
+  };
 
   return (
     <div className="keyboard-zone">
       <div className="keyboard-body" style={shellStyle}>
         <div className="keyboard-grid">
 
-          {/* Row 1 */}
           <div className="key-row">
             {ROW_FN.map((k, i) => (
               <Key key={i} keyDef={k} pressed={k.code ? ip(k.code) : false}
@@ -62,7 +56,6 @@ export function Keyboard({
             ))}
           </div>
 
-          {/* Row 2 */}
           <div className="key-row">
             {ROW_NUMBER.map((k, i) => (
               <Key key={i} keyDef={k} pressed={k.code ? ip(k.code) : false}
@@ -70,7 +63,6 @@ export function Keyboard({
             ))}
           </div>
 
-          {/* Row 3 */}
           <div className="key-row">
             {ROW_QWERTY.map((k, i) => (
               <Key key={i} keyDef={k} pressed={k.code ? ip(k.code) : false}
@@ -78,7 +70,6 @@ export function Keyboard({
             ))}
           </div>
 
-          {/* Row 4 */}
           <div className="key-row">
             {ROW_HOME.map((k, i) => (
               <Key key={i} keyDef={k} pressed={k.code ? ip(k.code) : false}
@@ -86,7 +77,6 @@ export function Keyboard({
             ))}
           </div>
 
-          {/* Row 5 */}
           <div className="key-row">
             {ROW_SHIFT.map((k, i) => (
               <Key key={i} keyDef={k}
@@ -98,11 +88,10 @@ export function Keyboard({
 
           {/* Row 6: Bottom modifiers */}
           <div className="key-row key-row--bottom">
-
             <div className="key k-mod-sm" onMouseDown={(e) => { e.preventDefault(); playClick(); }}>
               <div className="fn-globe-wrap">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   <circle cx="12" cy="12" r="10"/>
                   <line x1="2" y1="12" x2="22" y2="12"/>
                   <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
@@ -146,7 +135,6 @@ export function Keyboard({
               <span className="lbl-ml mod-sub">option</span>
             </div>
 
-            {/* Arrow cluster */}
             <div className={`key k-arrow ${ip("ArrowLeft") ? "key--pressed":""}`}
               role="button" style={{ alignSelf:"flex-end" }}
               onMouseDown={(e) => { e.preventDefault(); playClick(); onKeyPress("ArrowLeft"); }}>
@@ -171,8 +159,8 @@ export function Keyboard({
               onMouseDown={(e) => { e.preventDefault(); playClick(); onKeyPress("ArrowRight"); }}>
               <span className="arr-l">▶</span>
             </div>
-
           </div>
+
         </div>
       </div>
     </div>

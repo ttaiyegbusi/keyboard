@@ -1,7 +1,6 @@
 // ─────────────────────────────────────────────────────────────
 // src/components/PapersPanel.tsx
-//
-// Paper picker dropdown — now dark-themed to match the app.
+// Dark grid dropdown — "PAPERS" title, 3-col, tall thumbnails.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
@@ -19,13 +18,10 @@ interface PapersPanelProps {
 export function PapersPanel({ open, activePaper, onSelect }: PapersPanelProps) {
   return (
     <div
-      className={`dropdown-panel ${open ? "dropdown-panel--open" : ""}`}
-      role="listbox"
-      aria-label="Select paper type"
+      className={`dropdown-panel papers-panel-dark ${open ? "dropdown-panel--open" : ""}`}
       onClick={(e) => e.stopPropagation()}
     >
       <p className="dropdown-title">Papers</p>
-
       <div className="papers-grid">
         {PAPERS.map((paper) => {
           const isActive = paper.id === activePaper;
@@ -33,9 +29,8 @@ export function PapersPanel({ open, activePaper, onSelect }: PapersPanelProps) {
             <button
               key={paper.id}
               className={`paper-option ${isActive ? "paper-option--active" : ""}`}
-              role="option"
-              aria-selected={isActive}
               aria-label={paper.label}
+              aria-pressed={isActive}
               onClick={() => onSelect(paper.id)}
             >
               <div className="paper-thumb-wrap">
