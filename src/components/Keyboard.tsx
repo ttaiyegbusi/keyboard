@@ -107,12 +107,14 @@ export function Keyboard({
             ))}
           </div>
 
-          {/* Row 6: Bottom modifiers */}
+          {/* Row 6: Bottom modifiers — exact Apple layout */}
           <div className="key-row key-row--bottom">
+
+            {/* fn/globe - k-mod-sm = 44px */}
             <div className="key k-mod-sm" onMouseDown={(e) => { e.preventDefault(); playClick(); }}>
               <div className="fn-globe-wrap">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10"/>
                   <line x1="2" y1="12" x2="22" y2="12"/>
                   <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
@@ -121,67 +123,74 @@ export function Keyboard({
               </div>
             </div>
 
+            {/* control - k-mod = 56px */}
             <div className={`key k-mod ${ip("ControlLeft")||ip("ControlRight") ? "key--pressed":""}`}
               onMouseDown={(e) => { e.preventDefault(); playClick(); }}>
-              <span className="mod-sym">^</span>
+              <span className="mod-sym" style={{fontSize:"10px",top:"5px"}}>^</span>
               <span className="lbl-ml mod-sub">control</span>
             </div>
 
+            {/* option left - k-mod = 56px */}
             <div className={`key k-mod ${ip("AltLeft") ? "key--pressed":""}`}
               onMouseDown={(e) => { e.preventDefault(); playClick(); }}>
-              <span className="mod-sym">⌥</span>
+              <span className="mod-sym" style={{fontSize:"10px",top:"5px"}}>⌥</span>
               <span className="lbl-ml mod-sub">option</span>
             </div>
 
+            {/* command left - k-cmd = 72px */}
             <div className={`key k-cmd ${ip("MetaLeft") ? "key--pressed":""}`}
               onMouseDown={(e) => { e.preventDefault(); playClick(); }}>
-              <span className="mod-sym" style={{top:6}}>⌘</span>
+              <span className="mod-sym" style={{fontSize:"12px",top:"5px"}}>⌘</span>
               <span className="lbl-ml mod-sub">command</span>
             </div>
 
+            {/* Spacebar - k-space = 436px */}
             <div className={`key k-space ${ip("Space") ? "key--pressed":""}`}
               role="button" aria-label="Space"
               onMouseDown={(e) => { e.preventDefault(); playClick(); onKeyPress("Space"," "); }}
               onTouchStart={(e) => { e.preventDefault(); playClick(); onKeyPress("Space"," "); }} />
 
+            {/* command right - k-cmd = 72px */}
             <div className={`key k-cmd ${ip("MetaRight") ? "key--pressed":""}`}
               onMouseDown={(e) => { e.preventDefault(); playClick(); }}>
-              <span className="mod-sym" style={{top:6}}>⌘</span>
+              <span className="mod-sym" style={{fontSize:"12px",top:"5px"}}>⌘</span>
               <span className="lbl-ml mod-sub">command</span>
             </div>
 
+            {/* option right - k-mod = 56px */}
             <div className={`key k-mod ${ip("AltRight") ? "key--pressed":""}`}
               onMouseDown={(e) => { e.preventDefault(); playClick(); }}>
-              <span className="mod-sym">⌥</span>
+              <span className="mod-sym" style={{fontSize:"10px",top:"5px"}}>⌥</span>
               <span className="lbl-ml mod-sub">option</span>
             </div>
 
+            {/* Arrow cluster — left(44) + [up+down stacked(44)] + right(44) = 132 + 2×4gap */}
             <div className={`key k-arrow ${ip("ArrowLeft") ? "key--pressed":""}`}
-              role="button" style={{ alignSelf:"flex-end" }}
+              role="button" aria-label="◀" style={{ alignSelf:"flex-end" }}
               onMouseDown={(e) => { e.preventDefault(); playClick(); onKeyPress("ArrowLeft"); }}>
               <span className="arr-l">◀</span>
             </div>
 
             <div className="k-arrow-ud">
               <div className={`key k-arrow ${ip("ArrowUp") ? "key--pressed":""}`}
-                role="button"
+                role="button" aria-label="▲"
                 onMouseDown={(e) => { e.preventDefault(); playClick(); onKeyPress("ArrowUp"); }}>
                 <span className="arr-l">▲</span>
               </div>
               <div className={`key k-arrow ${ip("ArrowDown") ? "key--pressed":""}`}
-                role="button"
+                role="button" aria-label="▼"
                 onMouseDown={(e) => { e.preventDefault(); playClick(); onKeyPress("ArrowDown"); }}>
                 <span className="arr-l">▼</span>
               </div>
             </div>
 
             <div className={`key k-arrow ${ip("ArrowRight") ? "key--pressed":""}`}
-              role="button" style={{ alignSelf:"flex-end" }}
+              role="button" aria-label="▶" style={{ alignSelf:"flex-end" }}
               onMouseDown={(e) => { e.preventDefault(); playClick(); onKeyPress("ArrowRight"); }}>
               <span className="arr-l">▶</span>
             </div>
-          </div>
 
+          </div>
         </div>
       </div>
     </div>

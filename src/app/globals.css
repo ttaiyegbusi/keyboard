@@ -75,8 +75,8 @@
   --gap:         4px;
   --pad:        13px;
   --kbd-radius: 16px;
-  --inner-w:  1058px;
-  --shell-w:  1084px;
+  --inner-w:   960px;
+  --shell-w:   988px;
 
   /* SF Pro */
   --sf: -apple-system, BlinkMacSystemFont, "SF Pro Text",
@@ -320,15 +320,82 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   font-weight: 600;
 }
 
-/* Thumbnail textures */
-.pt-cream    { background: #f5edd6; }
-.pt-white    { background: #f0f0f0; background-image: radial-gradient(circle,#d0d0d0 0.8px,transparent 0.8px); background-size: 5px 5px; }
-.pt-kraft    { background: #a0622a; background-image: repeating-linear-gradient(0deg,rgba(0,0,0,0.07) 0,rgba(0,0,0,0.07) 1px,transparent 1px,transparent 5px); }
-.pt-antique  { background: radial-gradient(ellipse at 40% 30%,#d4b483 0%,#c9a55a 40%,#b8934a 100%); }
-.pt-carton   { background: #b07a3a; background-image: repeating-linear-gradient(0deg,rgba(0,0,0,0.11) 0,rgba(0,0,0,0.11) 2px,transparent 2px,transparent 9px); }
-.pt-oilpaper { background: #e8dfc0; background-image: radial-gradient(ellipse at 65% 35%,rgba(160,130,80,0.28) 0%,transparent 55%); }
-.pt-notebook { background: #f8f9ff; background-image: repeating-linear-gradient(0deg,transparent,transparent 12px,#b0c8e8 12px,#b0c8e8 13px); background-position: 0 8px; }
-.pt-dots     { background: #fff0f5; background-image: radial-gradient(circle,#e8a0b8 1.2px,transparent 1.2px); background-size: 10px 10px; background-position: 5px 5px; }
+/* ── Paper thumbnail textures — rich, detailed, accurate ──────────
+   These must look like real paper so the user can identify each.
+───────────────────────────────────────────────────────────────────*/
+
+/* Cream — warm aged parchment with subtle horizontal grain lines */
+.pt-cream {
+  background: #f5edd6;
+  background-image:
+    repeating-linear-gradient(0deg,
+      transparent 0px, transparent 18px,
+      rgba(180,160,110,0.18) 18px, rgba(180,160,110,0.18) 19px
+    );
+}
+
+/* A4 White — clean white with fine dot grid pattern */
+.pt-white {
+  background: #f8f8f8;
+  background-image: radial-gradient(circle, #c8c8c8 0.9px, transparent 0.9px);
+  background-size: 7px 7px;
+  background-position: 3.5px 3.5px;
+}
+
+/* Brown Kraft — dark warm brown with cross-hatch texture */
+.pt-kraft {
+  background: #a05a28;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.09) 0, rgba(0,0,0,0.09) 1px, transparent 1px, transparent 4px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 8px);
+}
+
+/* Antique — golden radial gradient with visible warm glow */
+.pt-antique {
+  background: radial-gradient(ellipse at 38% 28%, #e8c870 0%, #c8a040 35%, #a87828 70%, #8a5810 100%);
+}
+
+/* Carton — warm brown with clear horizontal wood-grain stripes */
+.pt-carton {
+  background: #b07838;
+  background-image:
+    repeating-linear-gradient(0deg,
+      rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 2px,
+      rgba(255,255,255,0.04) 2px, rgba(255,255,255,0.04) 3px,
+      transparent 3px, transparent 10px
+    );
+}
+
+/* Oil Paper — translucent pale yellow with blotch stain */
+.pt-oilpaper {
+  background: #ede0b0;
+  background-image:
+    radial-gradient(ellipse at 65% 35%, rgba(160,130,60,0.35) 0%, transparent 52%),
+    radial-gradient(ellipse at 28% 72%, rgba(180,150,80,0.22) 0%, transparent 42%),
+    radial-gradient(ellipse at 50% 50%, rgba(200,170,100,0.08) 0%, transparent 70%);
+}
+
+/* Note Book — white with clear blue horizontal lines + red margin */
+.pt-notebook {
+  background: #f8f9ff;
+  background-image:
+    /* Red margin line at ~22% from left */
+    linear-gradient(90deg, transparent 22%, #e8a0a0 22%, #e8a0a0 calc(22% + 1.5px), transparent calc(22% + 1.5px)),
+    /* Blue ruled lines */
+    repeating-linear-gradient(0deg,
+      transparent 0px, transparent 14px,
+      #a8c0e8 14px, #a8c0e8 15px
+    );
+  background-position: 0 7px, 0 7px;
+}
+
+/* Dots — soft pink with visible dot grid */
+.pt-dots {
+  background: #fff2f6;
+  background-image: radial-gradient(circle, #e090a8 1.4px, transparent 1.4px);
+  background-size: 9px 9px;
+  background-position: 4.5px 4.5px;
+}
 
 
 /* ── 9. KEYBOARD COLOR PANEL ────────────────────────────────── */
@@ -501,7 +568,7 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .keyboard-grid { display: flex; flex-direction: column; gap: var(--gap); }
 .key-row {
   display: flex; gap: var(--gap); align-items: flex-end;
-  width: var(--inner-w); justify-content: space-between;
+  
 }
 
 
@@ -538,18 +605,66 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 }
 
 
-/* ── 17. KEY SIZES ──────────────────────────────────────────── */
-.k-std    { width:60px; }  .k-esc    { width:96px; }
-.k-tab    { width:96px; }  .k-caps   { width:114px; }
-.k-delete { width:114px; } .k-return { width:132px; }
-.k-shift-l{ width:148px; } .k-shift-r{ width:144px; }
-.k-mod    { width:62px; }  .k-mod-sm { width:50px; }
-.k-cmd    { width:86px; }  .k-space  { width:400px; }
-.k-fn     { width:60px; }  .k-pipe   { width:84px; }
-.k-knob-w { height:var(--key-h); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.k-arrow  { width:60px; height:26px; border-radius:6px; }
-.k-arrow-ud { display:flex; flex-direction:column; gap:3px; align-self:flex-end; flex-shrink:0; }
+/* ── 17. KEY SIZES ──────────────────────────────────────────────
+   CRITICAL: Every row sums to exactly 960px with gap=4px.
+   No stretching — pure fixed widths. Gap is uniform everywhere.
+   Row verification:
+     fn:     169 + 12×50 + 139 + 13×4 = 960 ✓
+     num:    13×56 + 180 + 13×4 = 960 ✓
+     qwerty: 180 + 13×56 + 13×4 = 960 ✓
+     home:   82 + 13×56 + 98 + 13×4 = 960 ✓
+     shift:  148 + 11×56 + 148 + 12×4 = 960 ✓
+     bottom: 44+56+56+72+436+72+56+44+44+44 + 9×4 = 960 ✓
+───────────────────────────────────────────────────────────────*/
+.k-std     { width: 56px; }
+.k-fn      { width: 50px; }    /* fn row keys — narrower than letter keys */
+.k-esc     { width: 169px; }   /* ESC — wide, anchors left of fn row */
+.k-tab     { width: 180px; }
+.k-caps    { width: 82px; }
+.k-delete  { width: 180px; }
+.k-return  { width: 98px; }
+.k-shift-l { width: 148px; }
+.k-shift-r { width: 148px; }
+.k-mod     { width: 56px; }    /* ctrl, option */
+.k-mod-sm  { width: 44px; }    /* fn/globe */
+.k-cmd     { width: 72px; }    /* command */
+.k-space   { width: 436px; }
+.k-pipe    { width: 56px; }    /* backslash/pipe */
+.k-arrow   { width: 44px; height: 23px; border-radius: 5px; }
+.k-arrow-ud { display:flex; flex-direction:column; gap:3px; align-self:flex-end; flex-shrink:0; width:44px; }
 
+/* Touch ID — square key with circular sensor inset */
+.k-knob-w {
+  height: var(--key-h);
+  width: 139px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, var(--key-face) 0%, var(--key-face-bot) 100%);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-bottom: 1.5px solid rgba(0,0,0,0.14);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 2px 4px rgba(0,0,0,0.10),
+    0 1px 2px rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: default;
+}
+
+/* The fingerprint sensor circle inside the Touch ID key */
+.knob {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 38% 35%,
+    #f0f0f0 0%, #d4d4d4 45%, #b8b8b8 75%, #a0a0a0 100%);
+  border: 1px solid rgba(0,0,0,0.16);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.6) inset,
+    0 1px 3px rgba(0,0,0,0.20),
+    0 0 0 2px rgba(0,0,0,0.05);
+}
 
 /* ── 18. KEY LABELS — always dark text on white keys ─────────── */
 /* ── KEY LABELS — refined Apple-like typography ──────────────

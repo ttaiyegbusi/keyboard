@@ -92,7 +92,7 @@ export const ROW_QWERTY: KeyDef[] = [
   // Brackets are symbols → stacked layout
   { type: "char", code: "BracketLeft",  char: "[", shift: "{", sizeClass: "k-std" },
   { type: "char", code: "BracketRight", char: "]", shift: "}", sizeClass: "k-std" },
-  { type: "char", code: "Backslash",    char: "\\", shift: "|", sizeClass: "k-pipe" },
+  { type: "char", code: "Backslash",    char: "\\", shift: "|", sizeClass: "k-std" },
 ];
 
 export const ROW_HOME: KeyDef[] = [
