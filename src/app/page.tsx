@@ -1,12 +1,10 @@
 // ─────────────────────────────────────────────────────────────
 // src/app/page.tsx
-// Full layout: transparent topbar close to content,
-// 500×500 notepad, gap, keyboard.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Topbar }        from "@/components/Topbar";
 import { PaperCanvas }   from "@/components/PaperCanvas";
 import { Keyboard }      from "@/components/Keyboard";
@@ -24,21 +22,22 @@ export default function Home() {
     textareaRef, handleVirtualKey, registerSoundCb,
   } = useTypewriter();
 
+  // Custom paper color controlled by the color picker
+  const [customPaperColor, setCustomPaperColor] = useState("#f5edd6");
+
   const paperLabel = PAPERS.find((p) => p.id === activePaper)?.label ?? "Paper";
 
   return (
-    /* Full page — single background, no separate topbar bg */
     <div className="app" onClick={closeDropdowns}>
-
-      {/* Content column — topbar + notepad + keyboard all centred together */}
       <div className="content-col">
 
-        {/* Topbar — transparent, sits right above the notepad */}
         <Topbar
           activePaper={activePaper}   activeColor={activeColor}
           activeFont={activeFont}     volume={volume}
           openDropdown={openDropdown} textareaRef={textareaRef}
           activePaperLabel={paperLabel}
+          customPaperColor={customPaperColor}
+          onCustomPaperColor={setCustomPaperColor}
           onPaperChipClick={(e) => { e.stopPropagation(); toggleDropdown("paper"); }}
           onColorDotClick={(e)  => { e.stopPropagation(); toggleDropdown("color"); }}
           onFontLabelClick={(e) => { e.stopPropagation(); toggleDropdown("font");  }}
@@ -50,16 +49,14 @@ export default function Home() {
           closeDropdowns={closeDropdowns}
         />
 
-        {/* Notepad — 500×500, standalone card */}
         <PaperCanvas
-          activePaper={activePaper} activeFont={activeFont}
-          textareaRef={textareaRef} onPanelClick={closeDropdowns}
+          activePaper={activePaper}       activeFont={activeFont}
+          textareaRef={textareaRef}       onPanelClick={closeDropdowns}
+          customPaperColor={customPaperColor}
         />
 
-        {/* Gap between notepad and keyboard */}
         <div className="scene-gap" />
 
-        {/* Keyboard — completely separate */}
         <Keyboard
           pressedKeys={pressedKeys} shiftActive={shiftActive}
           capsLock={capsLock}       activeColor={activeColor}

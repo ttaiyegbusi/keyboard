@@ -1,9 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // src/components/PaperCanvas.tsx
-//
-// The notepad sits flush on top of the keyboard — no gap.
-// It has rounded top corners and its bottom edge merges into
-// the keyboard top edge, making them look like one unified piece.
+// Paper color is now driven by customPaperColor from the picker.
+// The paper-panel--{type} class still handles ruled lines etc.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
@@ -13,32 +11,29 @@ import { PaperType, FontId } from "@/types";
 import { FONTS } from "@/data/fonts";
 
 interface PaperCanvasProps {
-  activePaper:  PaperType;
-  activeFont:   FontId;
-  textareaRef:  RefObject<HTMLTextAreaElement>;
-  onPanelClick: () => void;
+  activePaper:      PaperType;
+  activeFont:       FontId;
+  textareaRef:      RefObject<HTMLTextAreaElement>;
+  onPanelClick:     () => void;
+  customPaperColor: string;
 }
 
 export function PaperCanvas({
-  activePaper, activeFont, textareaRef, onPanelClick,
+  activePaper, activeFont, textareaRef, onPanelClick, customPaperColor,
 }: PaperCanvasProps) {
   const fontFamily = FONTS.find((f) => f.id === activeFont)?.family ?? "inherit";
 
   return (
     <div
       className={`notepad paper-panel--${activePaper}`}
-      onClick={(e) => {
-        e.stopPropagation();
-        onPanelClick();
-        textareaRef.current?.focus();
-      }}
+      style={{ backgroundColor: customPaperColor }}
+      onClick={(e) => { e.stopPropagation(); onPanelClick(); textareaRef.current?.focus(); }}
     >
       <textarea
         ref={textareaRef}
         className="paper-textarea"
         placeholder="Start typing…"
-        spellCheck
-        autoComplete="off"
+        spellCheck autoComplete="off"
         style={{ fontFamily }}
         onClick={(e) => e.stopPropagation()}
       />

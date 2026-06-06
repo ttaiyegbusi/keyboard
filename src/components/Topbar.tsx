@@ -1,17 +1,20 @@
 // ─────────────────────────────────────────────────────────────
 // src/components/Topbar.tsx
 //
-// Transparent header — no background, blends with the page.
-// Positioned close to the content, not fixed at the very top.
-// Download button now triggers real PDF / PNG export.
+// 1200px wide transparent header with:
+//  - Paper color picker (HSB gradient + hex + swatches) — dark
+//  - Keyboard color dot grid — dark
+//  - Font list (each in its own font) — dark
+//  - Volume toggle
+//  - Retry icon (clears note)
+//  - Download blue pill button → PNG / PDF — dark dropdown
 // ─────────────────────────────────────────────────────────────
 
 "use client";
 
-import React, { useRef, useState } from "react";
-import { PapersPanel }  from "./PapersPanel";
-import { ColorsPanel }  from "./ColorsPanel";
-import { FontsPanel }   from "./FontsPanel";
+import React, { useRef, useState, useCallback, useEffect } from "react";
+import { ColorsPanel } from "./ColorsPanel";
+import { FontsPanel }  from "./FontsPanel";
 import { PaperType, KeyboardColor, FontId, VolumeState } from "@/types";
 import { PAPERS }          from "@/data/papers";
 import { KEYBOARD_COLORS } from "@/data/colors";
@@ -34,8 +37,137 @@ interface TopbarProps {
   onSelectColor:    (c: KeyboardColor) => void;
   onSelectFont:     (f: FontId) => void;
   closeDropdowns:   () => void;
+  // Custom paper color picked via color picker
+  customPaperColor: string;
+  onCustomPaperColor: (hex: string) => void;
 }
 
+// ── Recommended swatches shown in the color picker ──────────
+const SWATCHES = [
+  "#f5edd6","#f2f2f2","#9e5e28","#c9a55a","#ae7638",
+  "#e6ddb8","#f7f8ff","#fff0f5","#1a1a2e","#2d4a3e",
+];
+
+// ── Dark color picker panel ──────────────────────────────────
+function ColorPickerPanel({
+  open, color, onChange, onClose,
+}: { open: boolean; color: string; onChange: (hex: string) => void; onClose: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [hue, setHue] = useState(45);
+  const [hex, setHex] = useState(color.replace("#",""));
+  const [pickerPos, setPickerPos] = useState({ x: 80, y: 180 });
+  const dragging = useRef(false);
+
+  // Draw the SB gradient canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const w = canvas.width, h = canvas.height;
+    // White → hue gradient (left→right)
+    const hueGrad = ctx.createLinearGradient(0, 0, w, 0);
+    hueGrad.addColorStop(0, "white");
+    hueGrad.addColorStop(1, `hsl(${hue},100%,50%)`);
+    ctx.fillStyle = hueGrad;
+    ctx.fillRect(0, 0, w, h);
+    // Transparent → black gradient (top→bottom)
+    const darkGrad = ctx.createLinearGradient(0, 0, 0, h);
+    darkGrad.addColorStop(0, "rgba(0,0,0,0)");
+    darkGrad.addColorStop(1, "rgba(0,0,0,1)");
+    ctx.fillStyle = darkGrad;
+    ctx.fillRect(0, 0, w, h);
+  }, [hue]);
+
+  const pickFromCanvas = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+    setPickerPos({ x, y });
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const pixel = ctx.getImageData(x * scaleX, y * scaleY, 1, 1).data;
+    const h = pixel[0].toString(16).padStart(2,"0")
+            + pixel[1].toString(16).padStart(2,"0")
+            + pixel[2].toString(16).padStart(2,"0");
+    setHex(h);
+    onChange("#" + h);
+  }, [hue, onChange]);
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    dragging.current = true;
+    pickFromCanvas(e);
+  };
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (dragging.current) pickFromCanvas(e);
+  };
+  const handleMouseUp = () => { dragging.current = false; };
+
+  return (
+    <div
+      className={`dropdown-panel picker-panel ${open ? "dropdown-panel--open" : ""}`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <p className="dropdown-title">Paper Color</p>
+
+      {/* SB Canvas */}
+      <canvas
+        ref={canvasRef} width={220} height={180}
+        className="picker-canvas"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      />
+      {/* Crosshair */}
+      <div className="picker-crosshair" style={{ left: pickerPos.x - 7, top: 38 + pickerPos.y - 7 }} />
+
+      {/* Hue slider */}
+      <div className="picker-row">
+        <input
+          type="range" min={0} max={360} value={hue}
+          className="hue-slider"
+          onChange={(e) => setHue(Number(e.target.value))}
+        />
+      </div>
+
+      {/* Hex input */}
+      <div className="picker-hex-row">
+        <span className="picker-hex-label">Hex</span>
+        <input
+          className="picker-hex-input"
+          value={hex}
+          maxLength={6}
+          onChange={(e) => {
+            const v = e.target.value.replace(/[^0-9a-fA-F]/g,"");
+            setHex(v);
+            if (v.length === 6) onChange("#" + v);
+          }}
+        />
+      </div>
+
+      {/* Recommended swatches */}
+      <p className="picker-swatch-label">Recommended</p>
+      <div className="picker-swatches">
+        {SWATCHES.map((s) => (
+          <button
+            key={s}
+            className="picker-swatch"
+            style={{ background: s }}
+            onClick={() => { setHex(s.replace("#","")); onChange(s); }}
+            aria-label={s}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Main Topbar ──────────────────────────────────────────────
 export function Topbar({
   activePaper, activeColor, activeFont, volume, openDropdown,
   textareaRef,
@@ -43,119 +175,124 @@ export function Topbar({
   onDownloadClick, onVolumeClick,
   onSelectPaper, onSelectColor, onSelectFont,
   closeDropdowns,
+  customPaperColor, onCustomPaperColor,
 }: TopbarProps) {
-  const paperSwatch = PAPERS.find((p) => p.id === activePaper)?.swatchColor ?? "#f5edd6";
   const colorSwatch = KEYBOARD_COLORS.find((c) => c.id === activeColor)?.swatch ?? "#3a3c42";
   const fontLabel   = FONTS.find((f) => f.id === activeFont)?.label ?? "Font";
-  const paperLabel  = PAPERS.find((p) => p.id === activePaper)?.label ?? "Paper";
 
-  // ── Download handlers ──────────────────────────────────────
-  const handleDownloadPNG = async () => {
+  // ── Retry: clear the note ────────────────────────────────
+  const handleRetry = () => {
+    if (textareaRef.current) {
+      textareaRef.current.value = "";
+      textareaRef.current.focus();
+    }
+    closeDropdowns();
+  };
+
+  // ── Download PNG ─────────────────────────────────────────
+  const handleDownloadPNG = () => {
     closeDropdowns();
     const el = document.querySelector(".notepad") as HTMLElement;
     if (!el) return;
-    // Use html2canvas via dynamic import-style fetch from CDN
-    const script = document.createElement("script");
-    script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
-    document.head.appendChild(script);
-    script.onload = async () => {
-      // @ts-expect-error html2canvas global
-      const canvas = await window.html2canvas(el, { scale: 2, useCORS: true, backgroundColor: null });
-      const link = document.createElement("a");
-      link.download = `tta-note-${Date.now()}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    };
+    if ((window as unknown as Record<string, unknown>).html2canvas) {
+      // @ts-expect-error global
+      window.html2canvas(el, { scale: 2, useCORS: true, backgroundColor: null }).then((canvas: HTMLCanvasElement) => {
+        const link = document.createElement("a");
+        link.download = `tta-note-${Date.now()}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    } else {
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+      document.head.appendChild(script);
+      script.onload = () => {
+        // @ts-expect-error global
+        window.html2canvas(el, { scale: 2, useCORS: true, backgroundColor: null }).then((canvas: HTMLCanvasElement) => {
+          const link = document.createElement("a");
+          link.download = `tta-note-${Date.now()}.png`;
+          link.href = canvas.toDataURL("image/png");
+          link.click();
+        });
+      };
+    }
   };
 
-  const handleDownloadPDF = async () => {
+  // ── Download PDF ─────────────────────────────────────────
+  const handleDownloadPDF = () => {
     closeDropdowns();
     const text = textareaRef.current?.value ?? "";
-    if (!text.trim()) { alert("Nothing to download — write something first!"); return; }
-
-    // Build a simple PDF using the browser print dialog with a clean layout
+    if (!text.trim()) { alert("Write something first!"); return; }
     const win = window.open("", "_blank");
     if (!win) return;
-    const paper = PAPERS.find((p) => p.id === activePaper);
-    win.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>tta note</title>
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Caveat&display=swap');
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body {
-            background: ${paper?.swatchColor ?? "#f5edd6"};
-            font-family: 'Special Elite', serif;
-            padding: 60px;
-            min-height: 100vh;
-            color: #2a1f0e;
-          }
-          pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: inherit;
-            font-size: 16px;
-            line-height: 1.8;
-          }
-          @media print {
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          }
-        </style>
-      </head>
-      <body>
-        <pre>${text.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</pre>
-        <script>window.onload = () => { window.print(); }<\/script>
-      </body>
-      </html>
-    `);
+    win.document.write(`<!DOCTYPE html><html><head><title>tta note</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:${customPaperColor};font-family:'Special Elite',serif;padding:60px;min-height:100vh;color:#2a1f0e;}
+        pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:16px;line-height:1.8;}
+        @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+      </style></head><body>
+      <pre>${(textareaRef.current?.value ?? "").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</pre>
+      <script>window.onload=()=>window.print();<\/script>
+      </body></html>`);
     win.document.close();
   };
 
   return (
     <header className="topbar" onClick={(e) => e.stopPropagation()}>
-      {/* ── Brand ─────────────────────────────────────────── */}
+      {/* Brand */}
       <div className="brand">
         <span className="brand-dot" />
         <span>tta</span>
       </div>
 
-      {/* ── Toolbar ───────────────────────────────────────── */}
+      {/* Toolbar */}
       <div className="toolbar">
 
-        {/* 1. Paper picker */}
-        <button
-          className={`tb-btn chip-btn ${openDropdown === "paper" ? "tb-btn--active" : ""}`}
-          aria-label="Paper style" aria-expanded={openDropdown === "paper"}
-          onClick={onPaperChipClick}
-        >
-          <span className="chip-swatch" style={{ background: paperSwatch }} />
-          <ChevronIcon />
-        </button>
+        {/* 1. Paper color picker */}
+        <div className="tb-dd-wrap">
+          <button
+            className={`tb-btn chip-btn ${openDropdown === "paper" ? "tb-btn--active" : ""}`}
+            aria-label="Paper color" onClick={onPaperChipClick}
+          >
+            <span className="chip-swatch" style={{ background: customPaperColor }} />
+            <ChevronIcon />
+          </button>
+          <ColorPickerPanel
+            open={openDropdown === "paper"}
+            color={customPaperColor}
+            onChange={onCustomPaperColor}
+            onClose={closeDropdowns}
+          />
+        </div>
 
         <div className="tb-divider" />
 
-        {/* 2. Keyboard colour */}
-        <button
-          className={`tb-btn chip-btn ${openDropdown === "color" ? "tb-btn--active" : ""}`}
-          aria-label="Keyboard color" aria-expanded={openDropdown === "color"}
-          onClick={onColorDotClick}
-        >
-          <span className="color-dot" style={{ background: colorSwatch }} />
-          <ChevronIcon />
-        </button>
+        {/* 2. Keyboard color dot */}
+        <div className="tb-dd-wrap">
+          <button
+            className={`tb-btn chip-btn ${openDropdown === "color" ? "tb-btn--active" : ""}`}
+            aria-label="Keyboard color" onClick={onColorDotClick}
+          >
+            <span className="color-dot" style={{ background: colorSwatch }} />
+            <ChevronIcon />
+          </button>
+          <ColorsPanel open={openDropdown === "color"} activeColor={activeColor} onSelect={onSelectColor} />
+        </div>
 
         <div className="tb-divider" />
 
         {/* 3. Font selector */}
-        <button
-          className={`tb-btn tb-label ${openDropdown === "font" ? "tb-btn--active" : ""}`}
-          aria-label="Writing font" aria-expanded={openDropdown === "font"}
-          onClick={onFontLabelClick}
-        >
-          {fontLabel} <ChevronIcon />
-        </button>
+        <div className="tb-dd-wrap">
+          <button
+            className={`tb-btn tb-label ${openDropdown === "font" ? "tb-btn--active" : ""}`}
+            aria-label="Font" onClick={onFontLabelClick}
+          >
+            {fontLabel} <ChevronIcon />
+          </button>
+          <FontsPanel open={openDropdown === "font"} activeFont={activeFont} onSelect={onSelectFont} />
+        </div>
 
         <div className="tb-divider" />
 
@@ -164,58 +301,63 @@ export function Topbar({
           <VolumeIcon state={volume} />
         </button>
 
-        {/* 5. Settings (decorative) */}
-        <button className="tb-btn tb-icon-btn" aria-label="Settings">
+        {/* 5. Retry — clears the note */}
+        <button className="tb-btn tb-icon-btn" aria-label="Clear note" title="Clear note" onClick={handleRetry}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
           </svg>
         </button>
 
         <div className="tb-divider" />
 
-        {/* 6. Download — with real dropdown */}
-        <div className="dl-wrap">
+        {/* 6. Download — blue pill */}
+        <div className="tb-dd-wrap">
           <button
-            className={`tb-btn tb-label ${openDropdown === "download" ? "tb-btn--active" : ""}`}
-            aria-label="Download" aria-expanded={openDropdown === "download"}
-            onClick={onDownloadClick}
+            className={`dl-pill ${openDropdown === "download" ? "dl-pill--open" : ""}`}
+            aria-label="Download" onClick={onDownloadClick}
           >
-            Download <ChevronIcon />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download
+            <ChevronIcon />
           </button>
 
-          {/* Download options dropdown */}
-          <div className={`dl-panel dropdown-panel ${openDropdown === "download" ? "dropdown-panel--open" : ""}`}
+          {/* Download dropdown — dark */}
+          <div className={`dropdown-panel dl-panel ${openDropdown === "download" ? "dropdown-panel--open" : ""}`}
             onClick={(e) => e.stopPropagation()}>
             <p className="dropdown-title">Export As</p>
-            <button className="dl-option" onClick={handleDownloadPDF}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
-              <div>
-                <span className="dl-opt-label">PDF Document</span>
-                <span className="dl-opt-sub">Print-ready via browser</span>
-              </div>
-            </button>
+
             <button className="dl-option" onClick={handleDownloadPNG}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                <circle cx="8.5" cy="8.5" r="1.5"/>
-                <polyline points="21 15 16 10 5 21"/>
-              </svg>
-              <div>
-                <span className="dl-opt-label">PNG Image</span>
-                <span className="dl-opt-sub">Snapshot of the note card</span>
-              </div>
+              <span className="dl-opt-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+              </span>
+              <span className="dl-opt-text">Image</span>
+              <span className="dl-opt-type">PNG</span>
+            </button>
+
+            <button className="dl-option" onClick={handleDownloadPDF}>
+              <span className="dl-opt-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="9" y1="13" x2="15" y2="13"/>
+                  <line x1="9" y1="17" x2="12" y2="17"/>
+                </svg>
+              </span>
+              <span className="dl-opt-text">Document</span>
+              <span className="dl-opt-type">PDF</span>
             </button>
           </div>
         </div>
 
-        {/* ── Dropdowns ── */}
-        <PapersPanel open={openDropdown === "paper"} activePaper={activePaper} onSelect={onSelectPaper} />
-        <ColorsPanel open={openDropdown === "color"} activeColor={activeColor} onSelect={onSelectColor} />
-        <FontsPanel  open={openDropdown === "font"}  activeFont={activeFont}   onSelect={onSelectFont}  />
       </div>
     </header>
   );
