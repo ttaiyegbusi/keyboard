@@ -29,7 +29,7 @@ export interface UseTypewriterReturn {
 
 export function useTypewriter(): UseTypewriterReturn {
   const [activePaper, setActivePaperState] = useState<PaperType>("cream");
-  const [activeColor, setActiveColorState] = useState<KeyboardColor>("midnight");
+  const [activeColor, setActiveColorState] = useState<KeyboardColor>("silver");
   const [activeFont,  setActiveFontState]  = useState<FontId>("special-elite");
   const [volume,      setVolume]           = useState<VolumeState>("high");
   const [openDropdown, setOpenDropdown]    = useState<DropdownId>(null);

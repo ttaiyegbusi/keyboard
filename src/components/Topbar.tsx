@@ -96,7 +96,8 @@ function ColorPickerPanel({
             + pixel[2].toString(16).padStart(2,"0");
     setHex(h);
     onChange("#" + h);
-  }, [hue, onChange]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onChange]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     dragging.current = true;
