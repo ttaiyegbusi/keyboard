@@ -1,6 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // src/app/page.tsx
-// Scene: notepad sits flush on top of keyboard — one unified unit.
+// Full layout: transparent topbar close to content,
+// 500×500 notepad, gap, keyboard.
 // ─────────────────────────────────────────────────────────────
 
 "use client";
@@ -10,6 +11,7 @@ import { Topbar }        from "@/components/Topbar";
 import { PaperCanvas }   from "@/components/PaperCanvas";
 import { Keyboard }      from "@/components/Keyboard";
 import { useTypewriter } from "@/hooks/useTypewriter";
+import { PAPERS }        from "@/data/papers";
 
 export default function Home() {
   const {
@@ -22,38 +24,50 @@ export default function Home() {
     textareaRef, handleVirtualKey, registerSoundCb,
   } = useTypewriter();
 
-  return (
-    <>
-      <Topbar
-        activePaper={activePaper} activeColor={activeColor}
-        activeFont={activeFont}   volume={volume}
-        openDropdown={openDropdown}
-        onPaperChipClick={(e) => { e.stopPropagation(); toggleDropdown("paper"); }}
-        onColorDotClick={(e)  => { e.stopPropagation(); toggleDropdown("color"); }}
-        onFontLabelClick={(e) => { e.stopPropagation(); toggleDropdown("font");  }}
-        onVolumeClick={cycleVolume}
-        onSelectPaper={setActivePaper}
-        onSelectColor={setActiveColor}
-        onSelectFont={setActiveFont}
-      />
+  const paperLabel = PAPERS.find((p) => p.id === activePaper)?.label ?? "Paper";
 
-      <main className="scene" onClick={closeDropdowns}>
-        {/*
-          Notepad and Keyboard are direct siblings with no gap.
-          .notepad has margin-bottom:0, .keyboard-zone sits right below it.
-          Together they look like one physical object.
-        */}
+  return (
+    /* Full page — single background, no separate topbar bg */
+    <div className="app" onClick={closeDropdowns}>
+
+      {/* Content column — topbar + notepad + keyboard all centred together */}
+      <div className="content-col">
+
+        {/* Topbar — transparent, sits right above the notepad */}
+        <Topbar
+          activePaper={activePaper}   activeColor={activeColor}
+          activeFont={activeFont}     volume={volume}
+          openDropdown={openDropdown} textareaRef={textareaRef}
+          activePaperLabel={paperLabel}
+          onPaperChipClick={(e) => { e.stopPropagation(); toggleDropdown("paper"); }}
+          onColorDotClick={(e)  => { e.stopPropagation(); toggleDropdown("color"); }}
+          onFontLabelClick={(e) => { e.stopPropagation(); toggleDropdown("font");  }}
+          onDownloadClick={(e)  => { e.stopPropagation(); toggleDropdown("download"); }}
+          onVolumeClick={cycleVolume}
+          onSelectPaper={setActivePaper}
+          onSelectColor={setActiveColor}
+          onSelectFont={setActiveFont}
+          closeDropdowns={closeDropdowns}
+        />
+
+        {/* Notepad — 500×500, standalone card */}
         <PaperCanvas
           activePaper={activePaper} activeFont={activeFont}
           textareaRef={textareaRef} onPanelClick={closeDropdowns}
         />
+
+        {/* Gap between notepad and keyboard */}
+        <div className="scene-gap" />
+
+        {/* Keyboard — completely separate */}
         <Keyboard
           pressedKeys={pressedKeys} shiftActive={shiftActive}
           capsLock={capsLock}       activeColor={activeColor}
           volume={volume}           onKeyPress={handleVirtualKey}
           registerSoundCb={registerSoundCb}
         />
-      </main>
-    </>
+
+      </div>
+    </div>
   );
 }

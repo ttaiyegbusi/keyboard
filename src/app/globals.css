@@ -1,48 +1,21 @@
 /* ═══════════════════════════════════════════════════════════════
    src/app/globals.css
-   TABLE OF CONTENTS
-    1.  CSS VARIABLES
-    2.  RESET & BASE
-    3.  TOPBAR
-    4.  TOOLBAR BUTTONS
-    5.  SHARED DROPDOWN PANEL
-    6.  PAPERS PANEL
-    7.  COLORS PANEL
-    8.  FONTS PANEL
-    9.  SCENE LAYOUT
-   10.  NOTEPAD CARD
-   11.  PAPER BACKGROUNDS
-   12.  PAPER TYPOGRAPHY
-   13.  KEYBOARD SHELL & GRID
-   14.  KEY BASE
-   15.  KEY SIZES
-   16.  KEY LABELS
-   17.  KEY STATES
-   18.  RESPONSIVE
 ═══════════════════════════════════════════════════════════════ */
-
 
 /* ── 1. CSS VARIABLES ─────────────────────────────────────── */
 :root {
-  --bg:          #1a1a1a;
-  --topbar-bg:   #161616;
-  --toolbar-bg:  #121212;
+  --bg:     #1a1a1a;
 
-  /* Keyboard defaults (overridden per theme via inline vars) */
-  --kbd-top:          #222329;
-  --kbd-bot:          #1c1d21;
-  --key-top:          #303238;
-  --key-mid:          #282a30;
-  --key-bot:          #24262b;
-  --key-text:         #d8dade;
-  --key-text-sub:     #72767f;
-  --kbd-border:       rgba(255,255,255,0.07);
-  --key-highlight:    rgba(255,255,255,0.10);
-  --key-shadow:       rgba(0,0,0,0.50);
-  --key-drop-shadow:  rgba(0,0,0,0.65);
+  /* Key tokens */
+  --kbd-top:         #222329;  --kbd-bot:         #1c1d21;
+  --key-top:         #303238;  --key-mid:         #282a30;  --key-bot:    #24262b;
+  --key-text:        #d8dade;  --key-text-sub:    #72767f;
+  --kbd-border:      rgba(255,255,255,0.07);
+  --key-highlight:   rgba(255,255,255,0.10);
+  --key-shadow:      rgba(0,0,0,0.50);
+  --key-drop-shadow: rgba(0,0,0,0.65);
   --knob-bg: radial-gradient(circle at 35% 30%,#383b42 0%,#252832 50%,#111318 100%);
 
-  /* UI chrome */
   --blue:      #3b82f6;
   --divider:   rgba(255,255,255,0.09);
   --dd-bg:     #1c1c20;
@@ -52,26 +25,16 @@
   --dd-text:   #e0e2e8;
   --dd-sub:    #6e7280;
 
-  --key-h:       54px;   /* key height */
-  --gap:          7px;   /* gap between keys */
-  --pad:         14px;   /* shell padding — equal left & right */
-  --topbar-h:    52px;
-  --kbd-radius:  18px;
-
-  /*
-    Shell inner width = widest key row = Row 4 (home row):
-      caps(114) + 12×std(60) + return(132) + 13×gap(7) = 1057px
-    Shell total width = 1057 + 2×14 = 1085px
-    All shorter rows use justify-content:space-between to fill exactly 1057px.
-  */
+  --key-h:      54px;
+  --gap:         7px;
+  --pad:        14px;
+  --kbd-radius: 18px;
   --inner-w: 1057px;
   --shell-w:  1085px;
 
-  /* SF Pro system font stack */
   --sf: -apple-system, BlinkMacSystemFont, "SF Pro Text",
         "SF Pro Display", system-ui, "Helvetica Neue", Arial, sans-serif;
 
-  /* Writing fonts */
   --font-special-elite: var(--font-special-elite, 'Courier New', monospace);
   --font-inter:         var(--font-inter, sans-serif);
   --font-caveat:        var(--font-caveat, cursive);
@@ -82,7 +45,6 @@
 
   --keyboard-scale: 1;
 }
-
 
 /* ── 2. RESET & BASE ────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -99,35 +61,75 @@ body {
 }
 button { background: none; border: none; cursor: pointer; font-family: inherit; color: inherit; }
 
-
-/* ── 3. TOPBAR ──────────────────────────────────────────────── */
-.topbar {
-  flex-shrink: 0;
-  height: var(--topbar-h);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 28px;
-  background: var(--topbar-bg);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  position: relative; z-index: 200;
+/* ── 3. APP WRAPPER ─────────────────────────────────────────────
+   Full page, single background colour. No separate topbar bg.
+───────────────────────────────────────────────────────────────*/
+.app {
+  width: 100%;
+  height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
+
+/* ── 4. CONTENT COLUMN ──────────────────────────────────────────
+   Topbar + Notepad + Gap + Keyboard stack vertically, centred.
+   The topbar sits directly above the notepad, close to it.
+   No fixed positioning — everything flows naturally.
+───────────────────────────────────────────────────────────────*/
+.content-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  /* Center the whole stack vertically */
+  justify-content: center;
+}
+
+/* Gap between notepad and keyboard */
+.scene-gap { height: 24px; flex-shrink: 0; }
+
+
+/* ── 5. TOPBAR ──────────────────────────────────────────────────
+   Transparent — no background, no border.
+   Sits directly above the notepad as part of the same composition.
+   Width matches notepad (500px) so it reads as one unit.
+───────────────────────────────────────────────────────────────*/
+.topbar {
+  width: 500px;                    /* same width as notepad */
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  background: transparent;         /* NO background */
+  border: none;                    /* NO border */
+  position: relative;
+  z-index: 200;
+  flex-shrink: 0;
+  margin-bottom: 6px;              /* small gap between topbar and notepad */
+}
+
 .brand {
-  display: flex; align-items: center; gap: 9px;
-  font-size: 14px; font-weight: 600; color: #f0f0f0;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600; color: #f0f0f0;
   letter-spacing: -0.02em;
 }
-.brand-dot { width: 15px; height: 15px; border-radius: 999px; background: #f4f6f8; }
+.brand-dot { width: 14px; height: 14px; border-radius: 999px; background: #f4f6f8; }
 
 
-/* ── 4. TOOLBAR BUTTONS ─────────────────────────────────────── */
+/* ── 6. TOOLBAR BUTTONS ─────────────────────────────────────── */
 .toolbar {
-  display: flex; align-items: center; gap: 5px;
-  height: 34px; padding: 0 10px;
-  border-radius: 9px;
-  background: var(--toolbar-bg);
+  display: flex; align-items: center; gap: 4px;
+  height: 32px; padding: 0 8px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.07);
   position: relative;
 }
-.tb-divider { width: 1px; height: 14px; background: var(--divider); flex-shrink: 0; }
+.tb-divider { width: 1px; height: 12px; background: var(--divider); flex-shrink: 0; }
 
 .tb-btn {
   display: flex; align-items: center; gap: 4px;
@@ -136,41 +138,56 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   transition: background 0.14s, color 0.14s;
   white-space: nowrap;
 }
-.tb-btn:hover   { background: rgba(255,255,255,0.06); color: #b0b2ba; }
+.tb-btn:hover   { background: rgba(255,255,255,0.07); color: #b0b2ba; }
 .tb-btn--active { background: rgba(59,130,246,0.14); color: #6aabff; }
 
 .chip-swatch {
-  display: inline-block; width: 13px; height: 13px;
+  display: inline-block; width: 12px; height: 12px;
   border-radius: 3px; flex-shrink: 0;
   transition: background 0.25s; border: 1px solid rgba(255,255,255,0.1);
 }
 .color-dot {
-  display: inline-block; width: 13px; height: 13px;
+  display: inline-block; width: 12px; height: 12px;
   border-radius: 999px; flex-shrink: 0;
   border: 1px solid rgba(255,255,255,0.12);
 }
-.chevron-icon { width: 9px; height: 5px; stroke: currentColor; flex-shrink: 0; }
+.chevron-icon { width: 8px; height: 5px; stroke: currentColor; flex-shrink: 0; }
 .tb-icon-btn  { padding: 3px 4px; }
-.tb-icon-btn svg { width: 13px; height: 13px; color: #555866; transition: color 0.14s; }
+.tb-icon-btn svg { width: 12px; height: 12px; color: #555866; transition: color 0.14s; }
 .tb-icon-btn:hover svg              { color: #9a9ca8; }
 .tb-icon-btn[aria-label*="high"] svg { color: #6080b0; }
 .tb-icon-btn[aria-label*="low"]  svg { color: #6080b0; }
 .tb-icon-btn[aria-label*="mute"] svg { color: #904040; }
 .tb-label { color: #9a9ca2; }
 
+/* Download wrapper needs relative positioning for its dropdown */
+.dl-wrap { position: relative; }
 
-/* ── 5. SHARED DROPDOWN PANEL ───────────────────────────────── */
+/* Download options panel */
+.dl-panel { width: 240px; right: 0; }
+
+.dl-option {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; padding: 10px 10px; border-radius: 8px;
+  background: none; border: none; cursor: pointer;
+  color: var(--dd-text); text-align: left;
+  transition: background 0.14s;
+}
+.dl-option:hover { background: var(--dd-hover); }
+.dl-option svg   { width: 18px; height: 18px; color: var(--dd-sub); flex-shrink: 0; }
+.dl-opt-label    { display: block; font-size: 13px; font-weight: 500; color: var(--dd-text); }
+.dl-opt-sub      { display: block; font-size: 10px; color: var(--dd-sub); margin-top: 1px; }
+
+
+/* ── 7. SHARED DROPDOWN PANEL ───────────────────────────────── */
 .dropdown-panel {
   position: absolute;
-  top: calc(100% + 10px); right: 0;
+  top: calc(100% + 8px); right: 0;
   background: var(--dd-bg);
   border: 1px solid var(--dd-border);
-  border-radius: 16px;
-  box-shadow:
-    0 28px 70px rgba(0,0,0,0.65),
-    0 4px 16px rgba(0,0,0,0.4),
-    0 1px 0 rgba(255,255,255,0.04) inset;
-  padding: 16px 16px 18px;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.65), 0 4px 16px rgba(0,0,0,0.4);
+  padding: 14px 14px 16px;
   z-index: 500;
   opacity: 0; pointer-events: none;
   transform: translateY(-6px) scale(0.97);
@@ -180,19 +197,15 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .dropdown-panel--open { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
 .dropdown-title {
   font-size: 10px; font-weight: 700; color: var(--dd-sub);
-  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px;
 }
 
 
-/* ── 6. PAPERS PANEL ────────────────────────────────────────── */
-.papers-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 8px 6px; width: 294px;
-}
+/* ── 8. PAPERS PANEL ────────────────────────────────────────── */
+.papers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 6px; width: 294px; }
 .paper-option {
   display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 5px 3px; border-radius: 9px;
-  background: none; border: none; cursor: pointer;
+  padding: 5px 3px; border-radius: 9px; background: none; border: none; cursor: pointer;
   transition: background 0.14s;
 }
 .paper-option:hover { background: var(--dd-hover); }
@@ -201,12 +214,11 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   width: 74px; height: 90px; border-radius: 7px;
   border: 2px solid rgba(255,255,255,0.07); overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  transition: border-color 0.16s, transform 0.14s, box-shadow 0.14s;
+  transition: border-color 0.16s, transform 0.14s;
 }
-.paper-option:hover .paper-thumb { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.55); }
+.paper-option:hover .paper-thumb { transform: translateY(-2px); }
 .paper-option--active .paper-thumb { border-color: var(--blue); }
 .paper-thumb-inner { width: 100%; height: 100%; border-radius: 5px; }
-
 .check-badge {
   position: absolute; top: -5px; right: -5px;
   width: 17px; height: 17px; background: var(--blue); border-radius: 999px;
@@ -223,15 +235,15 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 /* Thumb textures */
 .pt-cream    { background: #f5edd6; }
 .pt-white    { background: #f0f0f0; background-image: radial-gradient(circle,#d0d0d0 0.8px,transparent 0.8px); background-size: 5px 5px; }
-.pt-kraft    { background: #a0622a; background-image: repeating-linear-gradient(0deg,rgba(0,0,0,0.07) 0,rgba(0,0,0,0.07) 1px,transparent 1px,transparent 5px); }
+.pt-kraft    { background: #a0622a; }
 .pt-antique  { background: radial-gradient(ellipse at 40% 30%,#d4b483 0%,#c9a55a 40%,#b8934a 100%); }
-.pt-carton   { background: #b07a3a; background-image: repeating-linear-gradient(0deg,rgba(0,0,0,0.11) 0,rgba(0,0,0,0.11) 2px,transparent 2px,transparent 9px); }
-.pt-oilpaper { background: #e8dfc0; background-image: radial-gradient(ellipse at 65% 35%,rgba(160,130,80,0.28) 0%,transparent 55%); }
+.pt-carton   { background: #b07a3a; }
+.pt-oilpaper { background: #e8dfc0; }
 .pt-notebook { background: #f8f9ff; background-image: repeating-linear-gradient(0deg,transparent,transparent 12px,#b0c8e8 12px,#b0c8e8 13px); background-position: 0 8px; }
-.pt-dots     { background: #fff0f5; background-image: radial-gradient(circle,#e8a0b8 1.2px,transparent 1.2px); background-size: 10px 10px; background-position: 5px 5px; }
+.pt-dots     { background: #fff0f5; background-image: radial-gradient(circle,#e8a0b8 1.2px,transparent 1.2px); background-size: 10px 10px; }
 
 
-/* ── 7. COLORS PANEL ────────────────────────────────────────── */
+/* ── 9. COLORS PANEL ────────────────────────────────────────── */
 .colors-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 228px; }
 .color-option {
   display: flex; flex-direction: column; align-items: center; gap: 5px;
@@ -241,10 +253,10 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .color-option:hover   { background: var(--dd-hover); }
 .color-option--active { background: rgba(255,255,255,0.05); }
 .color-swatch-circle {
-  width: 38px; height: 38px; border-radius: 999px;
+  width: 36px; height: 36px; border-radius: 999px;
   border: 2px solid rgba(255,255,255,0.14);
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.1) inset;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
   transition: transform 0.14s;
 }
 .color-option:hover .color-swatch-circle { transform: scale(1.1); }
@@ -252,68 +264,45 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   border-color: rgba(255,255,255,0.5);
   box-shadow: 0 0 0 3px rgba(59,130,246,0.5), 0 4px 12px rgba(0,0,0,0.5);
 }
-.color-check { width: 16px; height: 16px; }
+.color-check { width: 15px; height: 15px; }
 .color-label { font-size: 9px; font-weight: 500; color: var(--dd-sub); text-align: center; white-space: nowrap; }
 .color-option--active .color-label { color: var(--dd-text); }
 
 
-/* ── 8. FONTS PANEL ─────────────────────────────────────────── */
-.dropdown-panel--fonts { width: 270px; }
+/* ── 10. FONTS PANEL ────────────────────────────────────────── */
+.dropdown-panel--fonts { width: 260px; }
 .fonts-list { display: flex; flex-direction: column; gap: 2px; }
 .font-option {
   display: flex; align-items: center; gap: 8px;
-  padding: 8px 9px; border-radius: 7px;
+  padding: 7px 8px; border-radius: 7px;
   width: 100%; background: none; border: none; cursor: pointer;
   text-align: left; transition: background 0.14s; position: relative;
 }
 .font-option:hover   { background: var(--dd-hover); }
 .font-option--active { background: var(--dd-active); }
-.font-preview { font-size: 14px; color: var(--dd-text); min-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+.font-preview { font-size: 14px; color: var(--dd-text); min-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
 .font-meta    { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 .font-desc    { font-size: 9px; color: var(--dd-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .font-tag     { display: inline-block; font-size: 8px; font-weight: 700; letter-spacing: 0.06em; padding: 1px 4px; border-radius: 3px; width: fit-content; text-transform: uppercase; }
 .font-check   { width: 11px; height: 11px; flex-shrink: 0; margin-left: auto; }
 
 
-/* ── 9. SCENE LAYOUT ────────────────────────────────────────────
-   Two completely separate, independent elements stacked vertically:
-     1. Notepad card  — 500×300px, centered, floating freely
-     2. Gap           — visible dark space between them
-     3. Keyboard      — sits at the bottom independently
-   No connection, no overlap, no merging between the two.
-───────────────────────────────────────────────────────────────*/
-.scene {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 24px;               /* clear dark gap between notepad and keyboard */
-  padding-bottom: 48px;
-  overflow: hidden;
-}
-
-
-/* ── 10. NOTEPAD CARD ───────────────────────────────────────────
-   A standalone floating card.
-   500px wide, 300px tall.
-   Rounded corners on ALL 4 sides.
-   Completely separate from the keyboard — no overlap, no merging.
+/* ── 11. NOTEPAD CARD ───────────────────────────────────────────
+   500×500px standalone card. All 4 corners rounded.
+   Completely separate from keyboard.
    Dark background visible on all sides around it.
 ───────────────────────────────────────────────────────────────*/
 .notepad {
   width: 500px;
-  height: 300px;
-  border-radius: 16px;          /* all 4 corners rounded */
+  height: 500px;
+  border-radius: 16px;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
-  margin-bottom: 0;             /* no overlap with keyboard */
-  z-index: 5;
   box-shadow:
     0 1px 0 rgba(255,255,255,0.06) inset,
-    0 16px 48px rgba(0,0,0,0.5),
-    0 4px 14px rgba(0,0,0,0.35),
+    0 20px 60px rgba(0,0,0,0.5),
+    0 6px 18px rgba(0,0,0,0.35),
     0 2px 4px rgba(0,0,0,0.2);
   transition: background 0.3s ease;
 }
@@ -330,7 +319,7 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 }
 
 
-/* ── 11. PAPER BACKGROUNDS ──────────────────────────────────── */
+/* ── 12. PAPER BACKGROUNDS ──────────────────────────────────── */
 .paper-panel--cream {
   background: #f5edd6;
   background-image: repeating-linear-gradient(0deg, transparent, transparent 25px, rgba(180,160,110,0.13) 25px, rgba(180,160,110,0.13) 26px);
@@ -341,42 +330,35 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 }
 .paper-panel--kraft {
   background: #9e5e28;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 5px),
-    repeating-linear-gradient(90deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 10px);
+  background-image: repeating-linear-gradient(0deg,rgba(0,0,0,0.06) 0,rgba(0,0,0,0.06) 1px,transparent 1px,transparent 5px),
+    repeating-linear-gradient(90deg,rgba(0,0,0,0.03) 0,rgba(0,0,0,0.03) 1px,transparent 1px,transparent 10px);
 }
-.paper-panel--antique {
-  background: radial-gradient(ellipse at 40% 20%, #d4b483 0%, #c9a55a 50%, #b08030 100%);
-}
+.paper-panel--antique { background: radial-gradient(ellipse at 40% 20%,#d4b483 0%,#c9a55a 50%,#b08030 100%); }
 .paper-panel--carton {
   background: #ae7638;
-  background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 9px);
+  background-image: repeating-linear-gradient(0deg,rgba(0,0,0,0.1) 0,rgba(0,0,0,0.1) 2px,transparent 2px,transparent 9px);
 }
 .paper-panel--oilpaper {
   background: #e6ddb8;
-  background-image:
-    radial-gradient(ellipse at 70% 30%, rgba(160,130,70,0.3) 0%, transparent 55%),
-    radial-gradient(ellipse at 25% 75%, rgba(180,150,90,0.2) 0%, transparent 50%);
+  background-image: radial-gradient(ellipse at 70% 30%,rgba(160,130,70,0.3) 0%,transparent 55%),
+    radial-gradient(ellipse at 25% 75%,rgba(180,150,90,0.2) 0%,transparent 50%);
 }
 .paper-panel--notebook {
   background: #f7f8ff;
-  background-image: repeating-linear-gradient(0deg, transparent, transparent 25px, #b4c8e8 25px, #b4c8e8 26px);
+  background-image: repeating-linear-gradient(0deg,transparent,transparent 25px,#b4c8e8 25px,#b4c8e8 26px);
 }
 .paper-panel--dots {
   background: #fff0f5;
-  background-image: radial-gradient(circle, #e8a0b8 1.5px, transparent 1.5px);
-  background-size: 22px 22px;
-  background-position: 11px 11px;
+  background-image: radial-gradient(circle,#e8a0b8 1.5px,transparent 1.5px);
+  background-size: 22px 22px; background-position: 11px 11px;
 }
 
 
-/* ── 12. PAPER TYPOGRAPHY ───────────────────────────────────── */
+/* ── 13. PAPER TYPOGRAPHY ───────────────────────────────────── */
 .paper-textarea {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
+  position: absolute; inset: 0; width: 100%; height: 100%;
   background: transparent; border: none; outline: none; resize: none;
-  z-index: 2;
-  padding: 14px 20px 16px 64px;   /* left indent past the red margin */
+  z-index: 2; padding: 16px 20px 16px 64px;
   font-size: 14px; line-height: 26px; letter-spacing: 0.01em;
   caret-color: #2a4080;
 }
@@ -396,63 +378,40 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .paper-panel--notebook .paper-textarea::placeholder{ color: rgba(80,80,160,0.3); }
 
 
-/* ── 13. KEYBOARD SHELL & GRID ──────────────────────────────────
-   No 3D. Flat. Even padding on left and right.
-   Shell width = inner-w + 2×pad = 1057 + 28 = 1085px.
-   key-row uses justify-content: space-between so every row
-   stretches to exactly fill the inner width regardless of how
-   many keys it has — left and right edges always align.
-───────────────────────────────────────────────────────────────*/
+/* ── 14. KEYBOARD SHELL ─────────────────────────────────────── */
 .keyboard-zone {
   flex-shrink: 0;
   transform: scale(var(--keyboard-scale));
-  transform-origin: bottom center;
+  transform-origin: top center;
 }
 
 .keyboard-body {
-  width: var(--shell-w);    /* 1085px exactly */
-  padding: var(--pad);      /* 14px all sides */
-  padding-bottom: 16px;
+  width: var(--shell-w);
+  padding: var(--pad); padding-bottom: 16px;
   border-radius: var(--kbd-radius);
-  background: linear-gradient(180deg, var(--kbd-top) 0%, var(--kbd-bot) 100%);
+  background: linear-gradient(180deg,var(--kbd-top) 0%,var(--kbd-bot) 100%);
   border: 1px solid var(--kbd-border);
   box-shadow:
     0 2px 0 rgba(255,255,255,0.06) inset,
     0 -3px 0 rgba(0,0,0,0.7) inset,
     0 20px 50px rgba(0,0,0,0.6),
-    0 6px 16px rgba(0,0,0,0.5),
-    0 2px 4px rgba(0,0,0,0.5);
+    0 6px 16px rgba(0,0,0,0.5);
   transition: background 0.35s ease, border-color 0.35s ease;
 }
 
-.keyboard-grid {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap);
-}
-
-/* Every row fills the full inner width evenly */
+.keyboard-grid { display: flex; flex-direction: column; gap: var(--gap); }
 .key-row {
-  display: flex;
-  gap: var(--gap);
-  align-items: flex-end;
-  width: var(--inner-w);         /* exactly 1057px */
-  justify-content: space-between; /* keys spread perfectly edge-to-edge */
+  display: flex; gap: var(--gap); align-items: flex-end;
+  width: var(--inner-w);
+  justify-content: space-between;
 }
 
 
-/* ── 14. KEY BASE ─────────────────────────────────────────────
-   Physical button appearance using layered box-shadows and borders.
-   border-bottom acts as the key's physical bottom wall (thickness).
-───────────────────────────────────────────────────────────────*/
+/* ── 15. KEY BASE ───────────────────────────────────────────── */
 .key {
   height: var(--key-h);
   border-radius: 7px;
-  background: linear-gradient(180deg,
-    var(--key-top)  0%,
-    var(--key-mid) 50%,
-    var(--key-bot) 100%
-  );
+  background: linear-gradient(180deg,var(--key-top) 0%,var(--key-mid) 50%,var(--key-bot) 100%);
   border: 1px solid var(--kbd-border);
   border-top-color: var(--key-highlight);
   border-bottom: 2.5px solid var(--key-shadow);
@@ -464,119 +423,82 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   display: flex; align-items: center; justify-content: center;
   position: relative; flex-shrink: 0; user-select: none; cursor: pointer;
   font-family: var(--sf);
-  transition:
-    filter 0.07s, transform 0.07s, box-shadow 0.07s,
+  transition: filter 0.07s, transform 0.07s, box-shadow 0.07s,
     background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
   -webkit-tap-highlight-color: transparent;
 }
-
 .key--pressed {
-  filter: brightness(0.82);
-  transform: translateY(1px);
+  filter: brightness(0.82); transform: translateY(1px);
   border-bottom-width: 1px;
-  box-shadow:
-    0 0 0 rgba(255,255,255,0.05) inset,
-    0 1px 3px var(--key-drop-shadow);
+  box-shadow: 0 0 0 rgba(255,255,255,0.05) inset, 0 1px 3px var(--key-drop-shadow);
 }
 
 
-/* ── 15. KEY SIZES ──────────────────────────────────────────────
-   These widths are FIXED and intentional.
-   The key-row uses justify-content:space-between so rows with
-   fewer/wider keys (fn row, shift row) still fill the same width.
-   Do not change these without recalculating --inner-w.
-───────────────────────────────────────────────────────────────*/
-.k-std    { width: 60px; }
-.k-esc    { width: 96px; }
-.k-tab    { width: 96px; }
-.k-caps   { width: 114px; }
-.k-delete { width: 114px; }
-.k-return { width: 132px; }
-.k-shift-l{ width: 148px; }
-.k-shift-r{ width: 144px; }
-.k-mod    { width: 62px; }
-.k-mod-sm { width: 50px; }
-.k-cmd    { width: 86px; }   /* command key — wider than option */
-.k-space  { width: 400px; }  /* spacebar fills available bottom-row space */
-.k-fn     { width: 60px; }
-.k-pipe   { width: 84px; }
-.k-knob-w { height: var(--key-h); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.k-arrow  { width: 60px; height: 26px; border-radius: 5px; }
-.k-arrow-ud { display: flex; flex-direction: column; gap: 3px; align-self: flex-end; flex-shrink: 0; }
+/* ── 16. KEY SIZES ──────────────────────────────────────────── */
+.k-std    { width:60px; }  .k-esc    { width:96px; }
+.k-tab    { width:96px; }  .k-caps   { width:114px; }
+.k-delete { width:114px; } .k-return { width:132px; }
+.k-shift-l{ width:148px; } .k-shift-r{ width:144px; }
+.k-mod    { width:62px; }  .k-mod-sm { width:50px; }
+.k-cmd    { width:86px; }  .k-space  { width:400px; }
+.k-fn     { width:60px; }  .k-pipe   { width:84px; }
+.k-knob-w { height:var(--key-h); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.k-arrow  { width:60px; height:26px; border-radius:5px; }
+.k-arrow-ud { display:flex; flex-direction:column; gap:3px; align-self:flex-end; flex-shrink:0; }
 
 
-/* ── 16. KEY LABELS ─────────────────────────────────────────── */
-/* All colours use CSS variables — zero hardcoded hex */
-
-/* Single centred letter (A–Z) */
-.lbl-c { font-size: 15px; font-weight: 500; color: var(--key-text); letter-spacing: -0.02em; }
-
-/* Stacked: shift-symbol top, base-char bottom */
-.lbl-st { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
-.s-top  { font-size: 10px; font-weight: 500; color: var(--key-text-sub); line-height: 1.2; }
-.s-bot  { font-size: 13px; font-weight: 500; color: var(--key-text); line-height: 1.2; }
-
-/* Modifier text — bottom-left / bottom-right */
-.lbl-ml { position: absolute; bottom: 6px; left: 8px; font-size: 8px; font-weight: 500; color: var(--key-text-sub); letter-spacing: 0.01em; }
-.lbl-mr { position: absolute; bottom: 6px; right: 8px; font-size: 8px; font-weight: 500; color: var(--key-text-sub); letter-spacing: 0.01em; }
-
-/* Function key: icon + Fn number */
-.lbl-fn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 100%; height: 100%; }
-.fn-ic  { color: var(--key-text-sub); display: flex; align-items: center; }
-.fn-ic svg { width: 12px; height: 12px; }
-.fn-n   { font-size: 7px; font-weight: 700; color: var(--key-text-sub); letter-spacing: 0.05em; text-transform: uppercase; }
-
-/* Arrow + modifier symbols */
-.arr-l        { font-size: 9px; color: var(--key-text-sub); line-height: 1; }
-.fn-globe-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
-.fn-globe-wrap svg { color: var(--key-text-sub); }
-.mod-fn-label  { font-size: 7.5px; font-weight: 500; color: var(--key-text-sub); }
-.mod-sym { position: absolute; top: 7px; left: 8px; font-size: 11px; font-weight: 400; color: var(--key-text-sub); }
-.mod-sub { font-size: 8px !important; color: var(--key-text-sub) !important; }
-.mod-cmd { font-size: 15px; color: var(--key-text-sub); line-height: 1; }
-
-/* Knob */
+/* ── 17. KEY LABELS ─────────────────────────────────────────── */
+.lbl-c  { font-size:15px; font-weight:500; color:var(--key-text); letter-spacing:-0.02em; }
+.lbl-st { display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.1; }
+.s-top  { font-size:10px; font-weight:500; color:var(--key-text-sub); line-height:1.2; }
+.s-bot  { font-size:13px; font-weight:500; color:var(--key-text); line-height:1.2; }
+.lbl-ml { position:absolute; bottom:6px; left:8px; font-size:8px; font-weight:500; color:var(--key-text-sub); }
+.lbl-mr { position:absolute; bottom:6px; right:8px; font-size:8px; font-weight:500; color:var(--key-text-sub); }
+.lbl-fn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; width:100%; height:100%; }
+.fn-ic  { color:var(--key-text-sub); display:flex; align-items:center; }
+.fn-ic svg { width:12px; height:12px; }
+.fn-n   { font-size:7px; font-weight:700; color:var(--key-text-sub); letter-spacing:0.05em; text-transform:uppercase; }
+.arr-l  { font-size:9px; color:var(--key-text-sub); line-height:1; }
+.fn-globe-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; }
+.fn-globe-wrap svg { color:var(--key-text-sub); }
+.mod-fn-label  { font-size:7.5px; font-weight:500; color:var(--key-text-sub); }
+.mod-sym { position:absolute; top:7px; left:8px; font-size:11px; font-weight:400; color:var(--key-text-sub); }
+.mod-sub { font-size:8px !important; color:var(--key-text-sub) !important; }
+.mod-cmd { font-size:15px; color:var(--key-text-sub); line-height:1; }
 .knob {
-  width: 40px; height: 40px; border-radius: 999px;
-  background: var(--knob-bg);
-  box-shadow:
-    0 1px 2px rgba(255,255,255,0.15) inset,
-    0 -1px 1px rgba(0,0,0,0.5) inset,
-    0 4px 10px rgba(0,0,0,0.65),
-    0 1px 3px rgba(0,0,0,0.45);
+  width:40px; height:40px; border-radius:999px; background:var(--knob-bg);
+  box-shadow: 0 1px 2px rgba(255,255,255,0.15) inset, 0 -1px 1px rgba(0,0,0,0.5) inset,
+    0 4px 10px rgba(0,0,0,0.65), 0 1px 3px rgba(0,0,0,0.45);
 }
 
 
-/* ── 17. KEY STATES ─────────────────────────────────────────── */
-/* Homing bars (F and J) */
+/* ── 18. KEY STATES ─────────────────────────────────────────── */
 .key--homing::after {
-  content: ''; position: absolute; bottom: 8px;
-  left: 50%; transform: translateX(-50%);
-  width: 14px; height: 2px; border-radius: 999px;
-  background: rgba(0,0,0,0.4);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.15);
+  content:''; position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+  width:14px; height:2px; border-radius:999px;
+  background:rgba(0,0,0,0.4); box-shadow:0 1px 0 rgba(255,255,255,0.15);
 }
-
-/* Caps lock indicator */
 .caps-dot {
-  position: absolute; top: 7px; right: 7px;
-  width: 4px; height: 4px; border-radius: 999px;
-  background: var(--blue); opacity: 0; transition: opacity 0.15s;
+  position:absolute; top:7px; right:7px;
+  width:4px; height:4px; border-radius:999px;
+  background:var(--blue); opacity:0; transition:opacity 0.15s;
 }
-.key--caps.key--pressed .caps-dot { opacity: 1; }
+.key--caps.key--pressed .caps-dot { opacity:1; }
 
 
-/* ── 18. RESPONSIVE ─────────────────────────────────────────── */
-@media (max-width: 1160px) {
-  :root { --keyboard-scale: 0.76; }
-  .notepad { height: 200px; }
+/* ── 19. RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  :root { --keyboard-scale: 0.8; }
+  .notepad { width: 460px; height: 460px; }
+  .topbar  { width: 460px; }
 }
-@media (max-width: 900px) {
-  :root { --keyboard-scale: 0.56; }
-  .notepad { height: 180px; }
-  .scene { padding-bottom: 24px; }
+@media (max-width: 960px) {
+  :root { --keyboard-scale: 0.6; }
+  .notepad { width: 380px; height: 380px; }
+  .topbar  { width: 380px; }
 }
 @media (max-width: 640px) {
-  :root { --keyboard-scale: 0.38; }
-  .notepad { height: 160px; }
+  :root { --keyboard-scale: 0.4; }
+  .notepad { width: 300px; height: 300px; }
+  .topbar  { width: 300px; }
 }
