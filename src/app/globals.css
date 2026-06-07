@@ -115,33 +115,41 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 .app {
   width: 100%; height: 100vh;
   background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  flex-direction: column;   /* column so navbar goes top, content below */
+  align-items: stretch;
   overflow: hidden;
-  /* Subtle radial gradient — gives depth on light bg */
   background-image: radial-gradient(ellipse at 50% 60%, #f4f4f5 0%, #e4e4e7 100%);
 }
 
 
 /* ── 4. CONTENT COLUMN ──────────────────────────────────────── */
+/* Fills remaining height below navbar, centers notepad+keyboard */
 .content-col {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 0; justify-content: center;
+  flex: 1;                  /* takes all space below navbar */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;  /* vertically centers notepad+gap+keyboard */
+  gap: 0;
 }
 .scene-gap { height: 20px; flex-shrink: 0; }
 
 
 /* ── 5. TOPBAR ──────────────────────────────────────────────────
-   1200px wide, transparent, no border.
-   Sits directly above the notepad.
+   Fixed to the very top of the screen, full width.
+   Brand on the left, toolbar on the right.
+   Background matches the page — transparent so it blends in.
 ───────────────────────────────────────────────────────────────*/
 .topbar {
-  width: 1200px; max-width: 98vw;
-  height: 44px;
+  width: 100%;              /* full screen width */
+  height: 52px;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 4px;
-  background: transparent; border: none;
+  padding: 0 28px;          /* left/right page margins */
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
   position: relative; z-index: 200;
-  flex-shrink: 0; margin-bottom: 8px;
+  flex-shrink: 0;
 }
 .brand {
   display: flex; align-items: center; gap: 8px;
@@ -820,27 +828,57 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
    COLOR ANIMATION + APPLE IMAC 7-COLOR PANEL UPDATE
    ============================================================ */
 
-/* ── Keyboard color-change pulse animation ──────────────────
-   When activeColor changes, .kbd-pulse is added for 320ms.
-   The keyboard scales down slightly then springs back —
-   like physically clicking a new color into place.
+/* ── Keyboard color-change animation — "chameleon skin" ────────
+   Inspired by how a chameleon shifts color: slow start, the color
+   blooms from the center outward, eases gently to settle.
+   
+   Two-part effect:
+   1. The shell color itself transitions with a long, organic ease
+      — starts barely visible, accelerates, then drifts to final value
+   2. A subtle luminosity pulse rides on top — the shell briefly
+      brightens as if the new pigment is "activating", then settles
+   
+   Total duration: 900ms — slow enough to feel dramatic and premium,
+   fast enough to feel responsive.
 ──────────────────────────────────────────────────────────── */
-@keyframes kbdColorPulse {
-  0%   { transform: scale(1);     filter: brightness(1);    }
-  25%  { transform: scale(0.985); filter: brightness(0.92); }
-  60%  { transform: scale(1.004); filter: brightness(1.02); }
-  100% { transform: scale(1);     filter: brightness(1);    }
+@keyframes chameleonShift {
+  0%   {
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
+  15%  {
+    /* Color starts shifting — slight brightening as pigment activates */
+    filter: brightness(1.08) saturate(1.15);
+    transform: scale(1);
+  }
+  45%  {
+    /* Peak of the bloom — most vivid moment */
+    filter: brightness(1.12) saturate(1.25);
+    transform: scale(1.002);
+  }
+  75%  {
+    /* Color settling — slowly desaturating back to natural */
+    filter: brightness(1.04) saturate(1.08);
+    transform: scale(1.001);
+  }
+  100% {
+    /* Fully settled — natural aluminum finish */
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
 }
 
 .kbd-pulse {
-  animation: kbdColorPulse 320ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: chameleonShift 900ms cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
-/* Shell color transition — smooth crossfade between colors */
+/* Shell color crossfade — the core color change
+   Uses a very long ease-in-out so the color creeps in slowly
+   at first (like pigment cells slowly filling) then completes */
 .keyboard-body {
   transition:
-    background 400ms cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 400ms ease !important;
+    background 800ms cubic-bezier(0.4, 0.0, 0.2, 1),
+    border-color 800ms ease !important;
 }
 
 /* ── Apple iMac 7-color panel ───────────────────────────────

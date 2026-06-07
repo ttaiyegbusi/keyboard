@@ -45,7 +45,7 @@ export function Keyboard({
       prevColor.current = activeColor;
       // Trigger pulse: scale down then back up
       setPulsing(true);
-      const t = setTimeout(() => setPulsing(false), 320);
+      const t = setTimeout(() => setPulsing(false), 900);
       return () => clearTimeout(t);
     }
   }, [activeColor]);

@@ -38,9 +38,6 @@ interface TopbarProps {
   onSelectColor:    (c: KeyboardColor) => void;
   onSelectFont:     (f: FontId) => void;
   closeDropdowns:   () => void;
-  // Custom paper color picked via color picker
-  customPaperColor: string;
-  onCustomPaperColor: (hex: string) => void;
 }
 
 // ── Recommended swatches shown in the color picker ──────────
@@ -177,7 +174,6 @@ export function Topbar({
   onDownloadClick, onVolumeClick,
   onSelectPaper, onSelectColor, onSelectFont,
   closeDropdowns,
-  customPaperColor, onCustomPaperColor,
 }: TopbarProps) {
   const colorSwatch = KEYBOARD_COLORS.find((c) => c.id === activeColor)?.swatch ?? "#3a3c42";
   const fontLabel   = FONTS.find((f) => f.id === activeFont)?.label ?? "Font";

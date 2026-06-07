@@ -4,7 +4,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Topbar }        from "@/components/Topbar";
 import { PaperCanvas }   from "@/components/PaperCanvas";
 import { Keyboard }      from "@/components/Keyboard";
@@ -22,49 +22,43 @@ export default function Home() {
     textareaRef, handleVirtualKey, registerSoundCb,
   } = useTypewriter();
 
-  // Custom paper color controlled by the color picker
-  const [customPaperColor, setCustomPaperColor] = useState("#f5edd6");
-
   const paperLabel = PAPERS.find((p) => p.id === activePaper)?.label ?? "Paper";
 
   return (
     <div className="app" onClick={closeDropdowns}>
-      <div className="content-col">
 
-        <Topbar
-          activePaper={activePaper}   activeColor={activeColor}
-          activeFont={activeFont}     volume={volume}
-          openDropdown={openDropdown} textareaRef={textareaRef}
-          activePaperLabel={paperLabel}
-          customPaperColor={customPaperColor}
-          onCustomPaperColor={setCustomPaperColor}
-          onPaperChipClick={(e) => { e.stopPropagation(); toggleDropdown("paper"); }}
-          onColorDotClick={(e)  => { e.stopPropagation(); toggleDropdown("color"); }}
-          onFontLabelClick={(e) => { e.stopPropagation(); toggleDropdown("font");  }}
-          onDownloadClick={(e)  => { e.stopPropagation(); toggleDropdown("download"); }}
-          onVolumeClick={cycleVolume}
-          onSelectPaper={setActivePaper}
-          onSelectColor={setActiveColor}
-          onSelectFont={setActiveFont}
-          closeDropdowns={closeDropdowns}
-        />
+      {/* Navbar — sits at very top of screen */}
+      <Topbar
+        activePaper={activePaper}   activeColor={activeColor}
+        activeFont={activeFont}     volume={volume}
+        openDropdown={openDropdown} textareaRef={textareaRef}
+        activePaperLabel={paperLabel}
+        onPaperChipClick={(e) => { e.stopPropagation(); toggleDropdown("paper"); }}
+        onColorDotClick={(e)  => { e.stopPropagation(); toggleDropdown("color"); }}
+        onFontLabelClick={(e) => { e.stopPropagation(); toggleDropdown("font");  }}
+        onDownloadClick={(e)  => { e.stopPropagation(); toggleDropdown("download"); }}
+        onVolumeClick={cycleVolume}
+        onSelectPaper={setActivePaper}
+        onSelectColor={setActiveColor}
+        onSelectFont={setActiveFont}
+        closeDropdowns={closeDropdowns}
+      />
 
+      {/* Content — centered in remaining space below navbar */}
+      <div className="content-col" onClick={(e) => e.stopPropagation()}>
         <PaperCanvas
-          activePaper={activePaper}       activeFont={activeFont}
-          textareaRef={textareaRef}       onPanelClick={closeDropdowns}
-          customPaperColor={customPaperColor}
+          activePaper={activePaper} activeFont={activeFont}
+          textareaRef={textareaRef} onPanelClick={closeDropdowns}
         />
-
         <div className="scene-gap" />
-
         <Keyboard
           pressedKeys={pressedKeys} shiftActive={shiftActive}
           capsLock={capsLock}       activeColor={activeColor}
           volume={volume}           onKeyPress={handleVirtualKey}
           registerSoundCb={registerSoundCb}
         />
-
       </div>
+
     </div>
   );
 }
