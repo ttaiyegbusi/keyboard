@@ -142,14 +142,15 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
    Background matches the page — transparent so it blends in.
 ───────────────────────────────────────────────────────────────*/
 .topbar {
-  width: 100%;              /* full screen width */
-  height: 52px;
+  width: 100%;
+  height: 64px;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 28px;          /* left/right page margins */
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  background: transparent;   /* no background — blends with page */
+  border: none;              /* no border */
   position: relative; z-index: 200;
   flex-shrink: 0;
+  margin-top: 12px;          /* pushes it slightly down from very top */
 }
 .brand {
   display: flex; align-items: center; gap: 8px;
