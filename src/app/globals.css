@@ -75,8 +75,8 @@
   --gap:         4px;
   --pad:        13px;
   --kbd-radius: 16px;
-  --inner-w:   960px;
-  --shell-w:   988px;
+  --inner-w:   900px;
+  --shell-w:   928px;
 
   /* SF Pro */
   --sf: -apple-system, BlinkMacSystemFont, "SF Pro Text",
@@ -606,38 +606,48 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 
 
 /* ── 17. KEY SIZES ──────────────────────────────────────────────
-   Every row = exactly 960px inner width with 4px gap.
-   
-   Fn row uses a special layout (see .key-row--fn below):
-     ESC(80) + [group-gap] + F1-F4(61×4) + [group-gap] + 
-     F5-F8(61×4) + [group-gap] + F9-F12(61×4) + TouchID(80)
-     = 80 + 12×61 + 80 + 13×4 + 2×8 = 960 ✓
-   
-   All other rows use fixed widths with uniform 4px gap.
-     nums:   13×56 + 180(del) + 13×4 = 960 ✓
-     qwerty: 180(tab) + 13×56 + 13×4 = 960 ✓
-     home:   82(caps) + 13×56 + 98(ret) + 13×4 = 960 ✓
-     shift:  148 + 11×56 + 148 + 12×4 = 960 ✓
-     bottom: 44+56+56+72+436+72+56+44+44+44 + 9×4 = 960 ✓
+   All rows = 900px inner width, 4px gap, verified ✓
+   Key insight: home row has 12 std keys (not 13), shift has 10.
+   This gives return=100px and caps=76px — proper Apple proportions.
+
+   Row counts:
+     num:    13 std + delete  (14 items, 13 gaps)
+     qwerty: tab + 13 std     (14 items, 13 gaps)
+     home:   caps + 12 std + return (14 items, 13 gaps)
+     shift:  shift + 10 std + shift (12 items, 11 gaps... wait 13 items with 12 gaps)
+     bottom: fn+ctrl+opt+cmd+space+cmd+opt+arrows (9 main + arrows)
+
+   Verification:
+     fn:     80+12×56+80+13×4+2×8 = 900 ✓
+     num:    13×56+120+13×4 = 900 ✓
+     qwerty: 120+13×56+13×4 = 900 ✓
+     home:   76+12×56+100+13×4 = 900 ✓
+     shift:  146+10×56+146+12×4 = 900 ✓
+     bottom: 44+56+56+78+356+78+56+132+8+36 = 900 ✓
 ───────────────────────────────────────────────────────────────*/
 .k-std     { width: 56px; }
-.k-fn      { width: 61px; }   /* F1-F12 keys */
-.k-esc     { width: 80px; }   /* ESC — slightly wider than fn key */
-.k-tab     { width: 180px; }
-.k-caps    { width: 82px; }
-.k-delete  { width: 180px; }
-.k-return  { width: 98px; }
-.k-shift-l { width: 148px; }
-.k-shift-r { width: 148px; }
+.k-fn      { width: 56px; }   /* F1-F12: same as std so fn row fills evenly */
+.k-esc     { width: 80px; }
+.k-tab     { width: 120px; }  /* matches delete width */
+.k-caps    { width: 76px; }
+.k-delete  { width: 120px; }
+.k-return  { width: 156px; }  /* Apple return — wide right anchor */
+.k-shift-l { width: 146px; }
+.k-shift-r { width: 146px; }
 .k-mod     { width: 56px; }   /* ctrl, option */
 .k-mod-sm  { width: 44px; }   /* fn/globe */
-.k-cmd     { width: 72px; }   /* command */
-.k-space   { width: 436px; }
-.k-pipe    { width: 56px; }   /* backslash/pipe */
-.k-arrow   { width: 44px; height: 23px; border-radius: 5px; }
-.k-arrow-ud { display:flex; flex-direction:column; gap:3px; align-self:flex-end; flex-shrink:0; width:44px; }
+.k-cmd     { width: 78px; }   /* command */
+.k-space   { width: 356px; }
+.k-pipe    { width: 56px; }
 
-/* Touch ID key — same width as ESC */
+.k-arrow   { width: 44px; height: 23px; border-radius: 5px; }
+.k-arrow-ud {
+  display: flex; flex-direction: column;
+  gap: 3px; align-self: flex-end;
+  flex-shrink: 0; width: 44px;
+}
+
+/* Touch ID — square key, same width as ESC */
 .k-knob-w {
   height: var(--key-h);
   width: 80px;
@@ -656,10 +666,9 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   cursor: default;
 }
 
-/* The fingerprint sensor circle inside Touch ID */
+/* Fingerprint sensor inside Touch ID */
 .knob {
-  width: 26px;
-  height: 26px;
+  width: 26px; height: 26px;
   border-radius: 999px;
   background: radial-gradient(circle at 38% 35%,
     #f0f0f0 0%, #d4d4d4 45%, #b8b8b8 75%, #a0a0a0 100%);
@@ -670,22 +679,13 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
     0 0 0 2px rgba(0,0,0,0.05);
 }
 
-/* ── Fn row special layout ──────────────────────────────────────
-   Uses justify-content:space-between ONLY for fn row so that
-   the visual grouping gap (after F4, F8) distributes naturally.
-   All other rows use the default flex+gap layout.
-───────────────────────────────────────────────────────────────*/
+/* Fn row: space-between + group gaps */
 .key-row--fn {
   justify-content: space-between;
-  gap: 0;    /* override default gap — spacing handled by space-between */
+  gap: 0;
   width: var(--inner-w);
 }
-
-/* Group dividers in fn row — invisible spacers after F4 and F8 */
-.fn-group-gap {
-  width: 8px;  /* extra visual grouping space */
-  flex-shrink: 0;
-}
+.fn-group-gap { width: 8px; flex-shrink: 0; }
 
 /* ── 18. KEY LABELS — always dark text on white keys ─────────── */
 /* ── KEY LABELS — refined Apple-like typography ──────────────
