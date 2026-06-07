@@ -177,7 +177,7 @@ export function Topbar({
 }: TopbarProps) {
   const colorSwatch = KEYBOARD_COLORS.find((c) => c.id === activeColor)?.swatch ?? "#3a3c42";
   const fontLabel   = FONTS.find((f) => f.id === activeFont)?.label ?? "Font";
-  const paperSwatch = PAPERS.find((p) => p.id === activePaper)?.swatchColor ?? customPaperColor;
+  const paperSwatch = PAPERS.find((p) => p.id === activePaper)?.swatchColor ?? "#f5edd6";
 
   // ── Retry: clear the note ────────────────────────────────
   const handleRetry = () => {
@@ -228,7 +228,7 @@ export function Topbar({
       <style>
         @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{background:${customPaperColor};font-family:'Special Elite',serif;padding:60px;min-height:100vh;color:#2a1f0e;}
+        body{background:${paperSwatch};font-family:'Special Elite',serif;padding:60px;min-height:100vh;color:#2a1f0e;}
         pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:16px;line-height:1.8;}
         @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
       </style></head><body>
