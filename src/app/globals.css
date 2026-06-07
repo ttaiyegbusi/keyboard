@@ -606,37 +606,41 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
 
 
 /* ── 17. KEY SIZES ──────────────────────────────────────────────
-   CRITICAL: Every row sums to exactly 960px with gap=4px.
-   No stretching — pure fixed widths. Gap is uniform everywhere.
-   Row verification:
-     fn:     169 + 12×50 + 139 + 13×4 = 960 ✓
-     num:    13×56 + 180 + 13×4 = 960 ✓
-     qwerty: 180 + 13×56 + 13×4 = 960 ✓
-     home:   82 + 13×56 + 98 + 13×4 = 960 ✓
+   Every row = exactly 960px inner width with 4px gap.
+   
+   Fn row uses a special layout (see .key-row--fn below):
+     ESC(80) + [group-gap] + F1-F4(61×4) + [group-gap] + 
+     F5-F8(61×4) + [group-gap] + F9-F12(61×4) + TouchID(80)
+     = 80 + 12×61 + 80 + 13×4 + 2×8 = 960 ✓
+   
+   All other rows use fixed widths with uniform 4px gap.
+     nums:   13×56 + 180(del) + 13×4 = 960 ✓
+     qwerty: 180(tab) + 13×56 + 13×4 = 960 ✓
+     home:   82(caps) + 13×56 + 98(ret) + 13×4 = 960 ✓
      shift:  148 + 11×56 + 148 + 12×4 = 960 ✓
      bottom: 44+56+56+72+436+72+56+44+44+44 + 9×4 = 960 ✓
 ───────────────────────────────────────────────────────────────*/
 .k-std     { width: 56px; }
-.k-fn      { width: 50px; }    /* fn row keys — narrower than letter keys */
-.k-esc     { width: 169px; }   /* ESC — wide, anchors left of fn row */
+.k-fn      { width: 61px; }   /* F1-F12 keys */
+.k-esc     { width: 80px; }   /* ESC — slightly wider than fn key */
 .k-tab     { width: 180px; }
 .k-caps    { width: 82px; }
 .k-delete  { width: 180px; }
 .k-return  { width: 98px; }
 .k-shift-l { width: 148px; }
 .k-shift-r { width: 148px; }
-.k-mod     { width: 56px; }    /* ctrl, option */
-.k-mod-sm  { width: 44px; }    /* fn/globe */
-.k-cmd     { width: 72px; }    /* command */
+.k-mod     { width: 56px; }   /* ctrl, option */
+.k-mod-sm  { width: 44px; }   /* fn/globe */
+.k-cmd     { width: 72px; }   /* command */
 .k-space   { width: 436px; }
-.k-pipe    { width: 56px; }    /* backslash/pipe */
+.k-pipe    { width: 56px; }   /* backslash/pipe */
 .k-arrow   { width: 44px; height: 23px; border-radius: 5px; }
 .k-arrow-ud { display:flex; flex-direction:column; gap:3px; align-self:flex-end; flex-shrink:0; width:44px; }
 
-/* Touch ID — square key with circular sensor inset */
+/* Touch ID key — same width as ESC */
 .k-knob-w {
   height: var(--key-h);
-  width: 139px;
+  width: 80px;
   border-radius: 7px;
   background: linear-gradient(180deg, var(--key-face) 0%, var(--key-face-bot) 100%);
   border: 1px solid rgba(0,0,0,0.08);
@@ -652,10 +656,10 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
   cursor: default;
 }
 
-/* The fingerprint sensor circle inside the Touch ID key */
+/* The fingerprint sensor circle inside Touch ID */
 .knob {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 999px;
   background: radial-gradient(circle at 38% 35%,
     #f0f0f0 0%, #d4d4d4 45%, #b8b8b8 75%, #a0a0a0 100%);
@@ -664,6 +668,23 @@ button { background: none; border: none; cursor: pointer; font-family: inherit; 
     0 1px 0 rgba(255,255,255,0.6) inset,
     0 1px 3px rgba(0,0,0,0.20),
     0 0 0 2px rgba(0,0,0,0.05);
+}
+
+/* ── Fn row special layout ──────────────────────────────────────
+   Uses justify-content:space-between ONLY for fn row so that
+   the visual grouping gap (after F4, F8) distributes naturally.
+   All other rows use the default flex+gap layout.
+───────────────────────────────────────────────────────────────*/
+.key-row--fn {
+  justify-content: space-between;
+  gap: 0;    /* override default gap — spacing handled by space-between */
+  width: var(--inner-w);
+}
+
+/* Group dividers in fn row — invisible spacers after F4 and F8 */
+.fn-group-gap {
+  width: 8px;  /* extra visual grouping space */
+  flex-shrink: 0;
 }
 
 /* ── 18. KEY LABELS — always dark text on white keys ─────────── */

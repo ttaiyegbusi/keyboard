@@ -70,7 +70,7 @@ export function Keyboard({
       >
         <div className="keyboard-grid">
 
-          <div className="key-row">
+          <div className="key-row key-row--fn">
             {ROW_FN.map((k, i) => (
               <Key key={i} keyDef={k} pressed={k.code ? ip(k.code) : false}
                 shiftActive={shiftActive} capsLock={capsLock} onPress={hk} />

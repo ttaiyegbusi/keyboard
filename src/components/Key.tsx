@@ -40,6 +40,11 @@ export function Key({ keyDef, pressed, onPress }: KeyProps) {
     if (code) onPress(code, char, shift);
   };
 
+  // ── Invisible group spacer (fn row dividers) ──────────────
+  if (type === "gap") {
+    return <div className={sizeClass} aria-hidden />;
+  }
+
   // ── Touch ID — square key with circular sensor ─────────────
   if (type === "touchid") {
     return (

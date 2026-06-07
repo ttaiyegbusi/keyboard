@@ -9,7 +9,7 @@
 //   type "knob"     → dial, no label
 // ─────────────────────────────────────────────────────────────
 
-export type KeyType = "char" | "special" | "fn" | "knob" | "touchid";
+export type KeyType = "char" | "special" | "fn" | "knob" | "touchid" | "gap";
 
 export interface KeyDef {
   type: KeyType;
@@ -44,14 +44,21 @@ const ICONS = {
 
 export const ROW_FN: KeyDef[] = [
   { type: "special", code: "Escape",  label: "esc",  labelAlign: "left", sizeClass: "k-esc" },
+  // Group 1: F1-F4
   { type: "fn", code: "F1",  fnLabel: "F1",  fnIcon: ICONS.brightDown,  sizeClass: "k-fn" },
   { type: "fn", code: "F2",  fnLabel: "F2",  fnIcon: ICONS.brightUp,    sizeClass: "k-fn" },
   { type: "fn", code: "F3",  fnLabel: "F3",  fnIcon: ICONS.missionCtrl, sizeClass: "k-fn" },
   { type: "fn", code: "F4",  fnLabel: "F4",  fnIcon: ICONS.search,      sizeClass: "k-fn" },
+  // Group divider — visual gap between F4 and F5
+  { type: "gap", sizeClass: "fn-group-gap" },
+  // Group 2: F5-F8
   { type: "fn", code: "F5",  fnLabel: "F5",  fnIcon: ICONS.mic,         sizeClass: "k-fn" },
   { type: "fn", code: "F6",  fnLabel: "F6",  fnIcon: ICONS.moon,        sizeClass: "k-fn" },
   { type: "fn", code: "F7",  fnLabel: "F7",  fnIcon: ICONS.rewind,      sizeClass: "k-fn" },
   { type: "fn", code: "F8",  fnLabel: "F8",  fnIcon: ICONS.pause,       sizeClass: "k-fn" },
+  // Group divider — visual gap between F8 and F9
+  { type: "gap", sizeClass: "fn-group-gap" },
+  // Group 3: F9-F12
   { type: "fn", code: "F9",  fnLabel: "F9",  fnIcon: ICONS.fastFwd,     sizeClass: "k-fn" },
   { type: "fn", code: "F10", fnLabel: "F10", fnIcon: ICONS.mute,        sizeClass: "k-fn" },
   { type: "fn", code: "F11", fnLabel: "F11", fnIcon: ICONS.volDown,     sizeClass: "k-fn" },
