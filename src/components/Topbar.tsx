@@ -15,6 +15,7 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { ColorsPanel } from "./ColorsPanel";
 import { FontsPanel }  from "./FontsPanel";
+import { PapersPanel } from "./PapersPanel";
 import { PaperType, KeyboardColor, FontId, VolumeState } from "@/types";
 import { PAPERS }          from "@/data/papers";
 import { KEYBOARD_COLORS } from "@/data/colors";
@@ -180,6 +181,7 @@ export function Topbar({
 }: TopbarProps) {
   const colorSwatch = KEYBOARD_COLORS.find((c) => c.id === activeColor)?.swatch ?? "#3a3c42";
   const fontLabel   = FONTS.find((f) => f.id === activeFont)?.label ?? "Font";
+  const paperSwatch = PAPERS.find((p) => p.id === activePaper)?.swatchColor ?? customPaperColor;
 
   // ── Retry: clear the note ────────────────────────────────
   const handleRetry = () => {
@@ -251,20 +253,19 @@ export function Topbar({
       {/* Toolbar */}
       <div className="toolbar">
 
-        {/* 1. Paper color picker */}
+        {/* 1. Paper picker — opens the Papers grid (Image 2) */}
         <div className="tb-dd-wrap">
           <button
             className={`tb-btn chip-btn ${openDropdown === "paper" ? "tb-btn--active" : ""}`}
-            aria-label="Paper color" onClick={onPaperChipClick}
+            aria-label="Paper style" onClick={onPaperChipClick}
           >
-            <span className="chip-swatch" style={{ background: customPaperColor }} />
+            <span className="chip-swatch" style={{ background: paperSwatch }} />
             <ChevronIcon />
           </button>
-          <ColorPickerPanel
+          <PapersPanel
             open={openDropdown === "paper"}
-            color={customPaperColor}
-            onChange={onCustomPaperColor}
-            onClose={closeDropdowns}
+            activePaper={activePaper}
+            onSelect={onSelectPaper}
           />
         </div>
 
