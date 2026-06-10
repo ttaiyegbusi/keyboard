@@ -1,136 +1,97 @@
-# tta — Paper Typewriter
+# ChainCore — Accounting (Charts of Accounts)
 
-A premium dark-mode paper typewriter built with **Next.js 14**, **TypeScript**, and pure CSS.
+A Next.js 14 (App Router) + TypeScript + Tailwind implementation of the ChainCore
+core-banking **Charts of Accounts** and **General Ledger** experience, built from
+the supplied design spec and screenshots.
 
----
+## Getting started
 
-## ✦ Features
-
-- **8 paper styles** — Cream, A4 White, Brown Kraft, Antique, Carton, Oil Paper, Note Book, Dots
-- **Functional on-screen keyboard** — click any key to type on the paper
-- **Physical keyboard support** — type naturally; the on-screen key lights up in sync
-- **Paper picker dropdown** — click the colour chip in the toolbar to switch papers
-- **Per-paper typography** — each paper has its own font, colour, and line style
-
----
-
-## ✦ Project Structure
-
-```
-tta-typewriter/
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx        ← Root layout, fonts, metadata
-│   │   ├── page.tsx          ← Root page, wires components together
-│   │   └── globals.css       ← ALL styles (heavily commented, 15 sections)
-│   │
-│   ├── components/
-│   │   ├── Topbar.tsx        ← Header bar (brand + toolbar + dropdown anchor)
-│   │   ├── PapersPanel.tsx   ← Paper picker dropdown (white card, 3-col grid)
-│   │   ├── PaperCanvas.tsx   ← Large writing surface behind the keyboard
-│   │   ├── Keyboard.tsx      ← Full keyboard (6 rows)
-│   │   └── Key.tsx           ← Single key component
-│   │
-│   ├── hooks/
-│   │   └── useTypewriter.ts  ← Central state hook (paper, shift, capslock, etc.)
-│   │
-│   ├── data/
-│   │   ├── papers.ts         ← Paper options array (id, label, swatch, thumbClass)
-│   │   └── keyboard.ts       ← All key row definitions (char, fn, special types)
-│   │
-│   └── types/
-│       └── index.ts          ← Shared TypeScript types
-│
-├── public/                   ← Static assets (empty — add favicons here)
-├── package.json
-├── tsconfig.json
-├── next.config.mjs
-└── README.md
-```
-
----
-
-## ✦ Getting Started
-
-### 1. Install dependencies
 ```bash
 npm install
+npm run dev      # http://localhost:3000
 ```
 
-### 2. Run the development server
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 3. Build for production
-```bash
-npm run build
-npm start
-```
-
----
-
-## ✦ Deploy to Vercel
-
-The easiest way is the Vercel CLI:
+The root path redirects to `/accounting/charts-of-account`.
 
 ```bash
-npm i -g vercel
-vercel
+npm run build && npm run start   # production
 ```
 
-Or push to GitHub and import the repo at [vercel.com/new](https://vercel.com/new).  
-Vercel auto-detects Next.js — no configuration needed.
+## What's implemented
 
----
+| Screen | Route | Status |
+|---|---|---|
+| Charts of Account — All | `/accounting/charts-of-account` | ✅ |
+| Charts of Account — Asset/Liability/Equity/Income/Expense | `…?tab=asset` etc. | ✅ |
+| Create New General Ledger | `…/create` | ✅ |
+| Success modal | (after create) | ✅ |
+| GL detail / view | `…/:accountId` | ✅ |
+| GL edit mode | `…/:accountId?edit=1` or "Save GL" toggle | ✅ |
 
-## ✦ How to Customise
+### Features
+- **App shell**: fixed 66px primary icon rail (with hover tooltips + active states)
+  and a 250px Accounting sidebar that shows on list screens and hides on form screens.
+- **URL-driven tabs**: the active category lives in `?tab=`. The **All** tab shows
+  collapsed roots with a **Type** column; category tabs show the expanded hierarchy
+  without it.
+- **Hierarchical table**: recursive tree with expand/collapse chevrons, folder icons,
+  per-level indentation, uppercase roots, `$0.00 Dr/Cr` amount formatting, and a
+  per-row kebab menu (View / Edit / Add child / View transactions / Disable).
+- **Search** filters by code/name/type and keeps parent chains visible.
+- **Pagination bar**: rows-per-page, numbered pages, Prev/Next, Go-to-page, result count.
+- **Create form**: 4-column field row, two accordion sections, checkbox, Notes
+  textarea, sticky footer, and validation (required fields, code format, conditional
+  Header Account requirement based on hierarchy type).
+- **Accessibility**: aria-labels on icon buttons, `aria-selected` tabs, labeled fields,
+  focus rings, and a focus-trapped modal.
 
-### Add a new paper style
+### Not yet wired (intentional placeholders)
+- **Filter** and **Export** buttons are styled but inert.
+- Pagination total is fixed to "of 500" to match the reference; mock data has fewer
+  real rows. Swap in a real data source / generated rows to make paging functional.
+- "Save" actions don't persist (mock data is read-only in memory).
 
-1. **`src/types/index.ts`** — Add the new id to the `PaperType` union:
-   ```ts
-   export type PaperType = "cream" | "a4white" | ... | "your-new-paper";
-   ```
+## Project structure
 
-2. **`src/data/papers.ts`** — Add an entry to the `PAPERS` array:
-   ```ts
-   {
-     id: "your-new-paper",
-     label: "Your Paper",
-     swatchColor: "#hexcolor",
-     thumbClass: "pt-your-paper",
-   }
-   ```
-
-3. **`src/app/globals.css`** — Add two CSS blocks:
-   - Under **§6 PAPER THUMBNAILS** — thumbnail texture class `.pt-your-paper { ... }`
-   - Under **§8 PAPER BACKGROUNDS** — full panel `.paper-panel--your-paper { ... }`
-   - Under **§9 PAPER TYPOGRAPHY** — textarea style `.paper-panel--your-paper .paper-textarea { ... }`
-
-### Change fonts
-
-Edit `src/app/layout.tsx` — swap out the `next/font/google` imports and update the CSS variable names.  
-Then reference them in `globals.css` under **§9 PAPER TYPOGRAPHY**.
-
-### Change key colours / depth
-
-All key visual tokens are CSS variables at the top of `globals.css` under **§1 CSS VARIABLES**:
-```css
---key-top:  #303238;   /* top face gradient stop */
---key-mid:  #282a30;
---key-bot:  #24262b;   /* bottom face gradient stop */
+```
+src/
+  app/
+    layout.tsx                       # root layout, font, metadata
+    page.tsx                         # redirects to charts-of-account
+    globals.css                      # Geist @font-face + base styles
+    accounting/charts-of-account/
+      page.tsx                       # list screen (Suspense-wrapped)
+      create/page.tsx                # create form + success modal
+      [accountId]/page.tsx           # GL detail (Suspense-wrapped)
+  components/
+    PrimaryRail.tsx
+    AccountingSidebar.tsx
+    Common.tsx                       # Breadcrumbs, AskCoreAIButton
+    AccountCategoryTabs.tsx
+    ChartsToolbar.tsx
+    ChartOfAccountsTable.tsx
+    Pagination.tsx                   # scroll controls + pagination bar
+    FormControls.tsx                 # TextInput, SelectInput, Checkbox, Textarea, SectionAccordion
+    SuccessModal.tsx
+    GLDetailClient.tsx
+  data/
+    accounts.ts                      # mock chart of accounts + lookup helpers
+  lib/
+    types.ts                         # ChartAccount model, tabs, formatAmount
+public/
+  fonts/Geist.ttf                    # variable font (OFL licensed)
 ```
 
----
+## Design tokens
 
-## ✦ Tech Stack
+Colours, radii, and typography from the spec are defined in `tailwind.config.ts`
+(e.g. `primary #3157F6`, `border-strong #DDE3EA`, `surface-muted #F5F6F8`). Geist
+is the single typeface across the whole UI.
 
-| Layer       | Choice                  |
-|-------------|-------------------------|
-| Framework   | Next.js 14 (App Router) |
-| Language    | TypeScript              |
-| Styling     | Plain CSS (no Tailwind) |
-| Fonts       | next/font/google        |
-| Deployment  | Vercel (zero-config)    |
+## Notes on the mock data
+
+The screenshots contained placeholder inconsistencies (duplicate `1001200 Budpay`
+rows, every amount `$40,000.00`, and conflicting root codes where INCOME was both
+`300000` and `400000`). Per the spec's guidance, the mock data uses a clean, unique,
+internally consistent scheme: Asset `100000`, Liability `200000`, Equity `300000`,
+Income `400000`, Expense `500000`.

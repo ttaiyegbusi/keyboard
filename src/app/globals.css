@@ -1,939 +1,418 @@
-/* ═══════════════════════════════════════════════════════════════
-   src/app/globals.css  —  LIGHT MODE  (shadcn/ui color system)
-   https://ui.shadcn.com/docs/theming
-═══════════════════════════════════════════════════════════════ */
+:root { --rail-width: 72px; }
 
-/* ── 1. SHADCN LIGHT TOKENS ────────────────────────────────────
-   Using shadcn's default "zinc" light palette.
-   Variable names mirror shadcn conventions.
-───────────────────────────────────────────────────────────────*/
+/* Content panes that offset by the rail width slide in sync with the rail. */
+main[class*="var(--rail-width)"],
+aside[class*="var(--rail-width)"] {
+  transition: margin-left 450ms cubic-bezier(0.3, 0.8, 0.4, 1),
+              left 450ms cubic-bezier(0.3, 0.8, 0.4, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  main[class*="var(--rail-width)"],
+  aside[class*="var(--rail-width)"] {
+    transition: none;
+  }
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  /* shadcn background / surface */
-  --background:        #ffffff;
-  --foreground:        #09090b;          /* zinc-950 */
-  --card:              #ffffff;
-  --card-foreground:   #09090b;
-  --popover:           #ffffff;
-  --popover-foreground:#09090b;
-
-  /* shadcn muted */
-  --muted:             #f4f4f5;          /* zinc-100 */
-  --muted-foreground:  #71717a;          /* zinc-500 */
-
-  /* shadcn border / input */
-  --border:            #e4e4e7;          /* zinc-200 */
-  --input:             #e4e4e7;
-
-  /* shadcn primary (blue) */
-  --primary:           #18181b;          /* zinc-900 */
-  --primary-foreground:#fafafa;
-
-  /* shadcn accent */
-  --accent:            #f4f4f5;
-  --accent-foreground: #18181b;
-
-  /* shadcn ring */
-  --ring:              #3b82f6;          /* blue-500 */
-
-  /* shadcn radius */
-  --radius:            0.5rem;
-
-  /* App-level aliases */
-  --bg:             var(--background);
-  --text:           var(--foreground);
-  --surface:        var(--muted);        /* zinc-100 — topbar / toolbar bg */
-  --surface-border: var(--border);
-
-  /* ── Keyboard shell tokens (overridden per colour theme) ──
-     SHELL = the coloured aluminium frame
-     KEY   = always white/light — only text changes
-  ─────────────────────────────────────────────────────────── */
-  --kbd-shell:       #e4e4e7;            /* zinc-200  — default shell */
-  --kbd-shell-bot:   #d4d4d8;            /* zinc-300 */
-  --kbd-border-col:  rgba(0,0,0,0.10);
-
-  /* Keys are ALWAYS white/near-white regardless of shell color */
-  --key-face:        #ffffff;
-  --key-face-bot:    #f4f4f5;            /* zinc-100 */
-  --key-text-main:   #18181b;            /* zinc-900 — dark labels */
-  --key-text-sub:    #71717a;            /* zinc-500 — dim labels */
-  --key-highlight:   rgba(255,255,255,0.90);
-  --key-shadow-col:  rgba(0,0,0,0.18);
-  --key-drop:        rgba(0,0,0,0.12);
-  --knob-face:       radial-gradient(circle at 35% 30%,#e4e4e7 0%,#a1a1aa 50%,#71717a 100%);
-
-  /* ── Dropdown (popover) tokens — light ── */
-  --dd-bg:     var(--popover);           /* white */
-  --dd-border: var(--border);            /* zinc-200 */
-  --dd-hover:  var(--accent);            /* zinc-100 */
-  --dd-active: #eff6ff;                  /* blue-50 */
-  --dd-text:   var(--foreground);
-  --dd-sub:    var(--muted-foreground);
-
-  /* ── Sizing ── */
-  --key-h:      50px;
-  --gap:         4px;
-  --pad:        13px;
-  --kbd-radius: 16px;
-  --inner-w:   900px;
-  --shell-w:   928px;
-
-  /* SF Pro */
-  --sf: -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        "SF Pro Display", system-ui, "Helvetica Neue", Arial, sans-serif;
-
-  /* Writing fonts */
-  --font-special-elite: var(--font-special-elite, 'Courier New', monospace);
-  --font-inter:         var(--font-inter, sans-serif);
-  --font-caveat:        var(--font-caveat, cursive);
-  --font-playfair:      var(--font-playfair, Georgia, serif);
-  --font-jetbrains:     var(--font-jetbrains, monospace);
-  --font-lora:          var(--font-lora, Georgia, serif);
-  --font-dancing:       var(--font-dancing, cursive);
-
-  --keyboard-scale: 1;
+  --font-geist: "Geist";
 }
 
-
-/* ── 2. RESET ───────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; overflow: hidden; }
+html,
 body {
-  background: var(--bg);
-  font-family: var(--sf);
-  color: var(--text);
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #111827;
+  font-family: var(--font-geist), system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  letter-spacing: -0.02em;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-button { background: none; border: none; cursor: pointer; font-family: inherit; color: inherit; }
-
-
-/* ── 3. APP WRAPPER ─────────────────────────────────────────── */
-.app {
-  width: 100%; height: 100vh;
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;   /* column so navbar goes top, content below */
-  align-items: stretch;
-  overflow: hidden;
-  background-image: radial-gradient(ellipse at 50% 60%, #f4f4f5 0%, #e4e4e7 100%);
+  text-rendering: optimizeLegibility;
 }
 
-
-/* ── 4. CONTENT COLUMN ──────────────────────────────────────── */
-/* Fills remaining height below navbar, centers notepad+keyboard */
-.content-col {
-  flex: 1;                  /* takes all space below navbar */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;  /* vertically centers notepad+gap+keyboard */
-  gap: 0;
+* {
+  box-sizing: border-box;
 }
-.scene-gap { height: 20px; flex-shrink: 0; }
 
-
-/* ── 5. TOPBAR ──────────────────────────────────────────────────
-   Fixed to the very top of the screen, full width.
-   Brand on the left, toolbar on the right.
-   Background matches the page — transparent so it blends in.
-───────────────────────────────────────────────────────────────*/
-.topbar {
-  width: 100%;
-  height: 64px;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 28px;
-  background: transparent;   /* no background — blends with page */
-  border: none;              /* no border */
-  position: relative; z-index: 200;
-  flex-shrink: 0;
-  margin-top: 12px;          /* pushes it slightly down from very top */
+/* Thin custom scrollbar to keep the calm enterprise feel */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
-.brand {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 14px; font-weight: 700; color: var(--foreground);
-  letter-spacing: -0.03em;
+::-webkit-scrollbar-thumb {
+  background: #dde3ea;
+  border-radius: 8px;
 }
-.brand-dot { width: 14px; height: 14px; border-radius: 999px; background: var(--foreground); }
-
-
-/* ── 6. TOOLBAR ─────────────────────────────────────────────── */
-.toolbar {
-  display: flex; align-items: center; gap: 4px;
-  height: 36px; padding: 0 8px;
-  border-radius: 999px;                 /* fully rounded pill */
-  background: var(--card);
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-  position: relative;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
-.tb-divider { width: 1px; height: 14px; background: var(--border); flex-shrink: 0; }
 
-.tb-btn {
-  display: flex; align-items: center; gap: 4px;
-  padding: 3px 6px; border-radius: 6px;
-  color: var(--muted-foreground); font-size: 12px; font-weight: 500;
-  transition: background 0.14s, color 0.14s;
-  white-space: nowrap;
+/* Reusable focus ring for accessibility */
+.focus-ring:focus-visible {
+  outline: 2px solid #3157f6;
+  outline-offset: 2px;
 }
-.tb-btn:hover   { background: var(--accent); color: var(--foreground); }
-.tb-btn--active { background: #eff6ff; color: #2563eb; }
 
-.chip-swatch {
-  display: inline-block; width: 14px; height: 14px;
-  border-radius: 4px; flex-shrink: 0;
-  border: 1.5px solid var(--border);
-  transition: background 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+/* Apple-style floating panel enter/exit
+ * Subtle scale + opacity + slight slide-in from right.
+ */
+@keyframes coreai-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
 }
-.color-dot {
-  display: inline-block; width: 14px; height: 14px;
-  border-radius: 999px; flex-shrink: 0;
-  border: 1.5px solid var(--border);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+@keyframes coreai-exit {
+  from {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.97) translateX(12px);
+  }
 }
-.chevron-icon { width: 9px; height: 5px; stroke: currentColor; flex-shrink: 0; }
-.tb-icon-btn  { padding: 4px 5px; border-radius: 6px; }
-.tb-icon-btn svg { width: 14px; height: 14px; color: var(--muted-foreground); transition: color 0.14s; }
-.tb-icon-btn:hover svg              { color: var(--foreground); }
-.tb-icon-btn[aria-label*="high"] svg { color: #2563eb; }
-.tb-icon-btn[aria-label*="low"]  svg { color: #2563eb; }
-.tb-icon-btn[aria-label*="mute"] svg { color: #dc2626; }
-.tb-label { color: var(--muted-foreground); font-size: 12px; }
 
-/* Download pill — blue */
-.dl-pill {
-  display: flex; align-items: center; gap: 6px;
-  padding: 6px 14px; border-radius: 999px;
-  background: #2563eb; color: #fff;
-  font-size: 12px; font-weight: 600;
-  border: none; cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(37,99,235,0.4);
-}
-.dl-pill:hover   { background: #1d4ed8; }
-.dl-pill:active  { transform: scale(0.97); }
-.dl-pill--open   { background: #1e40af; }
-.dl-pill svg     { width: 13px; height: 13px; stroke: #fff; flex-shrink: 0; }
-.dl-pill .chevron-icon { width: 8px; height: 5px; stroke: rgba(255,255,255,0.7); }
-
-/* Dropdown anchor */
-.tb-dd-wrap { position: relative; }
-
-
-/* ── 7. SHARED DROPDOWN (light, shadcn popover style) ──────────
-   White card, zinc-200 border, soft shadow.
-───────────────────────────────────────────────────────────────*/
-.dropdown-panel {
-  position: absolute;
-  top: calc(100% + 8px); right: 0;
-  background: var(--popover);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow:
-    0 4px 6px -1px rgba(0,0,0,0.1),
-    0 2px 4px -2px rgba(0,0,0,0.1),
-    0 10px 30px rgba(0,0,0,0.08);
-  padding: 8px;
-  z-index: 500;
-  opacity: 0; pointer-events: none;
-  transform: translateY(-4px) scale(0.98);
+.coreai-panel-enter {
+  animation: coreai-enter 260ms cubic-bezier(0.32, 0.72, 0, 1) both;
   transform-origin: top right;
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-.dropdown-panel--open {
-  opacity: 1; pointer-events: all;
-  transform: translateY(0) scale(1);
-}
-.dropdown-title {
-  font-size: 10px; font-weight: 700;
-  color: var(--muted-foreground);
-  letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 4px 8px 8px;
 }
 
-
-/* ── 8. PAPERS PANEL — light mode grid ──────────────────────────
-   Matches Image 4 layout but in light mode:
-   White/zinc background, dark text, "PAPERS" uppercase title,
-   3-col grid, tall thumbnails with visible textures,
-   blue border + checkmark badge on active.
-───────────────────────────────────────────────────────────────*/
-.papers-panel-dark {
-  background: var(--popover) !important;       /* white */
-  border: 1px solid var(--border) !important;  /* zinc-200 */
-  width: 340px;
-  padding: 16px !important;
-  box-shadow:
-    0 4px 6px -1px rgba(0,0,0,0.1),
-    0 2px 4px -2px rgba(0,0,0,0.1),
-    0 10px 30px rgba(0,0,0,0.08) !important;
-}
-.papers-panel-dark .dropdown-title {
-  color: var(--muted-foreground);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  padding: 0 0 12px 2px;
+.coreai-panel-exit {
+  animation: coreai-exit 200ms cubic-bezier(0.4, 0, 1, 1) both;
+  transform-origin: top right;
 }
 
-.papers-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px 8px;
+/* ============================================================
+ * Core AI conversation streaming animations
+ * ============================================================ */
+
+/* Fade + rise — used for user bubbles, revealed thinking lines,
+ * the feedback row, and chart cards as they appear. */
+@keyframes coreai-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.paper-option {
-  display: flex; flex-direction: column; align-items: center; gap: 7px;
-  padding: 6px 4px; border-radius: 10px;
-  background: none; border: none; cursor: pointer;
-  transition: background 0.12s;
+.coreai-fade-up {
+  animation: coreai-fade-up 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
 }
-.paper-option:hover { background: var(--accent); }
-.paper-thumb-wrap { position: relative; width: 86px; height: 108px; }
-.paper-thumb {
-  width: 86px; height: 108px; border-radius: 10px;
-  border: 2px solid var(--border);
+
+/* Slow rotation for the sparkle mark while the assistant works. */
+@keyframes coreai-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.coreai-spin {
+  animation: coreai-spin 2.4s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+/* Shimmer sweep across the "Thinking" / "Researching" label text. */
+@keyframes coreai-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.coreai-shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #8a93a3 0%,
+    #8a93a3 35%,
+    #111827 50%,
+    #8a93a3 65%,
+    #8a93a3 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: coreai-shimmer 1.6s linear infinite;
+}
+
+/* Three bouncing dots for the working indicator. */
+.coreai-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: #8a93a3;
+  display: inline-block;
+  animation: coreai-bounce 1.2s ease-in-out infinite;
+}
+.coreai-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.coreai-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes coreai-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* Blinking caret at the end of the streaming answer text. */
+@keyframes coreai-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+.coreai-caret {
+  margin-left: 1px;
+  color: #3157f6;
+  font-weight: 400;
+  animation: coreai-blink 1s step-end infinite;
+}
+
+/* Bars in the bar chart grow from the left as they appear. */
+@keyframes coreai-bar-grow {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+.coreai-bar-grow {
+  transform-origin: left center;
+  animation: coreai-bar-grow 520ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Respect reduced-motion preferences. */
+@media (prefers-reduced-motion: reduce) {
+  .coreai-fade-up,
+  .coreai-spin,
+  .coreai-shimmer-text,
+  .coreai-dot,
+  .coreai-caret,
+  .coreai-bar-grow {
+    animation: none !important;
+  }
+  .coreai-shimmer-text {
+    -webkit-text-fill-color: #111827;
+  }
+}
+
+/* Revenue chart line sweep-in */
+@keyframes coreai-line-draw {
+  from { stroke-dasharray: 1200; stroke-dashoffset: 1200; }
+  to   { stroke-dasharray: 1200; stroke-dashoffset: 0; }
+}
+.coreai-line-draw {
+  animation: coreai-line-draw 700ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .coreai-line-draw { animation: none !important; }
+}
+
+/* Core AI more-menu open animation */
+@keyframes coreai-menu-in {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.coreai-menu-in {
+  animation: coreai-menu-in 180ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  transform-origin: top right;
+}
+@media (prefers-reduced-motion: reduce) {
+  .coreai-menu-in { animation: none !important; }
+}
+
+/* Core AI deep-link row highlight: gentle blue background pulse */
+@keyframes coreai-row-flash {
+  0%   { background-color: rgba(49, 87, 246, 0.14); }
+  60%  { background-color: rgba(49, 87, 246, 0.08); }
+  100% { background-color: transparent; }
+}
+.coreai-row-flash {
+  animation: coreai-row-flash 2.4s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .coreai-row-flash { animation: none !important; }
+}
+
+.organization-grid {
+  background-color: #f8fafc;
+  background-image: radial-gradient(#dbe3ef 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+/* ============================================================
+ * ChainCore page/table loading states
+ * ============================================================ */
+@keyframes page-transition-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.page-transition-in {
+  animation: page-transition-in 80ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.page-transition-shell {
+  animation: page-transition-in 80ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f3f5f8 0%, #edf1f6 45%, #f8fafc 60%, #f3f5f8 100%);
+  background-size: 220% 100%;
+  animation: skeleton-shimmer 1.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition-in,
+  .page-transition-shell,
+  .skeleton-shimmer {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+ * Apple-inspired UI animations for ChainCore
+ * ============================================================ */
+
+/* Tab indicator smooth slide */
+@keyframes tab-indicator-slide {
+  from {
+    transform: translateX(var(--from-x, 0));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.tab-indicator {
+  animation: tab-indicator-slide 150ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  transition: width 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tab content fade + subtle scale in */
+@keyframes tab-content-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.tab-content-transition {
+  animation: tab-content-in 150ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Chevron rotation (180 degrees smooth) */
+@keyframes chevron-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(180deg);
+  }
+}
+.chevron-expanding {
+  animation: chevron-rotate 200ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.chevron-collapsing {
+  animation: chevron-rotate 200ms cubic-bezier(0.4, 0, 0.2, 1) both reverse;
+}
+
+/* Smooth expand/collapse with max-height transition */
+.expandable-row {
+  max-height: 1000px;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.10);
-  transition: border-color 0.15s, transform 0.13s, box-shadow 0.13s;
+  transition: max-height 250ms cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
 }
-.paper-option:hover .paper-thumb {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.14);
-}
-.paper-option--active .paper-thumb { border-color: #3b82f6; border-width: 2.5px; }
-.paper-thumb-inner { width: 100%; height: 100%; border-radius: 8px; }
-
-.check-badge {
-  position: absolute; top: -6px; right: -6px;
-  width: 20px; height: 20px; background: #3b82f6;
-  border-radius: 999px; border: 2.5px solid #ffffff;
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; transform: scale(0.5);
-  transition: opacity 0.15s, transform 0.15s;
-  box-shadow: 0 1px 4px rgba(59,130,246,0.4);
-}
-.paper-option--active .check-badge { opacity: 1; transform: scale(1); }
-.check-badge svg { width: 10px; height: 10px; }
-.paper-name-label {
-  font-size: 11px; font-weight: 500;
-  color: var(--muted-foreground);
-  text-align: center;
-}
-.paper-option--active .paper-name-label {
-  color: var(--foreground);
-  font-weight: 600;
+.expandable-row.collapsed {
+  max-height: 0;
+  opacity: 0;
 }
 
-/* ── Paper thumbnail textures — rich, detailed, accurate ──────────
-   These must look like real paper so the user can identify each.
-───────────────────────────────────────────────────────────────────*/
-
-/* Cream — warm aged parchment with subtle horizontal grain lines */
-.pt-cream {
-  background: #f5edd6;
-  background-image:
-    repeating-linear-gradient(0deg,
-      transparent 0px, transparent 18px,
-      rgba(180,160,110,0.18) 18px, rgba(180,160,110,0.18) 19px
-    );
+/* Filter modal fade in */
+@keyframes filter-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
-
-/* A4 White — clean white with fine dot grid pattern */
-.pt-white {
-  background: #f8f8f8;
-  background-image: radial-gradient(circle, #c8c8c8 0.9px, transparent 0.9px);
-  background-size: 7px 7px;
-  background-position: 3.5px 3.5px;
-}
-
-/* Brown Kraft — dark warm brown with cross-hatch texture */
-.pt-kraft {
-  background: #a05a28;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(0,0,0,0.09) 0, rgba(0,0,0,0.09) 1px, transparent 1px, transparent 4px),
-    repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 8px);
-}
-
-/* Antique — golden radial gradient with visible warm glow */
-.pt-antique {
-  background: radial-gradient(ellipse at 38% 28%, #e8c870 0%, #c8a040 35%, #a87828 70%, #8a5810 100%);
-}
-
-/* Carton — warm brown with clear horizontal wood-grain stripes */
-.pt-carton {
-  background: #b07838;
-  background-image:
-    repeating-linear-gradient(0deg,
-      rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 2px,
-      rgba(255,255,255,0.04) 2px, rgba(255,255,255,0.04) 3px,
-      transparent 3px, transparent 10px
-    );
-}
-
-/* Oil Paper — translucent pale yellow with blotch stain */
-.pt-oilpaper {
-  background: #ede0b0;
-  background-image:
-    radial-gradient(ellipse at 65% 35%, rgba(160,130,60,0.35) 0%, transparent 52%),
-    radial-gradient(ellipse at 28% 72%, rgba(180,150,80,0.22) 0%, transparent 42%),
-    radial-gradient(ellipse at 50% 50%, rgba(200,170,100,0.08) 0%, transparent 70%);
-}
-
-/* Note Book — white with clear blue horizontal lines + red margin */
-.pt-notebook {
-  background: #f8f9ff;
-  background-image:
-    /* Red margin line at ~22% from left */
-    linear-gradient(90deg, transparent 22%, #e8a0a0 22%, #e8a0a0 calc(22% + 1.5px), transparent calc(22% + 1.5px)),
-    /* Blue ruled lines */
-    repeating-linear-gradient(0deg,
-      transparent 0px, transparent 14px,
-      #a8c0e8 14px, #a8c0e8 15px
-    );
-  background-position: 0 7px, 0 7px;
-}
-
-/* Dots — soft pink with visible dot grid */
-.pt-dots {
-  background: #fff2f6;
-  background-image: radial-gradient(circle, #e090a8 1.4px, transparent 1.4px);
-  background-size: 9px 9px;
-  background-position: 4.5px 4.5px;
-}
-
-
-/* ── 9. KEYBOARD COLOR PANEL ────────────────────────────────── */
-.colors-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 4px; width: 220px;
-}
-.color-option {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 8px 4px; border-radius: 8px;
-  background: none; border: none; cursor: pointer;
-  transition: background 0.12s;
-}
-.color-option:hover   { background: var(--accent); }
-.color-option--active { background: #eff6ff; }
-.color-swatch-circle {
-  width: 36px; height: 36px; border-radius: 999px;
-  border: 2px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.6) inset;
-  transition: transform 0.12s, box-shadow 0.12s;
-}
-.color-option:hover .color-swatch-circle { transform: scale(1.1); }
-.color-option--active .color-swatch-circle {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.25), 0 2px 8px rgba(0,0,0,0.12);
-}
-.color-check { width: 14px; height: 14px; }
-.color-label { font-size: 9px; font-weight: 500; color: var(--muted-foreground); text-align: center; white-space: nowrap; }
-.color-option--active .color-label { color: #2563eb; font-weight: 600; }
-
-
-/* ── 10. FONT PANEL ─────────────────────────────────────────── */
-.dropdown-panel--fonts { width: 210px; padding: 6px !important; }
-.font-row {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; padding: 10px 10px; border-radius: 8px;
-  background: none; border: none; cursor: pointer; text-align: left;
-  transition: background 0.12s;
-}
-.font-row:hover   { background: var(--accent); }
-.font-row--active { background: #2563eb !important; border-radius: 8px; }
-.font-row-name { font-size: 15px; color: var(--foreground); line-height: 1.3; }
-.font-row--active .font-row-name { color: #fff; }
-.font-row-check { width: 14px; height: 14px; flex-shrink: 0; }
-
-
-/* ── 11. DOWNLOAD PANEL ─────────────────────────────────────── */
-.dl-panel { width: 200px; right: 0; top: calc(100% + 8px); }
-.dl-option {
-  display: flex; align-items: center; gap: 12px;
-  width: 100%; padding: 10px 10px; border-radius: 8px;
-  background: none; border: none; cursor: pointer;
-  transition: background 0.12s;
-}
-.dl-option:hover { background: var(--accent); }
-.dl-opt-icon     { color: var(--muted-foreground); flex-shrink: 0; display: flex; }
-.dl-opt-icon svg { width: 16px; height: 16px; }
-.dl-opt-text     { font-size: 13px; font-weight: 500; color: var(--foreground); flex: 1; }
-.dl-opt-type     { font-size: 11px; color: var(--muted-foreground); }
-
-
-/* ── 12. NOTEPAD CARD ───────────────────────────────────────── */
-.notepad {
-  width: 500px; height: 400px;
-  border-radius: 14px;
-  position: relative; overflow: hidden; flex-shrink: 0;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.8) inset,
-    0 10px 30px rgba(0,0,0,0.12),
-    0 4px 10px rgba(0,0,0,0.08),
-    0 1px 3px rgba(0,0,0,0.06);
-  border: 1px solid var(--border);
-  transition: background 0.3s ease;
-}
-.notepad::before {
-  content: '';
-  position: absolute; left: 52px; top: 0; bottom: 0;
-  width: 1.5px; background: rgba(210,100,100,0.35);
-  pointer-events: none; z-index: 2;
-}
-
-
-/* ── 13. PAPER BACKGROUNDS ──────────────────────────────────── */
-.paper-panel--cream {
-  background: #f5edd6;
-  background-image: repeating-linear-gradient(0deg,transparent,transparent 25px,rgba(180,160,110,0.13) 25px,rgba(180,160,110,0.13) 26px);
-}
-.paper-panel--a4white {
-  background: #fafafa;
-  background-image: repeating-linear-gradient(0deg,transparent,transparent 25px,rgba(150,150,200,0.10) 25px,rgba(150,150,200,0.10) 26px);
-}
-.paper-panel--kraft {
-  background: #9e5e28;
-  background-image: repeating-linear-gradient(0deg,rgba(0,0,0,0.06) 0,rgba(0,0,0,0.06) 1px,transparent 1px,transparent 5px),
-    repeating-linear-gradient(90deg,rgba(0,0,0,0.03) 0,rgba(0,0,0,0.03) 1px,transparent 1px,transparent 10px);
-}
-.paper-panel--antique { background: radial-gradient(ellipse at 40% 20%,#d4b483 0%,#c9a55a 50%,#b08030 100%); }
-.paper-panel--carton {
-  background: #ae7638;
-  background-image: repeating-linear-gradient(0deg,rgba(0,0,0,0.1) 0,rgba(0,0,0,0.1) 2px,transparent 2px,transparent 9px);
-}
-.paper-panel--oilpaper {
-  background: #e6ddb8;
-  background-image: radial-gradient(ellipse at 70% 30%,rgba(160,130,70,0.3) 0%,transparent 55%),
-    radial-gradient(ellipse at 25% 75%,rgba(180,150,90,0.2) 0%,transparent 50%);
-}
-.paper-panel--notebook {
-  background: #f7f8ff;
-  background-image: repeating-linear-gradient(0deg,transparent,transparent 25px,#b4c8e8 25px,#b4c8e8 26px);
-}
-.paper-panel--dots {
-  background: #fff0f5;
-  background-image: radial-gradient(circle,#e8a0b8 1.5px,transparent 1.5px);
-  background-size: 22px 22px; background-position: 11px 11px;
-}
-
-
-/* ── 14. PAPER TYPOGRAPHY ───────────────────────────────────── */
-.paper-textarea {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  background: transparent; border: none; outline: none; resize: none;
-  z-index: 2; padding: 16px 20px 16px 64px;
-  font-size: 14px; line-height: 26px; letter-spacing: 0.01em;
-  caret-color: #2563eb;
-}
-.paper-panel--cream    .paper-textarea { color: #2a1f0e; font-family: var(--font-special-elite); }
-.paper-panel--a4white  .paper-textarea { color: #09090b; font-family: var(--font-inter); font-size: 13px; }
-.paper-panel--kraft    .paper-textarea { color: #f5e8d0; font-family: var(--font-special-elite); caret-color: #f5e8d0; }
-.paper-panel--antique  .paper-textarea { color: #2e1c00; font-family: var(--font-special-elite); }
-.paper-panel--carton   .paper-textarea { color: #f0e0c4; font-family: var(--font-special-elite); caret-color: #f0e0c4; }
-.paper-panel--oilpaper .paper-textarea { color: #2a200a; font-family: var(--font-special-elite); }
-.paper-panel--notebook .paper-textarea { color: #0f172a; font-family: var(--font-inter); font-size: 13px; }
-.paper-panel--dots     .paper-textarea { color: #4a1a30; font-family: var(--font-caveat); font-size: 17px; caret-color: #be185d; }
-.paper-textarea::placeholder { color: rgba(120,90,50,0.35); font-style: italic; }
-.paper-panel--kraft .paper-textarea::placeholder,
-.paper-panel--carton .paper-textarea::placeholder  { color: rgba(245,232,208,0.35); }
-.paper-panel--a4white .paper-textarea::placeholder { color: #a1a1aa; }
-.paper-panel--dots .paper-textarea::placeholder    { color: rgba(200,100,140,0.4); }
-.paper-panel--notebook .paper-textarea::placeholder{ color: #94a3b8; }
-
-
-/* ── 15. KEYBOARD SHELL ─────────────────────────────────────────
-   SHELL = the coloured aluminium frame.
-   Only --kbd-shell / --kbd-shell-bot change per colour theme.
-   Keys always stay white.
-───────────────────────────────────────────────────────────────*/
-.keyboard-zone {
-  flex-shrink: 0;
-  transform: scale(var(--keyboard-scale));
+.filter-modal-in {
+  animation: filter-modal-in 180ms cubic-bezier(0.4, 0, 0.2, 1) both;
   transform-origin: top center;
 }
 
-.keyboard-body {
-  width: var(--shell-w);
-  padding: var(--pad); padding-bottom: 15px;
-  border-radius: var(--kbd-radius);
-  /* Shell color via CSS variables — only these two change */
-  background: linear-gradient(160deg, var(--kbd-shell) 0%, var(--kbd-shell-bot) 100%);
-  border: 1px solid rgba(0,0,0,0.08);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.5) inset,   /* top highlight */
-    0 -2px 0 rgba(0,0,0,0.12) inset,         /* bottom edge */
-    0 8px 24px rgba(0,0,0,0.14),
-    0 3px 8px rgba(0,0,0,0.10),
-    0 1px 2px rgba(0,0,0,0.08);
-  transition: background 0.35s ease;
-}
-
-.keyboard-grid { display: flex; flex-direction: column; gap: var(--gap); }
-.key-row {
-  display: flex; gap: var(--gap); align-items: flex-end;
-  
-}
-
-
-/* ── 16. KEY BASE ───────────────────────────────────────────────
-   Keys are ALWAYS WHITE — they never take the shell colour.
-   The shell colour shows through the gaps between keys.
-   This is exactly how real Apple keyboards look:
-   white keys, coloured aluminium frame peeking through gaps.
-───────────────────────────────────────────────────────────────*/
-.key {
-  height: var(--key-h);
-  border-radius: 7px;
-  /* Always white/near-white — NOT affected by theme */
-  background: linear-gradient(180deg, var(--key-face) 0%, var(--key-face-bot) 100%);
-  border: 1px solid rgba(0,0,0,0.08);
-  border-bottom: 1.5px solid rgba(0,0,0,0.14);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.9) inset,
-    0 2px 4px rgba(0,0,0,0.10),
-    0 1px 2px rgba(0,0,0,0.06);
-  /* Text always dark — high contrast on white keys */
-  color: var(--key-text-main);
-  display: flex; align-items: center; justify-content: center;
-  position: relative; flex-shrink: 0; user-select: none; cursor: pointer;
-  font-family: var(--sf);
-  transition: filter 0.07s, transform 0.07s, box-shadow 0.07s;
-  -webkit-tap-highlight-color: transparent;
-}
-.key--pressed {
-  filter: brightness(0.94);
-  transform: translateY(1px);
-  border-bottom-width: 0.5px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-}
-
-
-/* ── 17. KEY SIZES ──────────────────────────────────────────────
-   All rows = 900px inner width, 4px gap, verified ✓
-   Key insight: home row has 12 std keys (not 13), shift has 10.
-   This gives return=100px and caps=76px — proper Apple proportions.
-
-   Row counts:
-     num:    13 std + delete  (14 items, 13 gaps)
-     qwerty: tab + 13 std     (14 items, 13 gaps)
-     home:   caps + 12 std + return (14 items, 13 gaps)
-     shift:  shift + 10 std + shift (12 items, 11 gaps... wait 13 items with 12 gaps)
-     bottom: fn+ctrl+opt+cmd+space+cmd+opt+arrows (9 main + arrows)
-
-   Verification:
-     fn:     80+12×56+80+13×4+2×8 = 900 ✓
-     num:    13×56+120+13×4 = 900 ✓
-     qwerty: 120+13×56+13×4 = 900 ✓
-     home:   76+12×56+100+13×4 = 900 ✓
-     shift:  146+10×56+146+12×4 = 900 ✓
-     bottom: 44+56+56+78+356+78+56+132+8+36 = 900 ✓
-───────────────────────────────────────────────────────────────*/
-.k-std     { width: 56px; }
-.k-fn      { width: 56px; }   /* F1-F12: same as std so fn row fills evenly */
-.k-esc     { width: 80px; }
-.k-tab     { width: 120px; }  /* matches delete width */
-.k-caps    { width: 76px; }
-.k-delete  { width: 120px; }
-.k-return  { width: 156px; }  /* Apple return — wide right anchor */
-.k-shift-l { width: 146px; }
-.k-shift-r { width: 146px; }
-.k-mod     { width: 56px; }   /* ctrl, option */
-.k-mod-sm  { width: 44px; }   /* fn/globe */
-.k-cmd     { width: 78px; }   /* command */
-.k-space   { width: 356px; }
-.k-pipe    { width: 56px; }
-
-.k-arrow   { width: 44px; height: 23px; border-radius: 5px; }
-.k-arrow-ud {
-  display: flex; flex-direction: column;
-  gap: 3px; align-self: flex-end;
-  flex-shrink: 0; width: 44px;
-}
-
-/* Touch ID — square key, same width as ESC */
-.k-knob-w {
-  height: var(--key-h);
-  width: 80px;
-  border-radius: 7px;
-  background: linear-gradient(180deg, var(--key-face) 0%, var(--key-face-bot) 100%);
-  border: 1px solid rgba(0,0,0,0.08);
-  border-bottom: 1.5px solid rgba(0,0,0,0.14);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.9) inset,
-    0 2px 4px rgba(0,0,0,0.10),
-    0 1px 2px rgba(0,0,0,0.06);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  cursor: default;
-}
-
-/* Fingerprint sensor inside Touch ID */
-.knob {
-  width: 26px; height: 26px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 38% 35%,
-    #f0f0f0 0%, #d4d4d4 45%, #b8b8b8 75%, #a0a0a0 100%);
-  border: 1px solid rgba(0,0,0,0.16);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.6) inset,
-    0 1px 3px rgba(0,0,0,0.20),
-    0 0 0 2px rgba(0,0,0,0.05);
-}
-
-/* Fn row: space-between + group gaps */
-.key-row--fn {
-  justify-content: space-between;
-  gap: 0;
-  width: var(--inner-w);
-}
-.fn-group-gap { width: 8px; flex-shrink: 0; }
-
-/* ── 18. KEY LABELS — always dark text on white keys ─────────── */
-/* ── KEY LABELS — refined Apple-like typography ──────────────
-   Letter keys: 16px medium weight, clean
-   Symbol keys: shift char small+dim, base char larger+dark
-   Modifier labels: 9px light, lowercase, bottom-aligned
-   Fn row icons: very thin 11px, barely visible — just hints
-   All labels use SF Pro via body font inheritance.
-─────────────────────────────────────────────────────────────*/
-.lbl-c  {
-  font-size: 16px;
-  font-weight: 400;           /* Apple uses regular weight */
-  color: var(--key-text-main);
-  letter-spacing: -0.01em;
-}
-
-/* Stacked symbol: shift char top (small, dim), base char bottom (larger, dark) */
-.lbl-st { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; }
-.s-top  { font-size: 9px;  font-weight: 400; color: var(--key-text-sub); line-height: 1.3; }
-.s-bot  { font-size: 12px; font-weight: 400; color: var(--key-text-main); line-height: 1.3; }
-
-/* Modifier labels: very small, light, lowercase */
-.lbl-ml {
-  position: absolute; bottom: 5px; left: 6px;
-  font-size: 9px; font-weight: 300;
-  color: var(--key-text-sub);
-  letter-spacing: 0;
-}
-.lbl-mr {
-  position: absolute; bottom: 5px; right: 6px;
-  font-size: 9px; font-weight: 300;
-  color: var(--key-text-sub);
-}
-
-/* Function key row: icon + tiny Fn label */
-.lbl-fn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; width:100%; height:100%; }
-.fn-ic  { color: var(--key-text-sub); display:flex; align-items:center; opacity: 0.7; }
-.fn-ic svg { width: 11px; height: 11px; stroke-width: 1.5; }  /* thinner strokes */
-.fn-n   {
-  font-size: 6.5px; font-weight: 500;
-  color: var(--key-text-sub);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  opacity: 0.8;
-}
-
-/* Arrow keys */
-.arr-l  { font-size: 8px; color: var(--key-text-sub); line-height: 1; }
-
-/* Globe + fn bottom-left key */
-.fn-globe-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
-.fn-globe-wrap svg { color: var(--key-text-sub); opacity: 0.7; }
-.mod-fn-label  { font-size: 7px; font-weight: 400; color: var(--key-text-sub); }
-
-/* Modifier symbols (^, ⌥) top of key */
-.mod-sym {
-  position: absolute; top: 5px; left: 6px;
-  font-size: 10px; font-weight: 300;
-  color: var(--key-text-sub);
-}
-.mod-sub { font-size: 8px !important; font-weight: 300 !important; color: var(--key-text-sub) !important; }
-.mod-cmd { font-size: 13px; color: var(--key-text-sub); line-height: 1; font-weight: 300; }
-
-/* Touch ID button — square key with circular sensor inset */
-/* The .k-knob-w wrapper IS the square key face */
-.k-knob-w {
-  height: var(--key-h) !important;
-  width: 60px;
-  border-radius: 7px;
-  background: linear-gradient(180deg, var(--key-face) 0%, var(--key-face-bot) 100%);
-  border: 1px solid rgba(0,0,0,0.08);
-  border-bottom: 1.5px solid rgba(0,0,0,0.14);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.9) inset,
-    0 2px 4px rgba(0,0,0,0.10),
-    0 1px 2px rgba(0,0,0,0.06);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  cursor: default;
-}
-
-/* The circular sensor inside the Touch ID key */
-.knob {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 38% 35%,
-    #f0f0f0 0%, #d8d8d8 45%, #b8b8b8 75%, #a0a0a0 100%);
-  border: 1px solid rgba(0,0,0,0.18);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.7) inset,
-    0 1px 3px rgba(0,0,0,0.20),
-    0 0 0 2px rgba(0,0,0,0.06);
-}
-
-
-/* ── 19. KEY STATES ─────────────────────────────────────────── */
-.key--homing::after {
-  content:''; position:absolute; bottom:7px;
-  left:50%; transform:translateX(-50%);
-  width:14px; height:2px; border-radius:999px;
-  background:rgba(0,0,0,0.2);
-}
-.caps-dot {
-  position:absolute; top:6px; right:6px;
-  width:4px; height:4px; border-radius:999px;
-  background:#2563eb; opacity:0; transition:opacity 0.15s;
-}
-.key--caps.key--pressed .caps-dot { opacity:1; }
-
-
-/* ── 20. RESPONSIVE ─────────────────────────────────────────── */
-@media (max-width: 1300px) { .topbar { width: min(1200px, 98vw); } }
-@media (max-width: 1160px) {
-  :root { --keyboard-scale: 0.78; }
-  .notepad { width: 460px; height: 360px; }
-}
-@media (max-width: 920px) {
-  :root { --keyboard-scale: 0.58; }
-  .notepad { width: 380px; height: 300px; }
-  .topbar  { width: min(700px, 96vw); }
-}
-@media (max-width: 640px) {
-  :root { --keyboard-scale: 0.40; }
-  .notepad { width: 300px; height: 260px; }
-}
-
-
-/* ============================================================
-   COLOR ANIMATION + APPLE IMAC 7-COLOR PANEL UPDATE
-   ============================================================ */
-
-/* ── Keyboard color-change animation — "chameleon skin" ────────
-   Inspired by how a chameleon shifts color: slow start, the color
-   blooms from the center outward, eases gently to settle.
-   
-   Two-part effect:
-   1. The shell color itself transitions with a long, organic ease
-      — starts barely visible, accelerates, then drifts to final value
-   2. A subtle luminosity pulse rides on top — the shell briefly
-      brightens as if the new pigment is "activating", then settles
-   
-   Total duration: 900ms — slow enough to feel dramatic and premium,
-   fast enough to feel responsive.
-──────────────────────────────────────────────────────────── */
-@keyframes chameleonShift {
-  0%   {
-    filter: brightness(1) saturate(1);
-    transform: scale(1);
-  }
-  15%  {
-    /* Color starts shifting — slight brightening as pigment activates */
-    filter: brightness(1.08) saturate(1.15);
-    transform: scale(1);
-  }
-  45%  {
-    /* Peak of the bloom — most vivid moment */
-    filter: brightness(1.12) saturate(1.25);
-    transform: scale(1.002);
-  }
-  75%  {
-    /* Color settling — slowly desaturating back to natural */
-    filter: brightness(1.04) saturate(1.08);
-    transform: scale(1.001);
-  }
-  100% {
-    /* Fully settled — natural aluminum finish */
-    filter: brightness(1) saturate(1);
-    transform: scale(1);
+@media (prefers-reduced-motion: reduce) {
+  .tab-indicator,
+  .tab-content-transition,
+  .chevron-expanding,
+  .chevron-collapsing,
+  .expandable-row,
+  .filter-modal-in {
+    animation: none !important;
+    transition: none !important;
   }
 }
 
-.kbd-pulse {
-  animation: chameleonShift 900ms cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-}
-
-/* Shell color crossfade — the core color change
-   Uses a very long ease-in-out so the color creeps in slowly
-   at first (like pigment cells slowly filling) then completes */
-.keyboard-body {
-  transition:
-    background 800ms cubic-bezier(0.4, 0.0, 0.2, 1),
-    border-color 800ms ease !important;
-}
-
-/* ── Apple iMac 7-color panel ───────────────────────────────
-   Larger swatches with color name labels.
-   Active swatch gets a white ring + blue outer glow.
-──────────────────────────────────────────────────────────── */
-.colors-grid {
-  display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
-  gap: 6px !important;
-  width: 240px !important;
-}
-
-.color-swatch-circle {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 999px !important;
-  border: 2px solid rgba(0,0,0,0.08) !important;
-  /* Premium anodized shimmer — subtle radial highlight */
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.5) inset,
-    0 2px 6px rgba(0,0,0,0.14),
-    0 1px 2px rgba(0,0,0,0.08) !important;
-  transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
-              box-shadow 0.18s ease !important;
-}
-
-.color-option:hover .color-swatch-circle {
-  transform: scale(1.12) !important;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.5) inset,
-    0 4px 12px rgba(0,0,0,0.18),
-    0 2px 4px rgba(0,0,0,0.10) !important;
-}
-
-.color-option--active .color-swatch-circle {
-  border: 3px solid #ffffff !important;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.5) inset,
-    0 0 0 3px #1d6ae5,
-    0 4px 12px rgba(0,0,0,0.18) !important;
-  transform: scale(1.06) !important;
-}
-
-/* Swatch check icon */
-.color-check {
-  width: 16px !important;
-  height: 16px !important;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-}
-
-/* Color label */
-.color-label {
-  font-size: 9.5px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.01em !important;
+@keyframes modalIn {
+  from { opacity: 0; transform: translateX(14px) scale(0.992); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
 }

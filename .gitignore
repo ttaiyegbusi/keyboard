@@ -1,26 +1,6 @@
-# Dependencies
-node_modules/
-.pnp
-.pnp.js
-
-# Next.js build output
-.next/
-out/
-
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Vercel
-.vercel
-
-# OS
+node_modules
+.next
+out
 .DS_Store
-Thumbs.db
-
-# Editor
-.vscode/settings.json
-*.swp
+*.log
+.env*.local
